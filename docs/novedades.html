@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Novedades - Executive Architect</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "on-surface-variant": "#566166", "outline": "#717c82", "secondary": "#526074", "secondary-dim": "#465468",
+        "error-container": "#fe8983", "primary": "#455f88", "primary-fixed": "#d6e3ff", "on-secondary": "#f8f8ff",
+        "background": "#f7f9fb", "surface-container-lowest": "#ffffff", "secondary-fixed": "#d5e3fc",
+        "surface-container-high": "#e1e9ee", "on-background": "#2a3439", "on-error-container": "#752121",
+        "surface-container-highest": "#d9e4ea", "secondary-container": "#d5e3fc", "surface-container-low": "#f0f4f7",
+        "on-secondary-container": "#455367", "on-primary": "#f6f7ff", "tertiary": "#5d5d78",
+        "tertiary-container": "#d9d7f8", "on-tertiary-container": "#4a4a65",
+        "surface-dim": "#cfdce3", "outline-variant": "#a9b4b9", "on-error": "#fff7f6",
+        "surface-container": "#e8eff3", "surface-bright": "#f7f9fb", "error": "#9f403d", "primary-dim": "#39537c",
+        "surface": "#f7f9fb", "on-primary-container": "#38527b", "primary-container": "#d6e3ff",
+        "on-surface": "#2a3439", "on-tertiary-fixed-variant": "#54546f", "on-secondary-fixed-variant": "#4e5c71"
+      },
+      borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+      fontFamily: { headline: ["Manrope"], body: ["Inter"], label: ["Inter"] }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .font-headline { font-family: 'Manrope', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-background text-on-background antialiased overflow-x-hidden">
+
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-slate-100 flex flex-col py-6 z-50">
+  <div class="px-6 mb-8">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary"><span class="material-symbols-outlined">architecture</span></div>
+      <div>
+        <h2 class="text-lg font-black text-slate-900 leading-none font-headline">Executive Architect</h2>
+        <p class="text-[10px] uppercase tracking-tighter text-on-surface-variant font-bold mt-1">Labor Management</p>
+      </div>
+    </div>
+  </div>
+  <nav class="flex-1 space-y-1 px-4">
+    <a href="index.html" data-nav="index.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
+    <a href="empleados.html" data-nav="empleados.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">groups</span><span>Empleados</span></a>
+    <a href="horarios.html" data-nav="horarios.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">calendar_today</span><span>Horarios</span></a>
+    <a href="horarios.html#ciclos" data-nav="ciclos" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">autorenew</span><span>Ciclos rotativos</span></a>
+    <a href="fichadas.html" data-nav="fichadas.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">fingerprint</span><span>Fichadas</span></a>
+    <a href="novedades.html" data-nav="novedades.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">notification_important</span><span>Novedades</span></a>
+    <a href="cierre.html" data-nav="cierre.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">payments</span><span>Cierre mensual</span></a>
+    <a href="exportaciones.html" data-nav="exportaciones.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">output</span><span>Exportaciones</span></a>
+  </nav>
+  <div class="mt-auto px-4 pt-6 border-t border-slate-200/50">
+    <button class="w-full mb-4 bg-gradient-to-br from-primary to-primary-dim text-white font-bold py-2.5 px-4 rounded-lg text-sm">Run Payroll</button>
+    <div class="space-y-1">
+      <a href="#" class="flex items-center gap-3 px-3 py-2 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-colors"><span class="material-symbols-outlined">help</span><span>Support</span></a>
+      <a href="login.html" class="flex items-center gap-3 px-3 py-2 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-colors"><span class="material-symbols-outlined">logout</span><span>Sign Out</span></a>
+    </div>
+  </div>
+</aside>
+
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-64 h-16 z-40 bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/50 flex items-center justify-between px-8 w-[calc(100%-16rem)]">
+  <div class="flex items-center gap-6">
+    <h1 class="text-xl font-bold text-slate-800 font-headline">NOVEDADES</h1>
+    <div class="relative">
+      <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><span class="material-symbols-outlined text-sm">search</span></span>
+      <input class="pl-10 pr-4 py-1.5 bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-md text-xs w-64" placeholder="BUSCAR NOVEDAD..." type="text"/>
+    </div>
+  </div>
+  <div class="flex items-center gap-3 pl-6 border-l border-slate-200/50">
+    <div class="text-right">
+      <p class="text-[10px] font-headline font-bold text-slate-900 leading-none">ADMINISTRATOR</p>
+      <p class="text-[9px] text-slate-500 font-headline uppercase tracking-widest mt-1">Super User</p>
+    </div>
+    <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary text-xs font-bold font-headline">AD</div>
+  </div>
+</header>
+
+<!-- Main -->
+<main class="ml-64 pt-20 px-8 pb-12 min-h-screen">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h2 class="text-2xl font-extrabold tracking-tight text-on-background font-headline">Gestión de Novedades</h2>
+      <p class="text-on-surface-variant text-sm mt-1">Revisión y aprobación de novedades del período.</p>
+    </div>
+    <div class="flex gap-3">
+      <button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md font-semibold text-sm shadow-sm hover:bg-primary-dim transition-colors">
+        <span class="material-symbols-outlined text-sm">add</span> Nueva novedad
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-4 gap-4 mb-8">
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Pendientes</p>
+      <p class="text-2xl font-headline font-black text-tertiary">9</p>
+    </div>
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Aprobadas hoy</p>
+      <p class="text-2xl font-headline font-black text-on-secondary-container">4</p>
+    </div>
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Rechazadas hoy</p>
+      <p class="text-2xl font-headline font-black text-error">1</p>
+    </div>
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Total del mes</p>
+      <p class="text-2xl font-headline font-black text-primary">28</p>
+    </div>
+  </div>
+
+  <!-- Novedades Table -->
+  <div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
+    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">playlist_add_check</span> NOVEDADES DEL PERÍODO
+      </h3>
+      <div class="flex gap-2">
+        <select class="bg-surface-container-low border-none rounded-md px-3 py-1.5 text-xs font-medium text-on-surface-variant">
+          <option>Todos los tipos</option>
+          <option>Horas extra 50%</option>
+          <option>Horas extra 100%</option>
+          <option>Justificación</option>
+          <option>Ausencia</option>
+          <option>Tardanza</option>
+        </select>
+        <select class="bg-surface-container-low border-none rounded-md px-3 py-1.5 text-xs font-medium text-on-surface-variant">
+          <option>Todos los estados</option>
+          <option>Pendiente</option>
+          <option>Aprobado</option>
+          <option>Rechazado</option>
+        </select>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-surface-container-low">
+            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">ID</th>
+            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Empleado</th>
+            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Tipo</th>
+            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Fecha</th>
+            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Cantidad</th>
+            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Estado</th>
+            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Origen</th>
+            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Acción</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-6 py-4 text-xs font-mono text-on-surface-variant">#889</td>
+            <td class="px-6 py-4"><a href="empleado-juan-perez.html" class="text-sm font-bold hover:text-primary hover:underline">Juan Perez</a><span class="text-xs text-on-surface-variant ml-2">0042</span></td>
+            <td class="px-6 py-4"><span class="px-2 py-1 bg-tertiary-container/30 text-on-tertiary-container text-[10px] font-bold rounded-full uppercase">horas_extra_50</span></td>
+            <td class="px-6 py-4 text-sm">12/06/2025</td>
+            <td class="px-6 py-4 text-sm font-bold">30 min</td>
+            <td class="px-6 py-4"><span class="flex items-center gap-1 text-[10px] font-bold text-tertiary"><span class="w-2 h-2 rounded-full bg-tertiary"></span> PENDIENTE</span></td>
+            <td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">automatica</td>
+            <td class="px-6 py-4 flex gap-2">
+              <button class="text-on-secondary-container font-black text-[10px] uppercase tracking-widest border border-on-secondary-container/20 px-2 py-1 rounded hover:bg-on-secondary-container/10">Aprobar</button>
+              <button class="text-error font-black text-[10px] uppercase tracking-widest border border-error/20 px-2 py-1 rounded hover:bg-error/5">Rechazar</button>
+            </td>
+          </tr>
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-6 py-4 text-xs font-mono text-on-surface-variant">#890</td>
+            <td class="px-6 py-4"><a href="empleado-juan-perez.html" class="text-sm font-bold hover:text-primary hover:underline">Juan Perez</a><span class="text-xs text-on-surface-variant ml-2">0042</span></td>
+            <td class="px-6 py-4"><span class="px-2 py-1 bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold rounded-full uppercase">justificacion</span></td>
+            <td class="px-6 py-4 text-sm">10/06/2025</td>
+            <td class="px-6 py-4 text-sm font-bold">1 día</td>
+            <td class="px-6 py-4"><span class="flex items-center gap-1 text-[10px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> APROBADO</span></td>
+            <td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">manual</td>
+            <td class="px-6 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest border border-primary/20 px-3 py-1 rounded">Ver</button></td>
+          </tr>
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-6 py-4 text-xs font-mono text-on-surface-variant">#891</td>
+            <td class="px-6 py-4"><a href="empleado-juan-perez.html" class="text-sm font-bold hover:text-primary hover:underline">Juan Perez</a><span class="text-xs text-on-surface-variant ml-2">0042</span></td>
+            <td class="px-6 py-4"><span class="px-2 py-1 bg-tertiary-container/30 text-on-tertiary-container text-[10px] font-bold rounded-full uppercase">tardanza</span></td>
+            <td class="px-6 py-4 text-sm">12/06/2025</td>
+            <td class="px-6 py-4 text-sm font-bold">15 min</td>
+            <td class="px-6 py-4"><span class="flex items-center gap-1 text-[10px] font-bold text-error"><span class="w-2 h-2 rounded-full bg-error"></span> RECHAZADO</span></td>
+            <td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">automatica</td>
+            <td class="px-6 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest border border-primary/20 px-3 py-1 rounded">Ver</button></td>
+          </tr>
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-6 py-4 text-xs font-mono text-on-surface-variant">#892</td>
+            <td class="px-6 py-4"><span class="text-sm font-bold">Ana Gomez</span><span class="text-xs text-on-surface-variant ml-2">0018</span></td>
+            <td class="px-6 py-4"><span class="px-2 py-1 bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold rounded-full uppercase">justificacion</span></td>
+            <td class="px-6 py-4 text-sm">12/06/2025</td>
+            <td class="px-6 py-4 text-sm font-bold">1 día</td>
+            <td class="px-6 py-4"><span class="flex items-center gap-1 text-[10px] font-bold text-tertiary"><span class="w-2 h-2 rounded-full bg-tertiary"></span> PENDIENTE</span></td>
+            <td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">manual</td>
+            <td class="px-6 py-4 flex gap-2">
+              <button class="text-on-secondary-container font-black text-[10px] uppercase tracking-widest border border-on-secondary-container/20 px-2 py-1 rounded hover:bg-on-secondary-container/10">Aprobar</button>
+              <button class="text-error font-black text-[10px] uppercase tracking-widest border border-error/20 px-2 py-1 rounded hover:bg-error/5">Rechazar</button>
+            </td>
+          </tr>
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-6 py-4 text-xs font-mono text-on-surface-variant">#893</td>
+            <td class="px-6 py-4"><span class="text-sm font-bold">Luis Diaz</span><span class="text-xs text-on-surface-variant ml-2">0031</span></td>
+            <td class="px-6 py-4"><span class="px-2 py-1 bg-error-container/10 text-error text-[10px] font-bold rounded-full uppercase">ausencia</span></td>
+            <td class="px-6 py-4 text-sm">12/06/2025</td>
+            <td class="px-6 py-4 text-sm font-bold">1 día</td>
+            <td class="px-6 py-4"><span class="flex items-center gap-1 text-[10px] font-bold text-tertiary"><span class="w-2 h-2 rounded-full bg-tertiary"></span> PENDIENTE</span></td>
+            <td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">automatica</td>
+            <td class="px-6 py-4 flex gap-2">
+              <button class="text-on-secondary-container font-black text-[10px] uppercase tracking-widest border border-on-secondary-container/20 px-2 py-1 rounded hover:bg-on-secondary-container/10">Aprobar</button>
+              <button class="text-error font-black text-[10px] uppercase tracking-widest border border-error/20 px-2 py-1 rounded hover:bg-error/5">Rechazar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+(function() {
+  var page = location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link[data-nav]').forEach(function(el) {
+    if (el.dataset.nav === page) {
+      el.classList.add('bg-slate-300', 'text-blue-900', 'border-r-4', 'border-blue-700');
+      el.classList.remove('text-slate-600', 'hover:bg-slate-200');
+    }
+  });
+})();
+</script>
+</body>
+</html>

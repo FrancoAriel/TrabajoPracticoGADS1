@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cierre Mensual - Executive Architect</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "on-surface-variant": "#566166", "outline": "#717c82", "secondary": "#526074", "secondary-dim": "#465468",
+        "error-container": "#fe8983", "primary": "#455f88", "primary-fixed": "#d6e3ff", "on-secondary": "#f8f8ff",
+        "background": "#f7f9fb", "surface-container-lowest": "#ffffff", "secondary-fixed": "#d5e3fc",
+        "surface-container-high": "#e1e9ee", "on-background": "#2a3439", "on-error-container": "#752121",
+        "surface-container-highest": "#d9e4ea", "secondary-container": "#d5e3fc", "surface-container-low": "#f0f4f7",
+        "on-secondary-container": "#455367", "on-primary": "#f6f7ff", "tertiary": "#5d5d78",
+        "tertiary-container": "#d9d7f8", "on-tertiary-container": "#4a4a65",
+        "outline-variant": "#a9b4b9", "on-error": "#fff7f6",
+        "surface-container": "#e8eff3", "error": "#9f403d", "primary-dim": "#39537c",
+        "surface": "#f7f9fb", "primary-container": "#d6e3ff",
+        "on-surface": "#2a3439", "on-secondary-fixed-variant": "#4e5c71"
+      },
+      borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+      fontFamily: { headline: ["Manrope"], body: ["Inter"], label: ["Inter"] }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .font-headline { font-family: 'Manrope', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-background text-on-background antialiased overflow-x-hidden">
+
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-slate-100 flex flex-col py-6 z-50">
+  <div class="px-6 mb-8">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary"><span class="material-symbols-outlined">architecture</span></div>
+      <div>
+        <h2 class="text-lg font-black text-slate-900 leading-none font-headline">Executive Architect</h2>
+        <p class="text-[10px] uppercase tracking-tighter text-on-surface-variant font-bold mt-1">Labor Management</p>
+      </div>
+    </div>
+  </div>
+  <nav class="flex-1 space-y-1 px-4">
+    <a href="index.html" data-nav="index.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
+    <a href="empleados.html" data-nav="empleados.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">groups</span><span>Empleados</span></a>
+    <a href="horarios.html" data-nav="horarios.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">calendar_today</span><span>Horarios</span></a>
+    <a href="horarios.html#ciclos" data-nav="ciclos" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">autorenew</span><span>Ciclos rotativos</span></a>
+    <a href="fichadas.html" data-nav="fichadas.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">fingerprint</span><span>Fichadas</span></a>
+    <a href="novedades.html" data-nav="novedades.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">notification_important</span><span>Novedades</span></a>
+    <a href="cierre.html" data-nav="cierre.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">payments</span><span>Cierre mensual</span></a>
+    <a href="exportaciones.html" data-nav="exportaciones.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">output</span><span>Exportaciones</span></a>
+  </nav>
+  <div class="mt-auto px-4 pt-6 border-t border-slate-200/50">
+    <button class="w-full mb-4 bg-gradient-to-br from-primary to-primary-dim text-white font-bold py-2.5 px-4 rounded-lg text-sm">Run Payroll</button>
+    <div class="space-y-1">
+      <a href="#" class="flex items-center gap-3 px-3 py-2 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-colors"><span class="material-symbols-outlined">help</span><span>Support</span></a>
+      <a href="login.html" class="flex items-center gap-3 px-3 py-2 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-colors"><span class="material-symbols-outlined">logout</span><span>Sign Out</span></a>
+    </div>
+  </div>
+</aside>
+
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-64 h-16 z-40 bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/50 flex items-center justify-between px-8 w-[calc(100%-16rem)]">
+  <div class="flex items-center gap-6">
+    <h1 class="text-xl font-bold text-slate-800 font-headline">CIERRE MENSUAL</h1>
+  </div>
+  <div class="flex items-center gap-3 pl-6 border-l border-slate-200/50">
+    <div class="text-right">
+      <p class="text-[10px] font-headline font-bold text-slate-900 leading-none">ADMINISTRATOR</p>
+      <p class="text-[9px] text-slate-500 font-headline uppercase tracking-widest mt-1">Super User</p>
+    </div>
+    <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary text-xs font-bold font-headline">AD</div>
+  </div>
+</header>
+
+<!-- Main -->
+<main class="ml-64 pt-20 px-8 pb-12 min-h-screen">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h2 class="text-2xl font-extrabold tracking-tight text-on-background font-headline">Cierre Mensual</h2>
+      <p class="text-on-surface-variant text-sm mt-1">Proceso de cierre y liquidación de horas del período.</p>
+    </div>
+    <div class="flex gap-2 items-center px-4 py-2 bg-tertiary-container/40 rounded-lg">
+      <span class="material-symbols-outlined text-tertiary text-sm">pending</span>
+      <span class="text-xs font-bold text-on-tertiary-container uppercase tracking-widest">Período abierto: Junio 2025</span>
+    </div>
+  </div>
+
+  <!-- Period Status -->
+  <div class="grid grid-cols-3 gap-6 mb-8">
+    <div class="bg-surface-container-lowest rounded-xl p-6 border-l-4 border-on-secondary-container">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-2">Mayo 2025</p>
+      <p class="text-xl font-headline font-black text-on-secondary-container mb-1">CERRADO</p>
+      <p class="text-xs text-on-surface-variant">Cerrado el 05/06/2025</p>
+      <a href="exportaciones.html" class="mt-4 flex items-center gap-1 text-xs font-bold text-primary hover:underline">
+        <span class="material-symbols-outlined text-sm">download</span> Exportar liquidación
+      </a>
+    </div>
+    <div class="bg-slate-900 rounded-xl p-6 text-white relative overflow-hidden">
+      <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl opacity-10">point_of_sale</span>
+      <p class="text-[10px] font-headline font-bold text-slate-400 tracking-widest uppercase mb-2">Junio 2025</p>
+      <p class="text-xl font-headline font-black mb-1">EN PROGRESO</p>
+      <p class="text-xs text-slate-400">9 novedades pendientes de aprobación</p>
+      <a href="novedades.html" class="mt-4 flex items-center gap-1 text-xs font-bold text-blue-300 hover:underline">
+        <span class="material-symbols-outlined text-sm">arrow_forward</span> Revisar novedades
+      </a>
+    </div>
+    <div class="bg-surface-container-highest rounded-xl p-6 opacity-60">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-2">Julio 2025</p>
+      <p class="text-xl font-headline font-black text-on-surface-variant mb-1">PENDIENTE</p>
+      <p class="text-xs text-on-surface-variant">Aún no iniciado</p>
+    </div>
+  </div>
+
+  <!-- Period Summary -->
+  <div class="bg-surface-container-lowest rounded-xl p-8 mb-8 border border-slate-200/50">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-lg font-bold font-headline flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">analytics</span> Resumen del Período Actual — Junio 2025
+      </h3>
+      <span class="text-[10px] font-bold uppercase tracking-widest text-tertiary bg-tertiary-container/30 px-3 py-1 rounded-full">BORRADOR</span>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="text-center p-4 bg-surface-container-low rounded-lg">
+        <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Total horas trabajadas</p>
+        <p class="text-2xl font-headline font-black text-primary">1,240</p>
+        <p class="text-[10px] text-on-surface-variant mt-1">hrs acumuladas</p>
+      </div>
+      <div class="text-center p-4 bg-surface-container-low rounded-lg">
+        <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">HE 50% acumuladas</p>
+        <p class="text-2xl font-headline font-black text-tertiary">42h 30m</p>
+        <p class="text-[10px] text-on-surface-variant mt-1">pendiente aprobación</p>
+      </div>
+      <div class="text-center p-4 bg-surface-container-low rounded-lg">
+        <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">HE 100% acumuladas</p>
+        <p class="text-2xl font-headline font-black text-error">8h 00m</p>
+        <p class="text-[10px] text-on-surface-variant mt-1">pendiente aprobación</p>
+      </div>
+      <div class="text-center p-4 bg-surface-container-low rounded-lg">
+        <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Ausencias justificadas</p>
+        <p class="text-2xl font-headline font-black text-on-secondary-container">3</p>
+        <p class="text-[10px] text-on-surface-variant mt-1">días aprobados</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checklist -->
+  <div class="bg-surface-container-lowest rounded-xl p-8 border border-slate-200/50">
+    <h3 class="text-lg font-bold font-headline mb-6 flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">checklist</span> Checklist de Cierre
+    </h3>
+    <div class="space-y-3">
+      <div class="flex items-center gap-4 p-4 bg-on-secondary-container/5 rounded-lg border border-on-secondary-container/20">
+        <span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+        <div class="flex-1">
+          <p class="text-sm font-bold">Novedades del período 1-10 aprobadas</p>
+          <p class="text-xs text-on-surface-variant">4 novedades procesadas</p>
+        </div>
+        <span class="text-[10px] font-bold text-on-secondary-container uppercase">Completado</span>
+      </div>
+      <div class="flex items-center gap-4 p-4 bg-tertiary-container/20 rounded-lg border border-tertiary/20">
+        <span class="material-symbols-outlined text-tertiary">pending</span>
+        <div class="flex-1">
+          <p class="text-sm font-bold">Aprobar novedades pendientes</p>
+          <p class="text-xs text-on-surface-variant">9 novedades esperando revisión</p>
+        </div>
+        <a href="novedades.html" class="text-[10px] font-bold text-primary uppercase hover:underline flex items-center gap-1">
+          Ir a novedades <span class="material-symbols-outlined text-xs">arrow_forward</span>
+        </a>
+      </div>
+      <div class="flex items-center gap-4 p-4 bg-surface-container-low rounded-lg opacity-60">
+        <span class="material-symbols-outlined text-outline-variant">radio_button_unchecked</span>
+        <div class="flex-1">
+          <p class="text-sm font-bold">Validar totales con RRHH</p>
+          <p class="text-xs text-on-surface-variant">Pendiente de novedades aprobadas</p>
+        </div>
+        <span class="text-[10px] font-bold text-on-surface-variant uppercase">Pendiente</span>
+      </div>
+      <div class="flex items-center gap-4 p-4 bg-surface-container-low rounded-lg opacity-60">
+        <span class="material-symbols-outlined text-outline-variant">radio_button_unchecked</span>
+        <div class="flex-1">
+          <p class="text-sm font-bold">Exportar liquidación final</p>
+          <p class="text-xs text-on-surface-variant">Disponible al cerrar el período</p>
+        </div>
+        <span class="text-[10px] font-bold text-on-surface-variant uppercase">Pendiente</span>
+      </div>
+    </div>
+    <div class="mt-8 flex gap-4">
+      <button class="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white text-[11px] font-bold tracking-widest uppercase rounded shadow-lg hover:-translate-y-0.5 transition-all opacity-50 cursor-not-allowed" disabled>
+        <span class="material-symbols-outlined text-sm">lock</span> Ejecutar cierre mensual
+      </button>
+      <p class="text-xs text-on-surface-variant self-center">Disponible cuando todas las novedades estén aprobadas</p>
+    </div>
+  </div>
+</main>
+
+<script>
+(function() {
+  var page = location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link[data-nav]').forEach(function(el) {
+    if (el.dataset.nav === page) {
+      el.classList.add('bg-slate-300', 'text-blue-900', 'border-r-4', 'border-blue-700');
+      el.classList.remove('text-slate-600', 'hover:bg-slate-200');
+    }
+  });
+})();
+</script>
+</body>
+</html>

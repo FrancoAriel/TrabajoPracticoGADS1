@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Juan Perez - Vista de Empleado | Executive Architect</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "on-surface-variant": "#566166", "inverse-on-surface": "#9a9d9f", "on-tertiary-fixed-variant": "#54546f",
+        "tertiary-container": "#d9d7f8", "on-tertiary": "#fbf7ff", "on-secondary-fixed-variant": "#4e5c71",
+        "outline": "#717c82", "secondary": "#526074", "on-secondary-fixed": "#324053", "secondary-dim": "#465468",
+        "error-container": "#fe8983", "primary": "#455f88", "primary-fixed": "#d6e3ff", "on-secondary": "#f8f8ff",
+        "background": "#f7f9fb", "on-primary-fixed": "#254067", "surface-container-lowest": "#ffffff",
+        "secondary-fixed": "#d5e3fc", "surface-container-high": "#e1e9ee", "on-background": "#2a3439",
+        "on-error-container": "#752121", "inverse-surface": "#0b0f10", "surface-container-highest": "#d9e4ea",
+        "secondary-container": "#d5e3fc", "surface-container-low": "#f0f4f7", "on-primary-fixed-variant": "#425c85",
+        "tertiary-fixed": "#d9d7f8", "on-secondary-container": "#455367", "on-primary": "#f6f7ff",
+        "tertiary": "#5d5d78", "tertiary-dim": "#51516c", "surface-dim": "#cfdce3", "outline-variant": "#a9b4b9",
+        "on-error": "#fff7f6", "error-dim": "#4e0309", "surface-variant": "#d9e4ea", "secondary-fixed-dim": "#c7d5ed",
+        "surface-container": "#e8eff3", "surface-bright": "#f7f9fb", "error": "#9f403d", "primary-dim": "#39537c",
+        "surface-tint": "#455f88", "surface": "#f7f9fb", "on-primary-container": "#38527b",
+        "primary-container": "#d6e3ff", "primary-fixed-dim": "#bfd5ff", "on-tertiary-fixed": "#373851",
+        "tertiary-fixed-dim": "#cbc9e9", "inverse-primary": "#b3cdfd", "on-surface": "#2a3439",
+        "on-tertiary-container": "#4a4a65"
+      },
+      borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+      fontFamily: { headline: ["Manrope"], body: ["Inter"], label: ["Inter"] }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+  .font-headline { font-family: 'Manrope', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .primary-gradient { background: linear-gradient(135deg, #455f88 0%, #39537c 100%); }
+</style>
+</head>
+<body class="text-on-background">
+
+<!-- SideNavBar -->
+<aside class="h-full w-64 fixed left-0 top-0 bg-slate-100 flex flex-col py-6 z-50">
+  <div class="px-6 mb-8">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary">
+        <span class="material-symbols-outlined">architecture</span>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold text-slate-900 leading-tight font-headline">Executive Architect</h1>
+        <p class="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Labor Management</p>
+      </div>
+    </div>
+  </div>
+  <nav class="flex-1 space-y-1 px-3">
+    <a href="index.html" data-nav="index.html" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
+      <span class="material-symbols-outlined">dashboard</span><span>Dashboard</span>
+    </a>
+    <a href="empleados.html" data-nav="empleados.html" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
+      <span class="material-symbols-outlined">groups</span><span>Empleados</span>
+    </a>
+    <a href="horarios.html" data-nav="horarios.html" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
+      <span class="material-symbols-outlined">calendar_today</span><span>Horarios</span>
+    </a>
+    <a href="horarios.html#ciclos" data-nav="ciclos" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
+      <span class="material-symbols-outlined">autorenew</span><span>Ciclos rotativos</span>
+    </a>
+    <a href="fichadas.html" data-nav="fichadas.html" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
+      <span class="material-symbols-outlined">fingerprint</span><span>Fichadas</span>
+    </a>
+    <a href="novedades.html" data-nav="novedades.html" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
+      <span class="material-symbols-outlined">notification_important</span><span>Novedades</span>
+    </a>
+    <a href="cierre.html" data-nav="cierre.html" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
+      <span class="material-symbols-outlined">payments</span><span>Cierre mensual</span>
+    </a>
+    <a href="exportaciones.html" data-nav="exportaciones.html" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
+      <span class="material-symbols-outlined">output</span><span>Exportaciones</span>
+    </a>
+  </nav>
+  <div class="px-3 pt-6 border-t border-slate-200 space-y-1">
+    <button class="w-full mb-3 bg-gradient-to-br from-primary to-primary-dim text-white font-bold py-2.5 px-4 rounded-lg text-sm">Run Payroll</button>
+    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium">
+      <span class="material-symbols-outlined text-xl">settings</span><span>Settings</span>
+    </a>
+    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium">
+      <span class="material-symbols-outlined text-xl">help</span><span>Support</span>
+    </a>
+    <a href="login.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium">
+      <span class="material-symbols-outlined text-xl">logout</span><span>Sign Out</span>
+    </a>
+  </div>
+</aside>
+
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-8 py-3 ml-64 top-0 sticky z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200/50">
+  <div class="flex items-center gap-4">
+    <a href="empleados.html" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-sm font-medium">
+      <span class="material-symbols-outlined text-lg">arrow_back</span> Empleados
+    </a>
+    <span class="text-slate-300">/</span>
+    <span class="text-sm font-bold text-on-background">Juan Perez</span>
+    <div class="relative group ml-4">
+      <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+        <span class="material-symbols-outlined text-lg">search</span>
+      </span>
+      <input class="bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary w-56" placeholder="Buscar empleado..." type="text"/>
+    </div>
+  </div>
+  <div class="flex items-center gap-6">
+    <div class="flex items-center gap-4 border-r border-slate-200 pr-6">
+      <button class="text-slate-500 hover:text-primary transition-colors relative">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span>
+      </button>
+      <button class="text-slate-500 hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">mail</span>
+      </button>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="text-right">
+        <p class="text-sm font-bold text-slate-900 leading-none">Admin User</p>
+        <p class="text-[11px] text-slate-500">Supervisión RRHH</p>
+      </div>
+      <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary text-sm font-bold font-headline">AD</div>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="ml-64 p-8 bg-surface min-h-screen">
+  <!-- Profile Header -->
+  <section class="bg-surface-container-lowest rounded-xl p-8 mb-6 flex items-start gap-8">
+    <div class="relative">
+      <div class="w-32 h-32 rounded-xl bg-primary flex items-center justify-center text-on-primary text-4xl font-black font-headline shadow-lg">JP</div>
+      <div class="absolute -bottom-2 -right-2 bg-on-secondary-container text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter shadow-sm">
+        Activo
+      </div>
+    </div>
+    <div class="flex-1">
+      <div class="flex items-end justify-between mb-6">
+        <div>
+          <h2 class="font-headline text-3xl font-extrabold text-on-background tracking-tight">Juan Perez</h2>
+          <p class="text-on-surface-variant font-medium flex items-center gap-2">
+            Legajo 0042 <span class="w-1 h-1 bg-outline rounded-full"></span> Administrativo
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <button class="primary-gradient text-on-primary px-6 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[0.98] transition-transform">
+            <span class="material-symbols-outlined text-lg">edit</span> Editar empleado
+          </button>
+        </div>
+      </div>
+      <div class="grid grid-cols-4 gap-y-4 gap-x-8 border-t border-slate-100 pt-6">
+        <div>
+          <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">DNI</p>
+          <p class="text-sm font-semibold text-on-surface">30111222</p>
+        </div>
+        <div>
+          <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">CUIL</p>
+          <p class="text-sm font-semibold text-on-surface">20-30111222-3</p>
+        </div>
+        <div>
+          <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Fecha de Ingreso</p>
+          <p class="text-sm font-semibold text-on-surface">10/03/2023</p>
+        </div>
+        <div>
+          <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Tipo de Contrato</p>
+          <p class="text-sm font-semibold text-on-surface">Comercio, jornada completa</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Action Bar -->
+  <section class="flex flex-wrap gap-3 mb-8">
+    <button class="bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
+      <span class="material-symbols-outlined text-lg">schedule</span> Asignar horario
+    </button>
+    <button class="bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
+      <span class="material-symbols-outlined text-lg">sync_alt</span> Asignar ciclo
+    </button>
+    <button class="bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
+      <span class="material-symbols-outlined text-lg">assignment_add</span> Cargar novedad
+    </button>
+    <button class="bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
+      <span class="material-symbols-outlined text-lg">fingerprint</span> Cargar fichada manual
+    </button>
+    <a href="fichadas.html" class="bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 ml-auto">
+      <span class="material-symbols-outlined text-lg">history</span> Ver fichadas
+    </a>
+  </section>
+
+  <!-- Mid Section: Config & Summary -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Active Schedule -->
+    <div class="bg-surface-container-lowest rounded-xl p-6 relative overflow-hidden">
+      <div class="absolute top-0 right-0 p-4 opacity-5">
+        <span class="material-symbols-outlined text-9xl">settings_suggest</span>
+      </div>
+      <h3 class="font-headline text-lg font-bold mb-6 flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">calendar_today</span> Configuración de Horario Activo
+      </h3>
+      <div class="grid grid-cols-2 gap-6 mb-8">
+        <div>
+          <p class="text-[11px] text-on-surface-variant uppercase font-bold mb-1">Tipo</p>
+          <p class="text-base font-semibold">Fijo</p>
+        </div>
+        <div>
+          <p class="text-[11px] text-on-surface-variant uppercase font-bold mb-1">Nombre</p>
+          <p class="text-base font-semibold">Oficina central</p>
+        </div>
+        <div>
+          <p class="text-[11px] text-on-surface-variant uppercase font-bold mb-1">Vigencia</p>
+          <p class="text-base font-semibold">01/06/2025 en adelante</p>
+        </div>
+        <div>
+          <p class="text-[11px] text-on-surface-variant uppercase font-bold mb-1">Descanso Mín.</p>
+          <p class="text-base font-semibold">60m</p>
+        </div>
+      </div>
+      <div class="bg-surface-container-low rounded-lg p-4 grid grid-cols-3 gap-4 mb-6">
+        <div>
+          <p class="text-[10px] text-on-surface-variant uppercase font-bold mb-1">Tol. Entrada</p>
+          <span class="bg-primary-container text-on-primary-container px-2 py-0.5 rounded text-xs font-bold">5m</span>
+        </div>
+        <div>
+          <p class="text-[10px] text-on-surface-variant uppercase font-bold mb-1">Tol. Salida</p>
+          <span class="bg-primary-container text-on-primary-container px-2 py-0.5 rounded text-xs font-bold">10m</span>
+        </div>
+        <div>
+          <p class="text-[10px] text-on-surface-variant uppercase font-bold mb-1">Umbral HE</p>
+          <span class="bg-primary-container text-on-primary-container px-2 py-0.5 rounded text-xs font-bold">15m</span>
+        </div>
+      </div>
+      <a href="horarios.html" class="block w-full py-3 rounded-xl border border-outline-variant/20 text-on-surface-variant font-bold text-xs uppercase tracking-widest hover:bg-surface-container-high transition-all text-center">
+        Ver horario semanal
+      </a>
+    </div>
+
+    <!-- Period Summary -->
+    <div class="bg-surface-container-highest rounded-xl p-6 relative">
+      <h3 class="font-headline text-lg font-bold mb-6 flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">analytics</span> Resumen del Período
+      </h3>
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="bg-surface-container-lowest p-4 rounded-lg flex justify-between items-center">
+          <span class="text-sm font-medium text-on-surface-variant">Días Trabajados</span>
+          <span class="text-xl font-bold font-headline">20</span>
+        </div>
+        <div class="bg-surface-container-lowest p-4 rounded-lg flex justify-between items-center">
+          <span class="text-sm font-medium text-on-surface-variant">Inasistencias</span>
+          <span class="text-xl font-bold font-headline text-error">1</span>
+        </div>
+        <div class="bg-surface-container-lowest p-4 rounded-lg flex justify-between items-center">
+          <span class="text-sm font-medium text-on-surface-variant">Llegadas Tarde</span>
+          <span class="text-xl font-bold font-headline text-tertiary">22m</span>
+        </div>
+        <div class="bg-surface-container-lowest p-4 rounded-lg flex justify-between items-center">
+          <span class="text-sm font-medium text-on-surface-variant">HE 50%</span>
+          <span class="text-xl font-bold font-headline text-primary">6h 15m</span>
+        </div>
+        <div class="bg-surface-container-lowest p-4 rounded-lg flex justify-between items-center">
+          <span class="text-sm font-medium text-on-surface-variant">HE 100%</span>
+          <span class="text-xl font-bold font-headline">0h 00m</span>
+        </div>
+        <div class="bg-surface-container-lowest p-4 rounded-lg flex justify-between items-center">
+          <span class="text-sm font-medium text-on-surface-variant">Horas Faltantes</span>
+          <span class="text-xl font-bold font-headline text-error">40m</span>
+        </div>
+      </div>
+      <div class="flex items-center justify-between p-4 bg-tertiary-container rounded-lg mb-6">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-on-tertiary-container">pending_actions</span>
+          <span class="text-sm font-bold text-on-tertiary-container">Items pendientes de aprobación</span>
+        </div>
+        <span class="text-xl font-black text-on-tertiary-container">2</span>
+      </div>
+      <button class="w-full py-3 rounded-xl bg-on-background text-surface font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all">
+        Ver resumen mensual
+      </button>
+    </div>
+  </div>
+
+  <!-- Weekly Schedule -->
+  <section class="bg-surface-container-lowest rounded-xl p-6 mb-6">
+    <h3 class="font-headline text-lg font-bold mb-6">Grilla Semanal de Trabajo</h3>
+    <div class="overflow-hidden rounded-lg">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-surface-container-low text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
+            <th class="px-6 py-4">Día</th>
+            <th class="px-6 py-4">Laborable</th>
+            <th class="px-6 py-4">Entrada</th>
+            <th class="px-6 py-4">Salida</th>
+            <th class="px-6 py-4">Observaciones</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm">
+          <tr class="border-b border-slate-50 hover:bg-surface-container-low transition-colors">
+            <td class="px-6 py-4 font-semibold">Lunes</td>
+            <td class="px-6 py-4"><span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span></td>
+            <td class="px-6 py-4">09:00</td><td class="px-6 py-4">18:00</td>
+            <td class="px-6 py-4 text-on-surface-variant italic">-</td>
+          </tr>
+          <tr class="border-b border-slate-50 hover:bg-surface-container-low transition-colors">
+            <td class="px-6 py-4 font-semibold">Martes</td>
+            <td class="px-6 py-4"><span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span></td>
+            <td class="px-6 py-4">09:00</td><td class="px-6 py-4">18:00</td>
+            <td class="px-6 py-4 text-on-surface-variant italic">-</td>
+          </tr>
+          <tr class="border-b border-slate-50 hover:bg-surface-container-low transition-colors">
+            <td class="px-6 py-4 font-semibold">Miércoles</td>
+            <td class="px-6 py-4"><span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span></td>
+            <td class="px-6 py-4">09:00</td><td class="px-6 py-4">18:00</td>
+            <td class="px-6 py-4 text-on-surface-variant italic">-</td>
+          </tr>
+          <tr class="border-b border-slate-50 hover:bg-surface-container-low transition-colors">
+            <td class="px-6 py-4 font-semibold">Jueves</td>
+            <td class="px-6 py-4"><span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span></td>
+            <td class="px-6 py-4">09:00</td><td class="px-6 py-4">18:00</td>
+            <td class="px-6 py-4 text-on-surface-variant italic">-</td>
+          </tr>
+          <tr class="border-b border-slate-50 hover:bg-surface-container-low transition-colors">
+            <td class="px-6 py-4 font-semibold">Viernes</td>
+            <td class="px-6 py-4"><span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span></td>
+            <td class="px-6 py-4">09:00</td><td class="px-6 py-4">18:00</td>
+            <td class="px-6 py-4 text-on-surface-variant italic">-</td>
+          </tr>
+          <tr class="border-b border-slate-50 hover:bg-surface-container-low transition-colors bg-surface-container-low/30">
+            <td class="px-6 py-4 font-semibold text-on-surface-variant">Sábado</td>
+            <td class="px-6 py-4"><span class="material-symbols-outlined text-outline">cancel</span></td>
+            <td class="px-6 py-4">-</td><td class="px-6 py-4">-</td>
+            <td class="px-6 py-4 text-on-surface-variant font-medium">Descanso</td>
+          </tr>
+          <tr class="hover:bg-surface-container-low transition-colors bg-surface-container-low/30">
+            <td class="px-6 py-4 font-semibold text-on-surface-variant">Domingo</td>
+            <td class="px-6 py-4"><span class="material-symbols-outlined text-outline">cancel</span></td>
+            <td class="px-6 py-4">-</td><td class="px-6 py-4">-</td>
+            <td class="px-6 py-4 text-on-surface-variant font-medium">Descanso</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Recent Logs -->
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <!-- Fichadas -->
+    <section class="bg-surface-container-lowest rounded-xl p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="font-headline text-lg font-bold">Últimas Fichadas</h3>
+        <a href="fichadas.html" class="text-xs font-bold text-primary uppercase tracking-widest hover:underline">Ver todas</a>
+      </div>
+      <div class="overflow-hidden rounded-lg">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="bg-surface-container-low text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
+              <th class="px-4 py-3">Fecha</th>
+              <th class="px-4 py-3">Fichadas</th>
+              <th class="px-4 py-3">Interpretación</th>
+            </tr>
+          </thead>
+          <tbody class="text-[13px]">
+            <tr class="border-b border-slate-50">
+              <td class="px-4 py-4 font-medium">12/06/2025</td>
+              <td class="px-4 py-4">09:15 - 18:30</td>
+              <td class="px-4 py-4">
+                <div class="flex flex-wrap gap-1">
+                  <span class="bg-tertiary-container text-on-tertiary-container px-2 py-0.5 rounded-full text-[10px] font-bold">Tardanza</span>
+                  <span class="bg-primary-container text-on-primary-container px-2 py-0.5 rounded-full text-[10px] font-bold">HE 50</span>
+                  <span class="bg-error-container text-on-error-container px-2 py-0.5 rounded-full text-[10px] font-bold">Descanso excedido</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="border-b border-slate-50">
+              <td class="px-4 py-4 font-medium">11/06/2025</td>
+              <td class="px-4 py-4">08:58 - 18:02</td>
+              <td class="px-4 py-4 text-on-secondary-container font-semibold">Normal</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-4 font-medium">10/06/2025</td>
+              <td class="px-4 py-4">-</td>
+              <td class="px-4 py-4 text-error font-semibold">Ausencia justificada</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Novedades -->
+    <section class="bg-surface-container-lowest rounded-xl p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="font-headline text-lg font-bold">Novedades Recientes</h3>
+        <a href="novedades.html" class="text-xs font-bold text-primary uppercase tracking-widest hover:underline">Gestionar todas</a>
+      </div>
+      <div class="overflow-hidden rounded-lg">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="bg-surface-container-low text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
+              <th class="px-4 py-3">ID</th>
+              <th class="px-4 py-3">Tipo</th>
+              <th class="px-4 py-3">Fecha / Cant.</th>
+              <th class="px-4 py-3">Estado</th>
+              <th class="px-4 py-3">Acción</th>
+            </tr>
+          </thead>
+          <tbody class="text-[13px]">
+            <tr class="border-b border-slate-50">
+              <td class="px-4 py-4 text-on-surface-variant">#889</td>
+              <td class="px-4 py-4 font-semibold">HE 50%</td>
+              <td class="px-4 py-4">12/06 - 0:30h</td>
+              <td class="px-4 py-4"><span class="flex items-center gap-1.5 text-tertiary font-bold"><span class="w-1.5 h-1.5 bg-tertiary rounded-full"></span> Pendiente</span></td>
+              <td class="px-4 py-4"><button class="material-symbols-outlined text-primary hover:scale-110 transition-transform">visibility</button></td>
+            </tr>
+            <tr class="border-b border-slate-50">
+              <td class="px-4 py-4 text-on-surface-variant">#890</td>
+              <td class="px-4 py-4 font-semibold">Justificación</td>
+              <td class="px-4 py-4">10/06 - 1 día</td>
+              <td class="px-4 py-4"><span class="flex items-center gap-1.5 text-on-secondary-container font-bold"><span class="w-1.5 h-1.5 bg-on-secondary-container rounded-full"></span> Aprobado</span></td>
+              <td class="px-4 py-4"><button class="material-symbols-outlined text-primary hover:scale-110 transition-transform">visibility</button></td>
+            </tr>
+            <tr>
+              <td class="px-4 py-4 text-on-surface-variant">#891</td>
+              <td class="px-4 py-4 font-semibold">Tardanza</td>
+              <td class="px-4 py-4">12/06 - 15m</td>
+              <td class="px-4 py-4"><span class="flex items-center gap-1.5 text-error font-bold"><span class="w-1.5 h-1.5 bg-error rounded-full"></span> Rechazado</span></td>
+              <td class="px-4 py-4"><button class="material-symbols-outlined text-primary hover:scale-110 transition-transform">visibility</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+// This page is under Empleados section
+(function() {
+  document.querySelectorAll('.nav-link[data-nav]').forEach(function(el) {
+    if (el.dataset.nav === 'empleados.html') {
+      el.classList.add('bg-slate-300', 'text-slate-900', 'font-semibold');
+      el.classList.remove('text-slate-600', 'hover:bg-slate-200');
+    }
+  });
+})();
+</script>
+</body>
+</html>

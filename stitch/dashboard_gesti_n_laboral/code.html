@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Labor Pulse - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#566166",
+                        "inverse-on-surface": "#9a9d9f",
+                        "on-tertiary-fixed-variant": "#54546f",
+                        "tertiary-container": "#d9d7f8",
+                        "on-tertiary": "#fbf7ff",
+                        "on-secondary-fixed-variant": "#4e5c71",
+                        "outline": "#717c82",
+                        "secondary": "#526074",
+                        "on-secondary-fixed": "#324053",
+                        "secondary-dim": "#465468",
+                        "error-container": "#fe8983",
+                        "primary": "#455f88",
+                        "primary-fixed": "#d6e3ff",
+                        "on-secondary": "#f8f8ff",
+                        "background": "#f7f9fb",
+                        "on-primary-fixed": "#254067",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#d5e3fc",
+                        "surface-container-high": "#e1e9ee",
+                        "on-background": "#2a3439",
+                        "on-error-container": "#752121",
+                        "inverse-surface": "#0b0f10",
+                        "surface-container-highest": "#d9e4ea",
+                        "secondary-container": "#d5e3fc",
+                        "surface-container-low": "#f0f4f7",
+                        "on-primary-fixed-variant": "#425c85",
+                        "tertiary-fixed": "#d9d7f8",
+                        "on-secondary-container": "#455367",
+                        "on-primary": "#f6f7ff",
+                        "tertiary": "#5d5d78",
+                        "tertiary-dim": "#51516c",
+                        "surface-dim": "#cfdce3",
+                        "outline-variant": "#a9b4b9",
+                        "on-error": "#fff7f6",
+                        "error-dim": "#4e0309",
+                        "surface-variant": "#d9e4ea",
+                        "secondary-fixed-dim": "#c7d5ed",
+                        "surface-container": "#e8eff3",
+                        "surface-bright": "#f7f9fb",
+                        "error": "#9f403d",
+                        "primary-dim": "#39537c",
+                        "surface-tint": "#455f88",
+                        "surface": "#f7f9fb",
+                        "on-primary-container": "#38527b",
+                        "primary-container": "#d6e3ff",
+                        "primary-fixed-dim": "#bfd5ff",
+                        "on-tertiary-fixed": "#373851",
+                        "tertiary-fixed-dim": "#cbc9e9",
+                        "inverse-primary": "#b3cdfd",
+                        "on-surface": "#2a3439",
+                        "on-tertiary-container": "#4a4a65"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased overflow-x-hidden">
+<!-- SideNavBar Shell -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-slate-100 dark:bg-slate-900 flex flex-col h-full py-6 z-50">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">architecture</span>
+</div>
+<div>
+<h2 class="text-lg font-black text-slate-900 dark:text-white leading-none">Executive Architect</h2>
+<p class="text-[10px] uppercase tracking-tighter text-on-surface-variant font-bold mt-1">Labor Management</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1 px-4">
+<!-- Active Tab: Dashboard -->
+<a class="flex items-center gap-3 px-3 py-2.5 bg-slate-300 dark:bg-slate-700 text-blue-900 dark:text-blue-200 border-r-4 border-blue-700 font-manrope font-bold tracking-tight text-sm transition-all duration-200 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 font-manrope font-bold tracking-tight text-sm hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span>Empleados</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 font-manrope font-bold tracking-tight text-sm hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span>Horarios</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 font-manrope font-bold tracking-tight text-sm hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">autorenew</span>
+<span>Ciclos rotativos</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 font-manrope font-bold tracking-tight text-sm hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">fingerprint</span>
+<span>Fichadas</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 font-manrope font-bold tracking-tight text-sm hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">notification_important</span>
+<span>Novedades</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 font-manrope font-bold tracking-tight text-sm hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span>Cierre mensual</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 font-manrope font-bold tracking-tight text-sm hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">output</span>
+<span>Exportaciones</span>
+</a>
+</nav>
+<div class="mt-auto px-4 pt-6 border-t border-slate-200/50">
+<button class="w-full mb-4 bg-gradient-to-br from-primary to-primary-dim text-white font-bold py-2.5 px-4 rounded-md text-sm active:scale-95 transition-all">
+                Run Payroll
+            </button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 font-manrope font-bold tracking-tight text-sm hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 font-manrope font-bold tracking-tight text-sm hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Sign Out</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 right-0 left-64 h-16 z-40 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 flex items-center justify-between px-8 w-[calc(100%-16rem)]">
+<div class="flex items-center gap-6">
+<h1 class="text-xl font-bold text-slate-800 dark:text-slate-100 font-headline">LABOR PULSE</h1>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+<span class="material-symbols-outlined text-sm">search</span>
+</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-md text-xs font-manrope tracking-widest w-64" placeholder="BUSCAR EMPLEADO..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex gap-4">
+<button class="text-slate-500 hover:text-blue-900 transition-all"><span class="material-symbols-outlined">notifications</span></button>
+<button class="text-slate-500 hover:text-blue-900 transition-all"><span class="material-symbols-outlined">history</span></button>
+</div>
+<div class="flex items-center gap-3 pl-6 border-l border-slate-200/50">
+<div class="text-right">
+<p class="text-[10px] font-headline font-bold text-slate-900 leading-none">ADMINISTRATOR</p>
+<p class="text-[9px] text-slate-500 font-headline uppercase tracking-widest mt-1">Super User</p>
+</div>
+<img alt="Administrator Profile" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm" data-alt="Close-up portrait of a professional male administrator in a clean office setting, soft professional lighting, neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQBoui5KBWI01rBfUTmrXYODFfoBNokwtYEAovJMQLleaRXU8AbkW7AC21M3sSTvJ_H3Y_maHZ2EHCbkRm_dJf7kecvg3WJq5Y6ixJy-043Y3dkaWSViesrEPs-goG-toi6GUlK6vkRLeI7oB-9PcXDkTtLY0-UAt6YR76bGs56SkLfLh-sJs_-Pi_4yXmT4rJPrYr9yXufVNIedlboSbHbV3AKI5VbadEvU8kUUgkdyoiiMiKO9172_ntmUMB1eJsQo0deeChGD4"/>
+<button class="text-xs font-headline font-bold text-error uppercase tracking-widest ml-2 hover:underline">Salir</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-64 pt-20 px-8 pb-12 min-h-screen">
+<!-- Header Hero Metrics -->
+<div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="bg-surface-container-highest p-6 rounded-lg relative overflow-hidden group">
+<p class="text-xs font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-2">Total tracked</p>
+<h3 class="text-3xl font-headline font-black text-primary">1,240<span class="text-sm font-medium ml-1">hrs</span></h3>
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-primary/5 group-hover:scale-110 transition-transform">schedule</span>
+</div>
+<div class="bg-surface-container-highest p-6 rounded-lg relative overflow-hidden group">
+<p class="text-xs font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-2">Active Shifts</p>
+<h3 class="text-3xl font-headline font-black text-on-secondary-container">42</h3>
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-on-secondary-container/5 group-hover:scale-110 transition-transform">groups</span>
+</div>
+<div class="bg-surface-container-highest p-6 rounded-lg relative overflow-hidden group">
+<p class="text-xs font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-2">Overtime Breach</p>
+<h3 class="text-3xl font-headline font-black text-error">12</h3>
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-error/5 group-hover:scale-110 transition-transform">warning</span>
+</div>
+<div class="bg-surface-container-highest p-6 rounded-lg relative overflow-hidden group">
+<p class="text-xs font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-2">Cycle Status</p>
+<h3 class="text-3xl font-headline font-black text-tertiary">92%</h3>
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-tertiary/5 group-hover:scale-110 transition-transform">donut_large</span>
+</div>
+</div>
+<div class="flex flex-col lg:flex-row gap-8 mb-8">
+<!-- Left Column: Filters -->
+<section class="lg:w-[30%] space-y-6">
+<div class="bg-surface-container-low p-6 rounded-xl">
+<h2 class="text-xs font-headline font-extrabold tracking-[0.2em] mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">filter_alt</span>
+                        FILTROS DE VISTA
+                    </h2>
+<div class="space-y-5">
+<div class="space-y-1">
+<label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Fecha de control</label>
+<input class="w-full bg-surface-container-lowest border-none border-b-2 border-primary focus:ring-0 text-sm font-medium py-2" type="date" value="2025-06-12"/>
+</div>
+<div class="space-y-1">
+<label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Turno</label>
+<select class="w-full bg-surface-container-lowest border-none border-b-2 border-primary focus:ring-0 text-sm font-medium py-2">
+<option>Todos</option>
+<option>Mañana</option>
+<option>Tarde</option>
+<option>Noche</option>
+</select>
+</div>
+<div class="space-y-1">
+<label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Tipo Horario</label>
+<select class="w-full bg-surface-container-lowest border-none border-b-2 border-primary focus:ring-0 text-sm font-medium py-2">
+<option>Todos</option>
+<option>Administrativo</option>
+<option>Planta</option>
+</select>
+</div>
+<div class="space-y-1">
+<label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Estado</label>
+<select class="w-full bg-surface-container-lowest border-none border-b-2 border-primary focus:ring-0 text-sm font-medium py-2">
+<option>Todos</option>
+<option>Activos</option>
+<option>Baja</option>
+</select>
+</div>
+<button class="w-full mt-4 py-3 bg-slate-900 text-white text-xs font-bold tracking-widest uppercase rounded hover:bg-black transition-colors">
+                            Aplicar Filtros
+                        </button>
+</div>
+</div>
+<!-- Small Stats / Map Placeholder -->
+<div class="bg-surface-container-highest aspect-[4/3] rounded-xl flex flex-col items-center justify-center p-8 text-center">
+<div class="mb-4">
+<span class="material-symbols-outlined text-4xl text-outline">location_on</span>
+</div>
+<p class="text-[10px] font-headline font-bold text-outline-variant uppercase tracking-widest">Planta Central</p>
+<p class="text-sm font-headline text-on-surface mt-2">Ubicación Geo-Referenciada de Fichadas Activas</p>
+<div class="mt-4 w-full h-24 bg-surface-container-high rounded border border-outline-variant/10 relative overflow-hidden">
+<img class="w-full h-full object-cover opacity-60" data-alt="Stylized map view of a city grid with soft blue and gray tones, minimalist aesthetic" data-location="Buenos Aires" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5N1UuS9K572LaON8Ag7J2a1ZqwS9nF7nTpSggCkxkLxniQV0-YBfsfafWXcvrmLtxNP1AMMPVjPnl-oUnzpK_ryCV2RAvrsbN5hxf3xDXssMWZstjRmu3KD4-DHSwolJapGpa6qcbd-l3zEYHEIMojoFXIBE4uFD8jI4tezL9nrUlsljJn3dHlKk3nBrWOVF_Wwyimp0BvhQNEMdy_RqQip_nRVJ7jTG4StacH7Iv6vUVkho2cGOKdsV-XjbFQW1JcBwbuLsWZ44"/>
+</div>
+</div>
+</section>
+<!-- Right Column: Daily Summary -->
+<section class="lg:w-[70%]">
+<div class="mb-6">
+<h2 class="text-xs font-headline font-extrabold tracking-[0.2em] mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">analytics</span>
+                        RESUMEN DIARIO - 12 JUN 2025
+                    </h2>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-slate-200/50 rounded-xl overflow-hidden border border-slate-200/50">
+<div class="bg-surface-container-lowest p-6 hover:bg-slate-50 transition-colors">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">Presentes</p>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-headline font-black text-on-secondary-container">34</span>
+<span class="text-[10px] font-bold text-on-secondary-fixed-variant">/ 37</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 hover:bg-slate-50 transition-colors">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">Ausentes</p>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-headline font-black text-error">3</span>
+<span class="material-symbols-outlined text-error text-sm">person_off</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 hover:bg-slate-50 transition-colors">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">Tardanzas</p>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-headline font-black text-tertiary">7</span>
+<span class="material-symbols-outlined text-tertiary text-sm">history</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 hover:bg-slate-50 transition-colors">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">Doble Fichada</p>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-headline font-black text-primary">2</span>
+<span class="material-symbols-outlined text-primary text-sm">error_outline</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 hover:bg-slate-50 transition-colors">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">HE 50% Hoy</p>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-headline font-black text-on-background">4h 30m</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 hover:bg-slate-50 transition-colors">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">HE 100% Hoy</p>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-headline font-black text-on-background">1h 00m</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 hover:bg-slate-50 transition-colors">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">Pendientes</p>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-headline font-black text-primary">9</span>
+<span class="text-[10px] font-bold text-primary">NOVEDADES</span>
+</div>
+</div>
+<div class="bg-slate-900 p-6 text-white group cursor-pointer">
+<p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Cierre Actual</p>
+<div class="flex items-baseline justify-between">
+<span class="text-lg font-headline font-bold">Junio <span class="text-[10px] opacity-60">BORR.</span></span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Alert Section -->
+<div class="bg-surface-container-low rounded-xl p-6">
+<h2 class="text-xs font-headline font-extrabold tracking-[0.2em] mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-error">campaign</span>
+                        ALERTAS DEL DIA
+                    </h2>
+<div class="space-y-2">
+<div class="flex items-center gap-4 bg-surface-container-lowest p-3 rounded shadow-[0_4px_20px_-10px_rgba(69,95,136,0.1)] hover:bg-slate-50 transition-all border-l-4 border-error">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div class="flex-1">
+<span class="font-bold text-sm">Juan Perez</span>
+<span class="text-xs text-on-surface-variant ml-2">(Leg. 0042)</span>
+</div>
+<span class="text-xs font-medium text-error px-3 py-1 bg-error-container/10 rounded-full">Tardanza 6 min</span>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-lowest p-3 rounded shadow-[0_4px_20px_-10px_rgba(69,95,136,0.1)] hover:bg-slate-50 transition-all border-l-4 border-primary">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">sync_problem</span>
+<div class="flex-1">
+<span class="font-bold text-sm">Ana Gomez</span>
+<span class="text-xs text-on-surface-variant ml-2">(Leg. 0018)</span>
+</div>
+<span class="text-xs font-medium text-primary px-3 py-1 bg-primary-container/10 rounded-full">Doble fichada de entrada</span>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-lowest p-3 rounded shadow-[0_4px_20px_-10px_rgba(69,95,136,0.1)] hover:bg-slate-50 transition-all border-l-4 border-error">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">person_alert</span>
+<div class="flex-1">
+<span class="font-bold text-sm">Luis Diaz</span>
+<span class="text-xs text-on-surface-variant ml-2">(Leg. 0031)</span>
+</div>
+<span class="text-xs font-medium text-error px-3 py-1 bg-error-container/10 rounded-full">Posible ausencia</span>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-lowest p-3 rounded shadow-[0_4px_20px_-10px_rgba(69,95,136,0.1)] hover:bg-slate-50 transition-all border-l-4 border-tertiary">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">coffee</span>
+<div class="flex-1">
+<span class="font-bold text-sm">Carla Ruiz</span>
+<span class="text-xs text-on-surface-variant ml-2">(Leg. 0050)</span>
+</div>
+<span class="text-xs font-medium text-tertiary px-3 py-1 bg-tertiary-container/20 rounded-full">Descanso excedido</span>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-lowest p-3 rounded shadow-[0_4px_20px_-10px_rgba(69,95,136,0.1)] hover:bg-slate-50 transition-all border-l-4 border-tertiary">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">exit_to_app</span>
+<div class="flex-1">
+<span class="font-bold text-sm">Martin Sosa</span>
+<span class="text-xs text-on-surface-variant ml-2">(Leg. 0027)</span>
+</div>
+<span class="text-xs font-medium text-tertiary px-3 py-1 bg-tertiary-container/20 rounded-full">Salida anticipada</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Pending News Table Section -->
+<section class="mb-8 bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
+<div class="p-6 flex items-center justify-between border-b border-slate-100">
+<h2 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">playlist_add_check</span>
+                    NOVEDADES PENDIENTES
+                </h2>
+<button class="text-[10px] font-bold text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
+                    Ver historial completo <span class="material-symbols-outlined text-xs">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Legajo</th>
+<th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Empleado</th>
+<th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Tipo</th>
+<th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Fecha</th>
+<th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Cantidad</th>
+<th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Estado</th>
+<th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Origen</th>
+<th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Acción</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<tr class="hover:bg-slate-50 transition-colors">
+<td class="px-6 py-4 text-sm font-medium">0042</td>
+<td class="px-6 py-4 text-sm font-bold">Juan Perez</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-tertiary-container/30 text-on-tertiary-container text-[10px] font-bold rounded-full uppercase tracking-tighter">horas_extra_50</span>
+</td>
+<td class="px-6 py-4 text-sm">12/06/2025</td>
+<td class="px-6 py-4 text-sm font-bold">105 min</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1 text-[10px] font-bold text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-outline-variant"></span> PENDIENTE
+                                </span>
+</td>
+<td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">automatica</td>
+<td class="px-6 py-4">
+<button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 transition-colors">
+<td class="px-6 py-4 text-sm font-medium">0018</td>
+<td class="px-6 py-4 text-sm font-bold">Ana Gomez</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold rounded-full uppercase tracking-tighter">justificacion</span>
+</td>
+<td class="px-6 py-4 text-sm">12/06/2025</td>
+<td class="px-6 py-4 text-sm font-bold">1 dia</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1 text-[10px] font-bold text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-outline-variant"></span> PENDIENTE
+                                </span>
+</td>
+<td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">manual</td>
+<td class="px-6 py-4">
+<button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 transition-colors">
+<td class="px-6 py-4 text-sm font-medium">0031</td>
+<td class="px-6 py-4 text-sm font-bold">Luis Diaz</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-error-container/10 text-error text-[10px] font-bold rounded-full uppercase tracking-tighter">ausencia</span>
+</td>
+<td class="px-6 py-4 text-sm">12/06/2025</td>
+<td class="px-6 py-4 text-sm font-bold">1 dia</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1 text-[10px] font-bold text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-outline-variant"></span> PENDIENTE
+                                </span>
+</td>
+<td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">automatica</td>
+<td class="px-6 py-4">
+<button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Footer Actions Bar -->
+<footer class="mt-8 flex flex-wrap gap-4 items-center justify-start p-6 bg-surface-container-low rounded-xl border border-slate-200/50">
+<button class="flex items-center gap-2 px-6 py-3 bg-primary text-white text-[11px] font-bold tracking-widest uppercase rounded shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 transition-all">
+<span class="material-symbols-outlined text-sm">history</span>
+                Ver fichadas del dia
+            </button>
+<button class="flex items-center gap-2 px-6 py-3 bg-secondary text-white text-[11px] font-bold tracking-widest uppercase rounded shadow-lg hover:shadow-secondary/20 hover:-translate-y-0.5 transition-all">
+<span class="material-symbols-outlined text-sm">edit_notifications</span>
+                Ver novedades
+            </button>
+<button class="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white text-[11px] font-bold tracking-widest uppercase rounded shadow-lg hover:-translate-y-0.5 transition-all">
+<span class="material-symbols-outlined text-sm">point_of_sale</span>
+                Ir a cierre mensual
+            </button>
+<button class="flex items-center gap-2 px-6 py-3 bg-surface-container-lowest text-primary border border-primary/20 text-[11px] font-bold tracking-widest uppercase rounded hover:bg-primary/5 transition-all ml-auto">
+<span class="material-symbols-outlined text-sm">download</span>
+                Exportar resumen rapido
+            </button>
+</footer>
+</main>
+</body></html>

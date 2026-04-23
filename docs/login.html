@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Iniciar sesión - Executive Architect</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "on-surface-variant": "#566166", "outline": "#717c82", "secondary": "#526074",
+        "error-container": "#fe8983", "primary": "#455f88", "primary-fixed": "#d6e3ff",
+        "on-secondary": "#f8f8ff", "background": "#f7f9fb", "surface-container-lowest": "#ffffff",
+        "secondary-fixed": "#d5e3fc", "surface-container-high": "#e1e9ee", "on-background": "#2a3439",
+        "on-error-container": "#752121", "surface-container-highest": "#d9e4ea",
+        "secondary-container": "#d5e3fc", "surface-container-low": "#f0f4f7",
+        "on-secondary-container": "#455367", "on-primary": "#f6f7ff", "tertiary": "#5d5d78",
+        "outline-variant": "#a9b4b9", "surface-container": "#e8eff3",
+        "error": "#9f403d", "primary-dim": "#39537c", "surface": "#f7f9fb",
+        "primary-container": "#d6e3ff", "on-surface": "#2a3439"
+      },
+      borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+      fontFamily: { headline: ["Manrope"], body: ["Inter"], label: ["Inter"] }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .font-headline { font-family: 'Manrope', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .primary-gradient { background: linear-gradient(135deg, #455f88 0%, #39537c 100%); }
+</style>
+</head>
+<body class="bg-surface-container-low min-h-screen flex items-center justify-center">
+
+  <!-- Background decoration -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-primary/5"></div>
+    <div class="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-primary/5"></div>
+  </div>
+
+  <div class="w-full max-w-md px-4 relative z-10">
+
+    <!-- Brand header -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-on-primary mx-auto mb-4 shadow-lg shadow-primary/20">
+        <span class="material-symbols-outlined text-3xl">architecture</span>
+      </div>
+      <h1 class="text-2xl font-black text-on-background font-headline tracking-tight">Executive Architect</h1>
+      <p class="text-sm text-on-surface-variant font-medium mt-1">Labor Management System</p>
+    </div>
+
+    <!-- Login card -->
+    <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-slate-200/60 p-8">
+      <h2 class="text-lg font-bold text-on-background font-headline mb-1">Iniciar sesión</h2>
+      <p class="text-xs text-on-surface-variant mb-6">Ingresá tus credenciales para continuar.</p>
+
+      <form id="login-form" novalidate>
+        <!-- Usuario -->
+        <div class="mb-5">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">
+            Usuario o legajo
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-outline">
+              <span class="material-symbols-outlined text-lg">person</span>
+            </span>
+            <input
+              id="username"
+              type="text"
+              placeholder="admin"
+              class="w-full pl-10 pr-4 py-3 bg-surface-container-low border border-outline-variant/40 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-outline-variant"
+            />
+          </div>
+          <p id="username-error" class="hidden mt-1.5 text-xs text-error flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">error</span> Ingresá tu usuario.
+          </p>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="mb-6">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">
+            Contraseña
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-outline">
+              <span class="material-symbols-outlined text-lg">lock</span>
+            </span>
+            <input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              class="w-full pl-10 pr-12 py-3 bg-surface-container-low border border-outline-variant/40 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-outline-variant"
+            />
+            <button
+              type="button"
+              id="toggle-password"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface transition-colors"
+              tabindex="-1"
+            >
+              <span class="material-symbols-outlined text-lg" id="eye-icon">visibility</span>
+            </button>
+          </div>
+          <p id="password-error" class="hidden mt-1.5 text-xs text-error flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">error</span> Ingresá tu contraseña.
+          </p>
+        </div>
+
+        <!-- Error general -->
+        <div id="login-error" class="hidden mb-5 p-3 bg-error-container/15 border border-error/20 rounded-xl flex items-center gap-3">
+          <span class="material-symbols-outlined text-error text-lg" style="font-variation-settings: 'FILL' 1;">cancel</span>
+          <p class="text-xs font-semibold text-error">Usuario o contraseña incorrectos. Intentá de nuevo.</p>
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          id="submit-btn"
+          class="w-full primary-gradient text-on-primary font-bold py-3 rounded-xl text-sm tracking-wide hover:opacity-95 active:scale-[0.98] transition-all shadow-md shadow-primary/20 flex items-center justify-center gap-2"
+        >
+          <span id="btn-text">Ingresar al sistema</span>
+          <span id="btn-icon" class="material-symbols-outlined text-lg">arrow_forward</span>
+          <span id="btn-spinner" class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+        </button>
+      </form>
+
+      <!-- Hint -->
+      <p class="text-center text-[11px] text-on-surface-variant mt-6">
+        Credenciales de demo: <span class="font-bold text-on-background">admin</span> / <span class="font-bold text-on-background">admin</span>
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <p class="text-center text-[11px] text-on-surface-variant mt-6">
+      &copy; 2025 Executive Architect · Labor Management
+    </p>
+  </div>
+
+<script>
+  // Toggle password visibility
+  document.getElementById('toggle-password').addEventListener('click', function() {
+    var input = document.getElementById('password');
+    var icon = document.getElementById('eye-icon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.textContent = 'visibility_off';
+    } else {
+      input.type = 'password';
+      icon.textContent = 'visibility';
+    }
+  });
+
+  // Form submit
+  document.getElementById('login-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var username = document.getElementById('username').value.trim();
+    var password = document.getElementById('password').value;
+    var valid = true;
+
+    // Reset errors
+    document.getElementById('username-error').classList.add('hidden');
+    document.getElementById('password-error').classList.add('hidden');
+    document.getElementById('login-error').classList.add('hidden');
+
+    if (!username) {
+      document.getElementById('username-error').classList.remove('hidden');
+      valid = false;
+    }
+    if (!password) {
+      document.getElementById('password-error').classList.remove('hidden');
+      valid = false;
+    }
+    if (!valid) return;
+
+    // Show loading state
+    var btn = document.getElementById('submit-btn');
+    document.getElementById('btn-text').textContent = 'Verificando...';
+    document.getElementById('btn-icon').classList.add('hidden');
+    document.getElementById('btn-spinner').classList.remove('hidden');
+    btn.disabled = true;
+
+    // Simulate auth check
+    setTimeout(function() {
+      if (username === 'admin' && password === 'admin') {
+        document.getElementById('btn-text').textContent = 'Acceso concedido';
+        document.getElementById('btn-spinner').classList.add('hidden');
+        document.getElementById('btn-icon').classList.remove('hidden');
+        document.getElementById('btn-icon').textContent = 'check_circle';
+        setTimeout(function() {
+          window.location.href = 'index.html';
+        }, 400);
+      } else {
+        document.getElementById('login-error').classList.remove('hidden');
+        document.getElementById('btn-text').textContent = 'Ingresar al sistema';
+        document.getElementById('btn-icon').textContent = 'arrow_forward';
+        document.getElementById('btn-icon').classList.remove('hidden');
+        document.getElementById('btn-spinner').classList.add('hidden');
+        btn.disabled = false;
+      }
+    }, 800);
+  });
+
+  // Enter key on fields
+  ['username', 'password'].forEach(function(id) {
+    document.getElementById(id).addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('login-form').dispatchEvent(new Event('submit'));
+    });
+  });
+</script>
+</body>
+</html>
