@@ -394,30 +394,38 @@ tailwind.config = {
         <p class="text-[10px] font-extrabold text-on-surface-variant uppercase tracking-wider mb-3 flex items-center gap-1.5">
           <span class="material-symbols-outlined text-sm text-tertiary">history</span> Trazabilidad de corrección
         </p>
-        <div class="bg-surface-container-low rounded-xl p-4 space-y-3">
-          <!-- Antes → Después -->
-          <div class="flex items-center gap-3">
-            <div class="flex-1 bg-white rounded-lg px-3 py-2.5 border border-outline-variant/20">
-              <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Original</p>
-              <p class="text-sm font-semibold text-on-background" id="traz-valor-original">—</p>
-              <p class="text-[11px] text-on-surface-variant font-mono mt-0.5" id="traz-fecha-original">—</p>
+        <div class="space-y-0">
+          <!-- Evento original -->
+          <div class="flex gap-4">
+            <div class="flex flex-col items-center">
+              <div class="w-3 h-3 rounded-full bg-outline-variant mt-1.5 shrink-0"></div>
+              <div class="w-px flex-1 bg-outline-variant/40 my-1"></div>
             </div>
-            <span class="material-symbols-outlined text-outline-variant">arrow_forward</span>
-            <div class="flex-1 bg-white rounded-lg px-3 py-2.5 border border-tertiary/30">
-              <p class="text-[10px] font-bold text-tertiary uppercase mb-1">Corregido</p>
-              <p class="text-sm font-semibold text-on-background" id="traz-valor-nuevo">—</p>
-              <p class="text-[11px] text-on-surface-variant font-mono mt-0.5" id="traz-fecha-correccion">—</p>
+            <div class="flex-1 pb-4">
+              <p class="text-[10px] font-black uppercase tracking-wider text-on-surface-variant mb-1.5">Registro original</p>
+              <div class="bg-surface-container-low rounded-xl px-4 py-3">
+                <p class="text-sm font-semibold text-on-background" id="traz-valor-original">—</p>
+                <p class="text-[11px] text-on-surface-variant font-mono mt-1" id="traz-fecha-original">—</p>
+              </div>
             </div>
           </div>
-          <!-- Metadata -->
-          <div class="flex items-center gap-1.5 text-xs text-on-surface-variant pt-1 border-t border-outline-variant/20">
-            <span class="material-symbols-outlined text-sm">person</span>
-            <span id="traz-operador" class="font-semibold text-on-background">—</span>
-            <span>·</span>
-            <span id="traz-fecha-op" class="font-mono">—</span>
-            <span>·</span>
-            <span class="material-symbols-outlined text-sm">info</span>
-            <span id="traz-motivo">—</span>
+          <!-- Corrección -->
+          <div class="flex gap-4">
+            <div class="flex flex-col items-center">
+              <div class="w-3 h-3 rounded-full bg-tertiary mt-1.5 shrink-0"></div>
+            </div>
+            <div class="flex-1 pb-1">
+              <p class="text-[10px] font-black uppercase tracking-wider text-tertiary mb-1.5">Corrección aplicada</p>
+              <div class="bg-tertiary-container/25 border border-tertiary/25 rounded-xl px-4 py-3">
+                <p class="text-sm font-semibold text-on-background" id="traz-valor-nuevo">—</p>
+                <p class="text-[11px] text-on-surface-variant font-mono mt-1" id="traz-fecha-correccion">—</p>
+                <div class="flex items-center gap-3 mt-2.5 pt-2.5 border-t border-tertiary/20 text-xs text-on-surface-variant">
+                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">person</span><span class="font-semibold text-on-background" id="traz-operador">—</span></span>
+                  <span>·</span>
+                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">info</span><span id="traz-motivo">—</span></span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -652,7 +660,6 @@ function verDetalle(fila) {
     document.getElementById('traz-valor-nuevo').textContent = tipo + ' · Manual (corregida)';
     document.getElementById('traz-motivo').textContent = 'Error del dispositivo';
     document.getElementById('traz-operador').textContent = 'admin';
-    document.getElementById('traz-fecha-op').textContent = '13/06/2025 10:05';
   } else {
     secTraz.classList.add('hidden');
   }
