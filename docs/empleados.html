@@ -96,9 +96,14 @@ tailwind.config = {
 <header class="fixed top-0 right-0 left-64 h-16 z-40 bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/50 flex items-center justify-between px-8 w-[calc(100%-16rem)]">
   <div class="flex items-center gap-6">
     <h1 class="text-xl font-bold text-slate-800 font-headline">EMPLEADOS</h1>
-    <div class="relative">
-      <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><span class="material-symbols-outlined text-sm">search</span></span>
-      <input class="pl-10 pr-4 py-1.5 bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-md text-xs w-64" placeholder="BUSCAR POR NOMBRE O LEGAJO..." type="text"/>
+    <div class="flex items-center gap-2">
+      <div class="relative">
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><span class="material-symbols-outlined text-sm">search</span></span>
+        <input id="search-emp" class="pl-10 pr-4 py-1.5 bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-md text-xs w-64" placeholder="BUSCAR POR NOMBRE O LEGAJO..." type="text" onkeydown="if(event.key==='Enter')filtrarEmpleados()"/>
+      </div>
+      <button onclick="filtrarEmpleados()" class="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-md hover:bg-primary-dim transition-colors">
+        <span class="material-symbols-outlined text-sm">search</span> Buscar
+      </button>
     </div>
   </div>
   <div class="flex items-center gap-6">
@@ -123,14 +128,9 @@ tailwind.config = {
       <h2 class="text-2xl font-extrabold tracking-tight text-on-background font-headline">Gestión de Empleados</h2>
       <p class="text-on-surface-variant text-sm mt-1">Administre el personal activo de la organización.</p>
     </div>
-    <div class="flex gap-3">
-      <button class="flex items-center gap-2 px-4 py-2 bg-surface-container-high text-on-secondary-container rounded-md font-semibold text-sm hover:bg-surface-container-highest transition-colors">
-        <span class="material-symbols-outlined text-sm">filter_list</span> Filtros
-      </button>
-      <button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md font-semibold text-sm shadow-sm hover:bg-primary-dim transition-colors">
-        <span class="material-symbols-outlined text-sm">person_add</span> Nuevo empleado
-      </button>
-    </div>
+    <button id="btn-nuevo-empleado" class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md font-semibold text-sm shadow-sm hover:bg-primary-dim transition-colors">
+      <span class="material-symbols-outlined text-sm">person_add</span> Nuevo empleado
+    </button>
   </div>
 
   <!-- Stats Bar -->
@@ -140,12 +140,12 @@ tailwind.config = {
       <p class="text-2xl font-headline font-black text-on-secondary-container">37</p>
     </div>
     <div class="bg-surface-container-highest p-5 rounded-lg">
-      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Administrativos</p>
-      <p class="text-2xl font-headline font-black text-primary">14</p>
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Jornada completa</p>
+      <p class="text-2xl font-headline font-black text-primary">30</p>
     </div>
     <div class="bg-surface-container-highest p-5 rounded-lg">
-      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Planta</p>
-      <p class="text-2xl font-headline font-black text-tertiary">23</p>
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Jornada parcial</p>
+      <p class="text-2xl font-headline font-black text-tertiary">7</p>
     </div>
     <div class="bg-surface-container-highest p-5 rounded-lg">
       <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Bajas este mes</p>
@@ -160,135 +160,161 @@ tailwind.config = {
         <span class="material-symbols-outlined text-sm">group</span> NÓMINA ACTIVA
       </h3>
       <div class="flex gap-2">
-        <select class="bg-surface-container-low border-none rounded-md px-3 py-1.5 text-xs font-medium text-on-surface-variant">
-          <option>Todos los sectores</option>
+        <select id="filtro-categoria" onchange="filtrarEmpleados()" class="bg-surface-container-low border-none rounded-md pl-3 pr-7 py-1.5 text-xs font-medium text-on-surface-variant min-w-[11rem]">
+          <option value="">Todas las categorías</option>
           <option>Administrativo</option>
-          <option>Planta</option>
+          <option>Operario</option>
+          <option>Técnico</option>
+          <option>Supervisor</option>
+          <option>Gerencia</option>
         </select>
-        <select class="bg-surface-container-low border-none rounded-md px-3 py-1.5 text-xs font-medium text-on-surface-variant">
-          <option>Todos los estados</option>
+        <select id="filtro-jornada" onchange="filtrarEmpleados()" class="bg-surface-container-low border-none rounded-md pl-3 pr-7 py-1.5 text-xs font-medium text-on-surface-variant min-w-[9rem]">
+          <option value="">Todas las jornadas</option>
+          <option>Completa</option>
+          <option>Parcial</option>
+        </select>
+        <select id="filtro-estado" onchange="filtrarEmpleados()" class="bg-surface-container-low border-none rounded-md pl-3 pr-7 py-1.5 text-xs font-medium text-on-surface-variant min-w-[9rem]">
+          <option value="">Todos los estados</option>
           <option>Activo</option>
-          <option>Baja</option>
+          <option>Inactivo</option>
+          <option>Suspendido</option>
         </select>
+        <button onclick="limpiarFiltros()" class="px-3 py-1.5 text-xs font-bold text-on-surface-variant hover:text-on-background border border-outline-variant/30 rounded-md hover:bg-surface-container-low transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">filter_alt_off</span> Limpiar
+        </button>
       </div>
     </div>
     <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead>
+      <table id="tabla-empleados" class="w-full text-left border-collapse">
+        <thead id="tabla-thead">
           <tr class="bg-surface-container-low">
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Legajo</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Empleado</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Sector</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Horario asignado</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Ingreso</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Estado</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Acción</th>
+            <th class="px-4 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Legajo</th>
+            <th class="px-4 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Empleado</th>
+            <th class="px-4 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Categoría</th>
+            <th class="px-4 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Convenio</th>
+            <th class="px-4 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Jornada</th>
+            <th class="px-4 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Horario</th>
+            <th class="px-4 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Estado</th>
+            <th class="px-4 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Acción</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
           <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-sm font-mono font-bold text-primary">0042</td>
-            <td class="px-6 py-4">
+            <td class="px-4 py-4 text-sm font-mono font-bold text-primary">0042</td>
+            <td class="px-4 py-4">
               <a href="empleado-juan-perez.html" class="flex items-center gap-3 hover:text-primary">
                 <div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-primary font-bold text-xs">JP</div>
-                <div><p class="text-sm font-bold">Juan Perez</p><p class="text-[11px] text-on-surface-variant">DNI 30111222</p></div>
+                <div><p class="text-sm font-bold">Juan Perez</p><p class="text-[11px] text-on-surface-variant font-mono">DNI 30.111.222</p></div>
               </a>
             </td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold rounded-full">Administrativo</span></td>
-            <td class="px-6 py-4 text-sm text-on-surface-variant">H-003 Oficina central</td>
-            <td class="px-6 py-4 text-sm">10/03/2023</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1.5 text-[11px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span></td>
-            <td class="px-6 py-4"><a href="empleado-juan-perez.html" class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</a></td>
+            <td class="px-4 py-4"><span class="px-2 py-1 bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold rounded-full">Administrativo</span></td>
+            <td class="px-4 py-4 text-xs text-on-surface-variant">Comercio (130/75)</td>
+            <td class="px-4 py-4 text-xs font-medium">Completa</td>
+            <td class="px-4 py-4 text-xs text-on-surface-variant">H-003 Oficina central</td>
+            <td class="px-4 py-4"><span class="flex items-center gap-1.5 text-[11px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+            <td class="px-4 py-4"><a href="empleado-juan-perez.html" class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</a></td>
           </tr>
           <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-sm font-mono font-bold text-primary">0018</td>
-            <td class="px-6 py-4">
+            <td class="px-4 py-4 text-sm font-mono font-bold text-primary">0018</td>
+            <td class="px-4 py-4">
               <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center text-tertiary font-bold text-xs">AG</div>
-                <div><p class="text-sm font-bold">Ana Gomez</p><p class="text-[11px] text-on-surface-variant">DNI 28445601</p></div>
+                <div><p class="text-sm font-bold">Ana Gomez</p><p class="text-[11px] text-on-surface-variant font-mono">DNI 28.445.601</p></div>
               </div>
             </td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold rounded-full">Administrativo</span></td>
-            <td class="px-6 py-4 text-sm text-on-surface-variant">H-003 Oficina central</td>
-            <td class="px-6 py-4 text-sm">05/07/2021</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1.5 text-[11px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span></td>
-            <td class="px-6 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button></td>
+            <td class="px-4 py-4"><span class="px-2 py-1 bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold rounded-full">Administrativo</span></td>
+            <td class="px-4 py-4 text-xs text-on-surface-variant">Comercio (130/75)</td>
+            <td class="px-4 py-4 text-xs font-medium">Parcial <span class="text-on-surface-variant">6hs</span></td>
+            <td class="px-4 py-4 text-xs text-on-surface-variant">H-003 Oficina central</td>
+            <td class="px-4 py-4"><span class="flex items-center gap-1.5 text-[11px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+            <td class="px-4 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button></td>
           </tr>
           <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-sm font-mono font-bold text-primary">0027</td>
-            <td class="px-6 py-4">
+            <td class="px-4 py-4 text-sm font-mono font-bold text-primary">0027</td>
+            <td class="px-4 py-4">
               <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold text-xs">MS</div>
-                <div><p class="text-sm font-bold">Martin Sosa</p><p class="text-[11px] text-on-surface-variant">DNI 33987412</p></div>
+                <div><p class="text-sm font-bold">Martin Sosa</p><p class="text-[11px] text-on-surface-variant font-mono">DNI 33.987.412</p></div>
               </div>
             </td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-tertiary-container/30 text-on-tertiary-container text-[10px] font-bold rounded-full">Planta</span></td>
-            <td class="px-6 py-4 text-sm text-on-surface-variant">C-002 Rotación planta A</td>
-            <td class="px-6 py-4 text-sm">12/01/2020</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1.5 text-[11px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span></td>
-            <td class="px-6 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button></td>
+            <td class="px-4 py-4"><span class="px-2 py-1 bg-tertiary-container/30 text-on-tertiary-container text-[10px] font-bold rounded-full">Operario</span></td>
+            <td class="px-4 py-4 text-xs text-on-surface-variant">Metalúrgico (260/75)</td>
+            <td class="px-4 py-4 text-xs font-medium">Completa</td>
+            <td class="px-4 py-4 text-xs text-on-surface-variant">C-002 Rotación planta A</td>
+            <td class="px-4 py-4"><span class="flex items-center gap-1.5 text-[11px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+            <td class="px-4 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button></td>
           </tr>
           <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-sm font-mono font-bold text-primary">0031</td>
-            <td class="px-6 py-4">
+            <td class="px-4 py-4 text-sm font-mono font-bold text-primary">0031</td>
+            <td class="px-4 py-4">
               <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center text-error font-bold text-xs">LD</div>
-                <div><p class="text-sm font-bold">Luis Diaz</p><p class="text-[11px] text-on-surface-variant">DNI 31200033</p></div>
+                <div><p class="text-sm font-bold">Luis Diaz</p><p class="text-[11px] text-on-surface-variant font-mono">DNI 31.200.033</p></div>
               </div>
             </td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-tertiary-container/30 text-on-tertiary-container text-[10px] font-bold rounded-full">Planta</span></td>
-            <td class="px-6 py-4 text-sm text-on-surface-variant">H-001 Planta Mañana</td>
-            <td class="px-6 py-4 text-sm">03/08/2019</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1.5 text-[11px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span></td>
-            <td class="px-6 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button></td>
+            <td class="px-4 py-4"><span class="px-2 py-1 bg-tertiary-container/30 text-on-tertiary-container text-[10px] font-bold rounded-full">Operario</span></td>
+            <td class="px-4 py-4 text-xs text-on-surface-variant">Metalúrgico (260/75)</td>
+            <td class="px-4 py-4 text-xs font-medium">Completa</td>
+            <td class="px-4 py-4 text-xs text-on-surface-variant">H-001 Planta Mañana</td>
+            <td class="px-4 py-4"><span class="flex items-center gap-1.5 text-[11px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+            <td class="px-4 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button></td>
           </tr>
           <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-sm font-mono font-bold text-primary">0050</td>
-            <td class="px-6 py-4">
+            <td class="px-4 py-4 text-sm font-mono font-bold text-primary">0050</td>
+            <td class="px-4 py-4">
               <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center text-tertiary font-bold text-xs">CR</div>
-                <div><p class="text-sm font-bold">Carla Ruiz</p><p class="text-[11px] text-on-surface-variant">DNI 35120099</p></div>
+                <div><p class="text-sm font-bold">Carla Ruiz</p><p class="text-[11px] text-on-surface-variant font-mono">DNI 35.120.099</p></div>
               </div>
             </td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold rounded-full">Administrativo</span></td>
-            <td class="px-6 py-4 text-sm text-on-surface-variant">H-003 Oficina central</td>
-            <td class="px-6 py-4 text-sm">20/11/2022</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1.5 text-[11px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span></td>
-            <td class="px-6 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button></td>
+            <td class="px-4 py-4"><span class="px-2 py-1 bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold rounded-full">Administrativo</span></td>
+            <td class="px-4 py-4 text-xs text-on-surface-variant">Comercio (130/75)</td>
+            <td class="px-4 py-4 text-xs font-medium">Parcial <span class="text-on-surface-variant">4hs</span></td>
+            <td class="px-4 py-4 text-xs text-on-surface-variant">H-003 Oficina central</td>
+            <td class="px-4 py-4"><span class="flex items-center gap-1.5 text-[11px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+            <td class="px-4 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button></td>
           </tr>
           <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-sm font-mono font-bold text-primary">0158</td>
-            <td class="px-6 py-4">
+            <td class="px-4 py-4 text-sm font-mono font-bold text-primary">0158</td>
+            <td class="px-4 py-4">
               <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold text-xs">MA</div>
-                <div><p class="text-sm font-bold">Maria Alvez</p><p class="text-[11px] text-on-surface-variant">DNI 29774421</p></div>
+                <div><p class="text-sm font-bold">Maria Alvez</p><p class="text-[11px] text-on-surface-variant font-mono">DNI 29.774.421</p></div>
               </div>
             </td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-tertiary-container/30 text-on-tertiary-container text-[10px] font-bold rounded-full">Planta</span></td>
-            <td class="px-6 py-4 text-sm text-on-surface-variant">C-001 4x2 Producción</td>
-            <td class="px-6 py-4 text-sm">14/02/2018</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1.5 text-[11px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span></td>
-            <td class="px-6 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button></td>
+            <td class="px-4 py-4"><span class="px-2 py-1 bg-tertiary-container/30 text-on-tertiary-container text-[10px] font-bold rounded-full">Operario</span></td>
+            <td class="px-4 py-4 text-xs text-on-surface-variant">Metalúrgico (260/75)</td>
+            <td class="px-4 py-4 text-xs font-medium">Completa</td>
+            <td class="px-4 py-4 text-xs text-on-surface-variant">C-001 4x2 Producción</td>
+            <td class="px-4 py-4"><span class="flex items-center gap-1.5 text-[11px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+            <td class="px-4 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button></td>
           </tr>
           <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-sm font-mono font-bold text-primary">0892</td>
-            <td class="px-6 py-4">
+            <td class="px-4 py-4 text-sm font-mono font-bold text-primary">0892</td>
+            <td class="px-4 py-4">
               <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-primary font-bold text-xs">RG</div>
-                <div><p class="text-sm font-bold">Roberto Gomez</p><p class="text-[11px] text-on-surface-variant">DNI 27663300</p></div>
+                <div><p class="text-sm font-bold">Roberto Gomez</p><p class="text-[11px] text-on-surface-variant font-mono">DNI 27.663.300</p></div>
               </div>
             </td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-tertiary-container/30 text-on-tertiary-container text-[10px] font-bold rounded-full">Planta</span></td>
-            <td class="px-6 py-4 text-sm text-on-surface-variant">H-002 Soporte Nocturno</td>
-            <td class="px-6 py-4 text-sm">07/04/2017</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1.5 text-[11px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span></td>
-            <td class="px-6 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button></td>
+            <td class="px-4 py-4"><span class="px-2 py-1 bg-surface-container-highest text-on-surface-variant text-[10px] font-bold rounded-full">Técnico</span></td>
+            <td class="px-4 py-4 text-xs text-on-surface-variant">Metalúrgico (260/75)</td>
+            <td class="px-4 py-4 text-xs font-medium">Completa</td>
+            <td class="px-4 py-4 text-xs text-on-surface-variant">H-002 Soporte Nocturno</td>
+            <td class="px-4 py-4"><span class="flex items-center gap-1.5 text-[11px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+            <td class="px-4 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button></td>
+          </tr>
+          <tr id="fila-sin-resultados" class="hidden">
+            <td colspan="8" class="px-6 py-12 text-center text-on-surface-variant text-sm">
+              <span class="material-symbols-outlined text-3xl block mb-2 opacity-30">search_off</span>
+              No se encontraron empleados con los filtros aplicados.
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="p-4 border-t border-slate-100 flex items-center justify-between">
-      <p class="text-xs text-on-surface-variant">Mostrando 7 de 37 empleados</p>
+      <p id="contador-empleados" class="text-xs text-on-surface-variant">Mostrando 7 de 37 empleados</p>
       <div class="flex gap-2">
         <button class="px-3 py-1 text-xs font-bold border border-outline-variant/30 rounded hover:bg-surface-container-low transition-colors">Anterior</button>
         <button class="px-3 py-1 text-xs font-bold bg-primary text-white rounded">1</button>
@@ -300,6 +326,161 @@ tailwind.config = {
   </div>
 </main>
 
+<!-- Modal: Nuevo Empleado -->
+<div id="modal-nuevo-empleado" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-nuevo-empleado')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Nuevo Empleado</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Completá los datos del nuevo empleado.</p>
+      </div>
+      <button onclick="cerrarModal('modal-nuevo-empleado')" class="text-slate-400 hover:text-slate-700 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form id="form-nuevo-empleado" onsubmit="guardarEmpleado(event)" class="px-8 py-6 space-y-5">
+
+      <!-- Nombre y Apellido -->
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Nombre *</label>
+          <input id="emp-nombre" required type="text" placeholder="Ej: María" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Apellido *</label>
+          <input id="emp-apellido" required type="text" placeholder="Ej: López" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+      </div>
+
+      <!-- DNI, Sexo y CUIL -->
+      <div class="grid grid-cols-3 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">DNI *</label>
+          <input id="emp-dni" required type="text" maxlength="8" placeholder="Ej: 32456789"
+            class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+            oninput="calcularCUIL()"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Sexo *</label>
+          <select id="emp-sexo" required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" onchange="calcularCUIL()">
+            <option value="">—</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+            <option value="X">No binario</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">
+            CUIL
+            <span class="normal-case font-normal text-on-surface-variant ml-1">(calculado)</span>
+          </label>
+          <input id="emp-cuil" type="text" placeholder="—" readonly
+            class="w-full px-3 py-2.5 bg-surface-container-highest border border-outline-variant/20 rounded-lg text-sm font-mono font-bold text-primary cursor-default"/>
+        </div>
+      </div>
+
+      <!-- Fecha de ingreso y Categoría laboral -->
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha de ingreso *</label>
+          <input required type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Categoría laboral *</label>
+          <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option value="">Seleccionar...</option>
+            <option>Administrativo</option>
+            <option>Operario / Planta</option>
+            <option>Técnico</option>
+            <option>Supervisor</option>
+            <option>Gerencia</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Convenio y Tipo de jornada -->
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Convenio colectivo</label>
+          <select class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option value="">Sin convenio / No aplica</option>
+            <option>Comercio (130/75)</option>
+            <option>Metalúrgico (260/75)</option>
+            <option>Gastronómico (389/04)</option>
+            <option>Construcción (76/75)</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tipo de jornada *</label>
+          <select id="emp-jornada" required onchange="toggleJornadaParcial()" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option value="">Seleccionar...</option>
+            <option value="completa">Completa</option>
+            <option value="parcial">Parcial</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Panel jornada parcial -->
+      <div id="panel-jornada-parcial" class="hidden rounded-xl border border-primary/20 bg-primary-container/10 overflow-hidden">
+        <div class="flex items-center gap-2 px-5 py-3 bg-primary-container/30 border-b border-primary/20">
+          <span class="material-symbols-outlined text-sm text-primary">calendar_view_week</span>
+          <span class="text-[11px] font-extrabold text-primary uppercase tracking-wider">Configuración de jornada parcial</span>
+        </div>
+        <div class="px-5 py-4">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Horas diarias *</label>
+          <div class="flex items-center gap-3">
+            <input id="parcial-horas" type="number" min="1" max="7" step="0.5" placeholder="Ej: 4"
+              class="w-32 px-3 py-2.5 bg-white border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+              oninput="validarHorasParcial(this)"/>
+            <span class="text-sm text-on-surface-variant font-medium">hs / día <span class="text-on-surface-variant/60">(máx. 7)</span></span>
+          </div>
+          <p id="parcial-error" class="hidden mt-1.5 text-xs text-error">Debe ser menor a 8 horas.</p>
+        </div>
+      </div>
+
+      <!-- Horario y Modalidad de fichada -->
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Horario asignado</label>
+          <select class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option value="">Sin asignar</option>
+            <option>H-001 Planta Mañana</option>
+            <option>H-002 Soporte Nocturno</option>
+            <option>H-003 Oficina central</option>
+            <option>C-001 4x2 Producción</option>
+            <option>C-002 Rotación planta A</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Modalidad de fichada</label>
+          <select class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option>Biométrico</option>
+            <option>App móvil</option>
+            <option>PIN / Teclado</option>
+            <option>QR</option>
+            <option>Manual</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-4 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-nuevo-empleado')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">person_add</span> Guardar empleado
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold transition-all">
+  <span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;" id="toast-icon">check_circle</span>
+  <span id="toast-msg">Acción completada</span>
+</div>
+
 <script>
 (function() {
   var page = location.pathname.split('/').pop() || 'index.html';
@@ -310,6 +491,140 @@ tailwind.config = {
     }
   });
 })();
+
+function abrirModal(id) {
+  document.getElementById(id).classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function cerrarModal(id) {
+  document.getElementById(id).classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function mostrarToast(msg, ok) {
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').textContent = ok ? 'check_circle' : 'error';
+  t.classList.remove('hidden');
+  setTimeout(function() { t.classList.add('hidden'); }, 3000);
+}
+
+// Filtrado de tabla
+function filtrarEmpleados() {
+  var busqueda = (document.getElementById('search-emp').value || '').toLowerCase().trim();
+  var catFiltro = (document.getElementById('filtro-categoria').value || '').toLowerCase();
+  var jorFiltro = (document.getElementById('filtro-jornada').value || '').toLowerCase();
+  var estFiltro = (document.getElementById('filtro-estado').value || '').toLowerCase();
+
+  var filas = document.querySelectorAll('#tabla-empleados tbody tr:not(#fila-sin-resultados)');
+  var visibles = 0;
+
+  filas.forEach(function(fila) {
+    var legajo = fila.cells[0].textContent.trim().toLowerCase();
+    var nombre = fila.cells[1].textContent.trim().toLowerCase();
+    var categoria = fila.cells[2].textContent.trim().toLowerCase();
+    var jornada = fila.cells[4].textContent.trim().toLowerCase();
+    var estado = fila.cells[6].textContent.trim().toLowerCase();
+
+    var okBusqueda = !busqueda || legajo.includes(busqueda) || nombre.includes(busqueda);
+    var okCat = !catFiltro || categoria.includes(catFiltro);
+    var okJor = !jorFiltro || jornada.includes(jorFiltro);
+    var okEst = !estFiltro || estado.includes(estFiltro);
+
+    var mostrar = okBusqueda && okCat && okJor && okEst;
+    fila.style.display = mostrar ? '' : 'none';
+    if (mostrar) visibles++;
+  });
+
+  var sinResultados = document.getElementById('fila-sin-resultados');
+  var thead = document.getElementById('tabla-thead');
+  sinResultados.style.display = visibles === 0 ? '' : 'none';
+  sinResultados.classList.remove('hidden');
+  thead.style.display = visibles === 0 ? 'none' : '';
+
+  document.getElementById('contador-empleados').textContent =
+    'Mostrando ' + visibles + ' de 37 empleados';
+}
+
+function limpiarFiltros() {
+  document.getElementById('search-emp').value = '';
+  document.getElementById('filtro-categoria').value = '';
+  document.getElementById('filtro-jornada').value = '';
+  document.getElementById('filtro-estado').value = '';
+  filtrarEmpleados();
+}
+
+// Legajo correlativo (simulado)
+var proximoLegajo = 893;
+
+// Botón Nuevo empleado
+document.getElementById('btn-nuevo-empleado').addEventListener('click', function() {
+  abrirModal('modal-nuevo-empleado');
+});
+
+// Panel jornada parcial
+function toggleJornadaParcial() {
+  var val = document.getElementById('emp-jornada').value;
+  var panel = document.getElementById('panel-jornada-parcial');
+  var input = document.getElementById('parcial-horas');
+  if (val === 'parcial') {
+    panel.classList.remove('hidden');
+    input.required = true;
+  } else {
+    panel.classList.add('hidden');
+    input.required = false;
+    input.value = '';
+    document.getElementById('parcial-error').classList.add('hidden');
+  }
+}
+
+function validarHorasParcial(input) {
+  var err = document.getElementById('parcial-error');
+  if (parseFloat(input.value) >= 8) {
+    input.value = 7;
+  }
+  if (input.value && parseFloat(input.value) < 1) {
+    input.value = 1;
+  }
+  err.classList.add('hidden');
+}
+
+// Cálculo de CUIL argentino
+function calcularCUIL() {
+  var dni = document.getElementById('emp-dni').value.replace(/\D/g, '');
+  var sexo = document.getElementById('emp-sexo').value;
+  var cuil = document.getElementById('emp-cuil');
+
+  if (dni.length < 7 || !sexo) { cuil.value = ''; return; }
+
+  var prefijos = { M: '20', F: '27', X: '23' };
+  var prefijo = prefijos[sexo];
+  var base = prefijo + dni.padStart(8, '0');
+  var pesos = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+  var suma = 0;
+  for (var i = 0; i < 10; i++) suma += parseInt(base[i]) * pesos[i];
+  var resto = suma % 11;
+  var verificador = 11 - resto;
+  if (verificador === 11) verificador = 0;
+  if (verificador === 10) {
+    prefijo = '23';
+    base = prefijo + dni.padStart(8, '0');
+    suma = 0;
+    for (var j = 0; j < 10; j++) suma += parseInt(base[j]) * pesos[j];
+    verificador = 11 - (suma % 11);
+    if (verificador === 11) verificador = 0;
+  }
+  cuil.value = prefijo + '-' + dni.padStart(8, '0') + '-' + verificador;
+}
+
+function guardarEmpleado(e) {
+  e.preventDefault();
+  proximoLegajo++;
+  cerrarModal('modal-nuevo-empleado');
+  e.target.reset();
+  document.getElementById('emp-cuil').value = '';
+  mostrarToast('Empleado creado correctamente.', true);
+}
 </script>
 </body>
 </html>

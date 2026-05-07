@@ -143,39 +143,57 @@ tailwind.config = {
         Activo
       </div>
     </div>
-    <div class="flex-1">
-      <div class="flex items-end justify-between mb-6">
-        <div>
-          <h2 class="font-headline text-3xl font-extrabold text-on-background tracking-tight">Juan Perez</h2>
-          <p class="text-on-surface-variant font-medium flex items-center gap-2">
-            Legajo 0042 <span class="w-1 h-1 bg-outline rounded-full"></span> Administrativo
-          </p>
+      <div class="flex-1">
+          <div class="flex items-start justify-between mb-6">
+            <div>
+              <h2 class="font-headline text-3xl font-extrabold text-on-background tracking-tight">Juan Perez</h2>
+              <p class="text-on-surface-variant font-medium flex items-center gap-2 mt-1">
+                Legajo <span class="font-mono font-bold text-primary">0042</span>
+                <span class="w-1 h-1 bg-outline rounded-full"></span>
+                Administrativo
+                <span class="w-1 h-1 bg-outline rounded-full"></span>
+                <span class="flex items-center gap-1 text-on-secondary-container font-bold"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span>
+              </p>
+            </div>
+            <button class="primary-gradient text-on-primary px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[0.98] transition-transform">
+              <span class="material-symbols-outlined text-lg">edit</span> Editar empleado
+            </button>
+          </div>
+          <div class="grid grid-cols-4 gap-y-5 gap-x-8 border-t border-slate-100 pt-6">
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">DNI</p>
+              <p class="text-sm font-semibold font-mono text-on-surface">30.111.222</p>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">CUIL</p>
+              <p class="text-sm font-semibold font-mono text-on-surface">20-30111222-3</p>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Fecha de ingreso</p>
+              <p class="text-sm font-semibold text-on-surface">10/03/2023</p>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Categoría laboral</p>
+              <p class="text-sm font-semibold text-on-surface">Administrativo</p>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Convenio</p>
+              <p class="text-sm font-semibold text-on-surface">Comercio (130/75)</p>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Tipo de jornada</p>
+              <p class="text-sm font-semibold text-on-surface">Completa</p>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Modalidad fichada</p>
+              <p class="text-sm font-semibold text-on-surface">Biométrico</p>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Horario activo</p>
+              <p class="text-sm font-semibold text-on-surface">H-003 Oficina central</p>
+            </div>
+          </div>
         </div>
-        <div class="flex gap-2">
-          <button class="primary-gradient text-on-primary px-6 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[0.98] transition-transform">
-            <span class="material-symbols-outlined text-lg">edit</span> Editar empleado
-          </button>
-        </div>
-      </div>
-      <div class="grid grid-cols-4 gap-y-4 gap-x-8 border-t border-slate-100 pt-6">
-        <div>
-          <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">DNI</p>
-          <p class="text-sm font-semibold text-on-surface">30111222</p>
-        </div>
-        <div>
-          <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">CUIL</p>
-          <p class="text-sm font-semibold text-on-surface">20-30111222-3</p>
-        </div>
-        <div>
-          <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Fecha de Ingreso</p>
-          <p class="text-sm font-semibold text-on-surface">10/03/2023</p>
-        </div>
-        <div>
-          <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Tipo de Contrato</p>
-          <p class="text-sm font-semibold text-on-surface">Comercio, jornada completa</p>
-        </div>
-      </div>
-    </div>
   </section>
 
   <!-- Action Bar -->
@@ -440,6 +458,304 @@ tailwind.config = {
   </div>
 </main>
 
+<!-- Modal: Editar Empleado -->
+<div id="modal-editar-empleado" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-editar-empleado')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Editar Empleado</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Legajo 0042 — los cambios quedan registrados con trazabilidad.</p>
+      </div>
+      <button onclick="cerrarModal('modal-editar-empleado')" class="text-slate-400 hover:text-slate-700 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form onsubmit="guardarEdicion(event)" class="px-8 py-6 space-y-5">
+
+      <!-- Nombre y Apellido -->
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Nombre *</label>
+          <input required type="text" value="Juan" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Apellido *</label>
+          <input required type="text" value="Perez" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+      </div>
+
+      <!-- DNI, Sexo y CUIL -->
+      <div class="grid grid-cols-3 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">DNI *</label>
+          <input id="edit-dni" required type="text" maxlength="8" value="30111222"
+            class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+            oninput="calcularCUILEdit()"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Sexo *</label>
+          <select id="edit-sexo" required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" onchange="calcularCUILEdit()">
+            <option value="M" selected>Masculino</option>
+            <option value="F">Femenino</option>
+            <option value="X">No binario / X</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">CUIL <span class="normal-case font-normal text-on-surface-variant ml-1">(calculado)</span></label>
+          <input id="edit-cuil" type="text" value="20-30111222-3" readonly
+            class="w-full px-3 py-2.5 bg-surface-container-highest border border-outline-variant/20 rounded-lg text-sm font-mono font-bold text-primary cursor-default"/>
+        </div>
+      </div>
+
+      <!-- Fecha de ingreso y Categoría laboral -->
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha de ingreso *</label>
+          <input required type="date" value="2023-03-10" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Categoría laboral *</label>
+          <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option selected>Administrativo</option>
+            <option>Operario / Planta</option>
+            <option>Técnico</option>
+            <option>Supervisor</option>
+            <option>Gerencia</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Convenio y Tipo de jornada -->
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Convenio colectivo</label>
+          <select class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option value="">Sin convenio / No aplica</option>
+            <option selected>Comercio (130/75)</option>
+            <option>Metalúrgico (260/75)</option>
+            <option>Gastronómico (389/04)</option>
+            <option>Construcción (76/75)</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tipo de jornada *</label>
+          <select id="edit-jornada" required onchange="toggleJornadaParcialEdit()" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option value="completa" selected>Completa</option>
+            <option value="parcial">Parcial</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Panel jornada parcial (edición) -->
+      <div id="edit-panel-parcial" class="hidden rounded-xl border border-primary/20 bg-primary-container/10 overflow-hidden">
+        <div class="flex items-center gap-2 px-5 py-3 bg-primary-container/30 border-b border-primary/20">
+          <span class="material-symbols-outlined text-sm text-primary">schedule</span>
+          <span class="text-[11px] font-extrabold text-primary uppercase tracking-wider">Horas de jornada parcial</span>
+        </div>
+        <div class="px-5 py-4">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Horas diarias *</label>
+          <div class="flex items-center gap-3">
+            <input id="edit-parcial-horas" type="number" min="1" max="7" step="0.5" placeholder="Ej: 4"
+              class="w-32 px-3 py-2.5 bg-white border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+              oninput="if(parseFloat(this.value)>=8)this.value=7;if(this.value&&parseFloat(this.value)<1)this.value=1"/>
+            <span class="text-sm text-on-surface-variant font-medium">hs / día <span class="text-on-surface-variant/60">(máx. 7)</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Horario y Modalidad -->
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Horario asignado</label>
+          <select class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option value="">Sin asignar</option>
+            <option>H-001 Planta Mañana</option>
+            <option>H-002 Soporte Nocturno</option>
+            <option selected>H-003 Oficina central</option>
+            <option>C-001 4x2 Producción</option>
+            <option>C-002 Rotación planta A</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Modalidad de fichada</label>
+          <select class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option selected>Biométrico</option>
+            <option>App móvil</option>
+            <option>PIN / Teclado</option>
+            <option>QR</option>
+            <option>Manual</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-4 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-editar-empleado')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">save</span> Guardar cambios
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Asignar Horario -->
+<div id="modal-asignar-horario" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-asignar-horario')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Asignar Horario</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Juan Perez — Legajo 0042</p>
+      </div>
+      <button onclick="cerrarModal('modal-asignar-horario')" class="text-slate-400 hover:text-slate-700 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form onsubmit="guardarHorario(event)" class="px-8 py-6 space-y-4">
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Horario a asignar *</label>
+        <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+          <option value="">Seleccionar horario...</option>
+          <optgroup label="Horarios fijos">
+            <option>H-001 Planta Mañana (Lun-Vie 06:00-14:00)</option>
+            <option selected>H-003 Oficina central (Lun-Vie 09:00-18:00)</option>
+            <option>H-002 Soporte Nocturno (Lun-Vie 22:00-06:00)</option>
+          </optgroup>
+          <optgroup label="Ciclos rotativos">
+            <option>C-001 4x2 Producción</option>
+            <option>C-002 Rotación planta A</option>
+          </optgroup>
+        </select>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Vigencia desde *</label>
+        <input required type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+      </div>
+      <div class="flex gap-3 pt-2 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-asignar-horario')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">schedule</span> Asignar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Cargar Novedad -->
+<div id="modal-cargar-novedad" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-cargar-novedad')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Cargar Novedad</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Juan Perez — Legajo 0042</p>
+      </div>
+      <button onclick="cerrarModal('modal-cargar-novedad')" class="text-slate-400 hover:text-slate-700 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form onsubmit="guardarNovedadEmp(event)" class="px-8 py-6 space-y-4">
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tipo de novedad *</label>
+        <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+          <option value="">Seleccionar tipo...</option>
+          <optgroup label="Licencias">
+            <option>Licencia por enfermedad</option>
+            <option>Licencia por examen</option>
+            <option>Vacaciones parciales</option>
+            <option>Permiso especial</option>
+          </optgroup>
+          <optgroup label="Disciplinarias / Administrativas">
+            <option>Suspensión disciplinaria</option>
+            <option>Justificación de ausencia</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha desde *</label>
+          <input required type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha hasta</label>
+          <input type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Observación</label>
+        <textarea rows="2" placeholder="Detalle adicional (opcional)..." class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none"></textarea>
+      </div>
+      <div class="flex gap-3 pt-2 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-cargar-novedad')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">add</span> Cargar novedad
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Cargar Fichada Manual -->
+<div id="modal-fichada-manual" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-fichada-manual')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Cargar Fichada Manual</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Juan Perez — Legajo 0042</p>
+      </div>
+      <button onclick="cerrarModal('modal-fichada-manual')" class="text-slate-400 hover:text-slate-700 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form onsubmit="guardarFichadaManual(event)" class="px-8 py-6 space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha *</label>
+          <input required type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Hora *</label>
+          <input required type="time" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tipo *</label>
+        <div class="flex gap-3">
+          <label class="flex-1 flex items-center gap-2 p-3 border border-outline-variant/40 rounded-lg cursor-pointer hover:bg-surface-container-low has-[:checked]:border-primary has-[:checked]:bg-primary-container/20">
+            <input type="radio" name="tipo-f-manual" value="entrada" class="accent-primary" required/>
+            <span class="material-symbols-outlined text-sm text-green-600">login</span>
+            <span class="text-sm font-semibold">Entrada</span>
+          </label>
+          <label class="flex-1 flex items-center gap-2 p-3 border border-outline-variant/40 rounded-lg cursor-pointer hover:bg-surface-container-low has-[:checked]:border-error has-[:checked]:bg-error-container/10">
+            <input type="radio" name="tipo-f-manual" value="salida" class="accent-error"/>
+            <span class="material-symbols-outlined text-sm text-red-600">logout</span>
+            <span class="text-sm font-semibold">Salida</span>
+          </label>
+        </div>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Motivo *</label>
+        <textarea required rows="2" placeholder="Describí el motivo del registro manual..." class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none"></textarea>
+      </div>
+      <div class="flex gap-3 pt-2 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-fichada-manual')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">fingerprint</span> Registrar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold">
+  <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;" id="toast-icon">check_circle</span>
+  <span id="toast-msg">Acción completada</span>
+</div>
+
 <script>
 // This page is under Empleados section
 (function() {
@@ -450,6 +766,85 @@ tailwind.config = {
     }
   });
 })();
+
+function abrirModal(id) {
+  document.getElementById(id).classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function cerrarModal(id) {
+  document.getElementById(id).classList.add('hidden');
+  document.body.style.overflow = '';
+}
+function mostrarToast(msg) {
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(function() { t.classList.add('hidden'); }, 3000);
+}
+
+// Wiring botones de action bar
+document.querySelectorAll('section button, section a').forEach(function(btn) {
+  var txt = btn.textContent.trim();
+  if (txt.includes('Editar empleado')) btn.addEventListener('click', function(e) { e.preventDefault(); abrirModal('modal-editar-empleado'); });
+  if (txt.includes('Asignar horario')) btn.addEventListener('click', function() { abrirModal('modal-asignar-horario'); });
+  if (txt.includes('Asignar ciclo')) btn.addEventListener('click', function() { abrirModal('modal-asignar-horario'); });
+  if (txt.includes('Cargar novedad')) btn.addEventListener('click', function() { abrirModal('modal-cargar-novedad'); });
+  if (txt.includes('Cargar fichada manual')) btn.addEventListener('click', function() { abrirModal('modal-fichada-manual'); });
+});
+
+function calcularCUILEdit() {
+  var dni = document.getElementById('edit-dni').value.replace(/\D/g, '');
+  var sexo = document.getElementById('edit-sexo').value;
+  var cuil = document.getElementById('edit-cuil');
+  if (dni.length < 7 || !sexo) { cuil.value = ''; return; }
+  var prefijos = { M: '20', F: '27', X: '23' };
+  var prefijo = prefijos[sexo];
+  var base = prefijo + dni.padStart(8, '0');
+  var pesos = [5,4,3,2,7,6,5,4,3,2];
+  var suma = 0;
+  for (var i = 0; i < 10; i++) suma += parseInt(base[i]) * pesos[i];
+  var verificador = 11 - (suma % 11);
+  if (verificador === 11) verificador = 0;
+  if (verificador === 10) {
+    prefijo = '23'; base = prefijo + dni.padStart(8, '0'); suma = 0;
+    for (var j = 0; j < 10; j++) suma += parseInt(base[j]) * pesos[j];
+    verificador = 11 - (suma % 11);
+    if (verificador === 11) verificador = 0;
+  }
+  cuil.value = prefijo + '-' + dni.padStart(8, '0') + '-' + verificador;
+}
+
+function toggleJornadaParcialEdit() {
+  var val = document.getElementById('edit-jornada').value;
+  var panel = document.getElementById('edit-panel-parcial');
+  var input = document.getElementById('edit-parcial-horas');
+  if (val === 'parcial') { panel.classList.remove('hidden'); input.required = true; }
+  else { panel.classList.add('hidden'); input.required = false; input.value = ''; }
+}
+
+function guardarEdicion(e) {
+  e.preventDefault();
+  cerrarModal('modal-editar-empleado');
+  mostrarToast('Datos del empleado actualizados correctamente.');
+}
+function guardarHorario(e) {
+  e.preventDefault();
+  cerrarModal('modal-asignar-horario');
+  e.target.reset();
+  mostrarToast('Horario asignado correctamente.');
+}
+function guardarNovedadEmp(e) {
+  e.preventDefault();
+  cerrarModal('modal-cargar-novedad');
+  e.target.reset();
+  mostrarToast('Novedad cargada. Estado: Pendiente.');
+}
+function guardarFichadaManual(e) {
+  e.preventDefault();
+  cerrarModal('modal-fichada-manual');
+  e.target.reset();
+  mostrarToast('Fichada manual registrada correctamente.');
+}
 </script>
 </body>
 </html>

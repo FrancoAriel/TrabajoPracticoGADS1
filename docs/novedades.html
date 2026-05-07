@@ -224,6 +224,102 @@ tailwind.config = {
   </div>
 </main>
 
+<!-- Modal: Nueva Novedad -->
+<div id="modal-nueva-novedad" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-nueva-novedad')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Nueva Novedad</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Cargá una novedad manual para un empleado.</p>
+      </div>
+      <button onclick="cerrarModal('modal-nueva-novedad')" class="text-slate-400 hover:text-slate-700 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form onsubmit="guardarNovedad(event)" class="px-8 py-6 space-y-4">
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Empleado *</label>
+        <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+          <option value="">Seleccionar empleado...</option>
+          <option>0042 — Juan Perez</option>
+          <option>0018 — Ana Gomez</option>
+          <option>0027 — Martin Sosa</option>
+          <option>0031 — Luis Diaz</option>
+          <option>0050 — Carla Ruiz</option>
+          <option>0158 — Maria Alvez</option>
+          <option>0892 — Roberto Gomez</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tipo de novedad *</label>
+        <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+          <option value="">Seleccionar tipo...</option>
+          <optgroup label="Licencias">
+            <option>Licencia por enfermedad</option>
+            <option>Licencia por examen</option>
+            <option>Vacaciones parciales</option>
+            <option>Permiso especial (casamiento, nacimiento, etc.)</option>
+          </optgroup>
+          <optgroup label="Disciplinarias / Administrativas">
+            <option>Suspensión disciplinaria</option>
+            <option>Justificación de ausencia</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha desde *</label>
+          <input required type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha hasta</label>
+          <input type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Observación</label>
+        <textarea rows="2" placeholder="Detalle adicional (opcional)..." class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none"></textarea>
+      </div>
+      <div class="flex gap-3 pt-2 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-nueva-novedad')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">add</span> Cargar novedad
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Rechazar novedad -->
+<div id="modal-rechazar" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-rechazar')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+      <h3 class="text-base font-extrabold font-headline text-on-background">Rechazar novedad</h3>
+      <button onclick="cerrarModal('modal-rechazar')" class="text-slate-400 hover:text-slate-700 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form onsubmit="confirmarRechazo(event)" class="px-8 py-6 space-y-4">
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Motivo de rechazo *</label>
+        <textarea required id="motivo-rechazo" rows="3" placeholder="Indicá el motivo del rechazo..." class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-error/30 focus:border-error resize-none"></textarea>
+      </div>
+      <div class="flex gap-3">
+        <button type="button" onclick="cerrarModal('modal-rechazar')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-error text-white font-bold text-sm rounded-lg hover:opacity-90 transition-opacity">Confirmar rechazo</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold">
+  <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;" id="toast-icon">check_circle</span>
+  <span id="toast-msg">Acción completada</span>
+</div>
+
 <script>
 (function() {
   var page = location.pathname.split('/').pop() || 'index.html';
@@ -234,6 +330,69 @@ tailwind.config = {
     }
   });
 })();
+
+function abrirModal(id) {
+  document.getElementById(id).classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function cerrarModal(id) {
+  document.getElementById(id).classList.add('hidden');
+  document.body.style.overflow = '';
+}
+function mostrarToast(msg, ok) {
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').textContent = ok === false ? 'cancel' : 'check_circle';
+  t.classList.remove('hidden');
+  setTimeout(function() { t.classList.add('hidden'); }, 3000);
+}
+
+// Botón Nueva novedad
+document.querySelector('button.bg-primary').addEventListener('click', function() {
+  abrirModal('modal-nueva-novedad');
+});
+
+function guardarNovedad(e) {
+  e.preventDefault();
+  cerrarModal('modal-nueva-novedad');
+  e.target.reset();
+  mostrarToast('Novedad cargada. Estado: Pendiente.');
+}
+
+var filaRechazando = null;
+
+// Aprobar / Rechazar en tabla
+document.querySelectorAll('tbody tr').forEach(function(fila) {
+  var btnAprobar = fila.querySelector('button:not(.text-error)');
+  var btnRechazar = fila.querySelector('button.text-error');
+  var celdaEstado = fila.querySelector('td:nth-child(6)');
+
+  if (btnAprobar && btnAprobar.textContent.trim() === 'Aprobar') {
+    btnAprobar.addEventListener('click', function() {
+      celdaEstado.innerHTML = '<span class="flex items-center gap-1 text-[10px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> APROBADO</span>';
+      btnAprobar.closest('td').innerHTML = '<span class="text-[10px] font-bold text-on-secondary-container uppercase tracking-widest">Aprobado</span>';
+      mostrarToast('Novedad aprobada correctamente.');
+    });
+  }
+  if (btnRechazar && btnRechazar.textContent.trim() === 'Rechazar') {
+    btnRechazar.addEventListener('click', function() {
+      filaRechazando = { fila: fila, celdaEstado: celdaEstado };
+      document.getElementById('motivo-rechazo').value = '';
+      abrirModal('modal-rechazar');
+    });
+  }
+});
+
+function confirmarRechazo(e) {
+  e.preventDefault();
+  if (filaRechazando) {
+    filaRechazando.celdaEstado.innerHTML = '<span class="flex items-center gap-1 text-[10px] font-bold text-error"><span class="w-2 h-2 rounded-full bg-error"></span> RECHAZADO</span>';
+    filaRechazando.fila.querySelector('td:last-child').innerHTML = '<span class="text-[10px] font-bold text-error uppercase tracking-widest">Rechazado</span>';
+    filaRechazando = null;
+  }
+  cerrarModal('modal-rechazar');
+  mostrarToast('Novedad rechazada.', false);
+}
 </script>
 </body>
 </html>

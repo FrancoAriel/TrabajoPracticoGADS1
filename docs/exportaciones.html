@@ -297,6 +297,12 @@ tailwind.config = {
   </div>
 </main>
 
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold">
+  <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">download</span>
+  <span id="toast-msg">Exportación iniciada</span>
+</div>
+
 <script>
 (function() {
   var page = location.pathname.split('/').pop() || 'index.html';
@@ -307,6 +313,40 @@ tailwind.config = {
     }
   });
 })();
+
+function mostrarToast(msg) {
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(function() { t.classList.add('hidden'); }, 3000);
+}
+
+var reportNames = [
+  'Reporte de Fichadas',
+  'Reporte de Novedades',
+  'Liquidación Mensual',
+  'Horas Extra',
+  'Nómina de Empleados',
+  'Horarios Asignados'
+];
+
+document.querySelectorAll('.grid button').forEach(function(btn, i) {
+  if (btn.textContent.trim().includes('Exportar')) {
+    btn.addEventListener('click', function() {
+      var card = btn.closest('.bg-surface-container-lowest');
+      var titulo = card ? card.querySelector('h3') : null;
+      var nombre = titulo ? titulo.textContent.trim() : (reportNames[i] || 'Reporte');
+      var fmt = card ? (card.querySelector('select:last-of-type') || card.querySelector('select')).value : 'Excel';
+      mostrarToast('Generando: ' + nombre + ' (' + fmt + ')...');
+    });
+  }
+});
+
+document.querySelectorAll('.space-y-2 button').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    mostrarToast('Descargando exportación anterior...');
+  });
+});
 </script>
 </body>
 </html>
