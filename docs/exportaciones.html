@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html class="light" lang="es">
 <head>
 <meta charset="utf-8"/>
@@ -54,7 +54,6 @@ tailwind.config = {
     <a href="index.html" data-nav="index.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
     <a href="empleados.html" data-nav="empleados.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">groups</span><span>Empleados</span></a>
     <a href="horarios.html" data-nav="horarios.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">calendar_today</span><span>Horarios</span></a>
-    <a href="horarios.html#ciclos" data-nav="ciclos" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">autorenew</span><span>Ciclos rotativos</span></a>
     <a href="fichadas.html" data-nav="fichadas.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">fingerprint</span><span>Fichadas</span></a>
     <a href="novedades.html" data-nav="novedades.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">notification_important</span><span>Novedades</span></a>
     <a href="cierre.html" data-nav="cierre.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">payments</span><span>Cierre mensual</span></a>
@@ -83,218 +82,284 @@ tailwind.config = {
 
 <!-- Main -->
 <main class="ml-64 pt-20 px-8 pb-12 min-h-screen">
-  <div class="mb-8">
-    <h2 class="text-2xl font-extrabold tracking-tight text-on-background font-headline">Exportaciones</h2>
-    <p class="text-on-surface-variant text-sm mt-1">Generación y descarga de reportes e informes del sistema.</p>
+
+  <!-- Page Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-extrabold tracking-tight text-on-background font-headline">Exportaciones</h2>
+      <p class="text-on-surface-variant text-sm mt-1">Generación y descarga de reportes e informes del sistema.</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Reportes disponibles</p>
+      <p class="text-2xl font-headline font-black text-primary">6</p>
+    </div>
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Exportaciones este mes</p>
+      <p class="text-2xl font-headline font-black text-on-secondary-container">14</p>
+    </div>
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Última exportación</p>
+      <p class="text-2xl font-headline font-black text-tertiary">Hoy</p>
+    </div>
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Períodos cerrados</p>
+      <p class="text-2xl font-headline font-black text-on-background">2</p>
+    </div>
   </div>
 
   <!-- Export Cards Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-    <!-- Card 1 -->
-    <div class="bg-surface-container-lowest rounded-xl p-6 border border-slate-200/50 hover:shadow-md transition-all group">
-      <div class="flex items-center gap-4 mb-4">
-        <div class="w-12 h-12 bg-primary-container rounded-xl flex items-center justify-center">
-          <span class="material-symbols-outlined text-primary">table_chart</span>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
+
+    <!-- Fichadas -->
+    <div class="bg-surface-container-lowest rounded-xl p-6 border border-slate-200/50 hover:shadow-md transition-all flex flex-col">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 bg-primary-container rounded-xl flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-primary text-xl">fingerprint</span>
         </div>
         <div>
-          <h3 class="font-headline font-bold text-base">Reporte de Fichadas</h3>
+          <h3 class="font-headline font-bold text-sm">Reporte de Fichadas</h3>
           <p class="text-xs text-on-surface-variant">Listado completo por período</p>
         </div>
       </div>
-      <div class="space-y-3 mb-6">
+      <div class="space-y-3 flex-1 mb-5">
         <div>
-          <label class="text-[10px] font-bold text-on-surface-variant uppercase">Período</label>
-          <select class="w-full mt-1 bg-surface-container-low border-none rounded-lg px-3 py-2 text-sm">
+          <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Período</label>
+          <select class="w-full mt-1 bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option>Junio 2025</option><option>Mayo 2025</option><option>Abril 2025</option>
           </select>
         </div>
         <div>
-          <label class="text-[10px] font-bold text-on-surface-variant uppercase">Formato</label>
-          <select class="w-full mt-1 bg-surface-container-low border-none rounded-lg px-3 py-2 text-sm">
+          <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Formato</label>
+          <select class="w-full mt-1 bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option>Excel (.xlsx)</option><option>CSV</option><option>PDF</option>
           </select>
         </div>
       </div>
-      <button class="w-full py-2.5 bg-primary text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+      <button onclick="exportar(this,'Reporte de Fichadas')" class="w-full py-2.5 bg-primary text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
         <span class="material-symbols-outlined text-sm">download</span> Exportar
       </button>
     </div>
 
-    <!-- Card 2 -->
-    <div class="bg-surface-container-lowest rounded-xl p-6 border border-slate-200/50 hover:shadow-md transition-all group">
-      <div class="flex items-center gap-4 mb-4">
-        <div class="w-12 h-12 bg-tertiary-container rounded-xl flex items-center justify-center">
-          <span class="material-symbols-outlined text-tertiary">person_search</span>
+    <!-- Novedades -->
+    <div class="bg-surface-container-lowest rounded-xl p-6 border border-slate-200/50 hover:shadow-md transition-all flex flex-col">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 bg-tertiary-container rounded-xl flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-tertiary text-xl">notification_important</span>
         </div>
         <div>
-          <h3 class="font-headline font-bold text-base">Reporte de Novedades</h3>
+          <h3 class="font-headline font-bold text-sm">Reporte de Novedades</h3>
           <p class="text-xs text-on-surface-variant">Por empleado o período</p>
         </div>
       </div>
-      <div class="space-y-3 mb-6">
+      <div class="space-y-3 flex-1 mb-5">
         <div>
-          <label class="text-[10px] font-bold text-on-surface-variant uppercase">Período</label>
-          <select class="w-full mt-1 bg-surface-container-low border-none rounded-lg px-3 py-2 text-sm">
+          <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Período</label>
+          <select class="w-full mt-1 bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option>Junio 2025</option><option>Mayo 2025</option><option>Abril 2025</option>
           </select>
         </div>
         <div>
-          <label class="text-[10px] font-bold text-on-surface-variant uppercase">Formato</label>
-          <select class="w-full mt-1 bg-surface-container-low border-none rounded-lg px-3 py-2 text-sm">
+          <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Formato</label>
+          <select class="w-full mt-1 bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option>Excel (.xlsx)</option><option>CSV</option><option>PDF</option>
           </select>
         </div>
       </div>
-      <button class="w-full py-2.5 bg-tertiary text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-tertiary-dim transition-colors flex items-center justify-center gap-2">
+      <button onclick="exportar(this,'Reporte de Novedades')" class="w-full py-2.5 bg-tertiary text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-tertiary/90 transition-colors flex items-center justify-center gap-2">
         <span class="material-symbols-outlined text-sm">download</span> Exportar
       </button>
     </div>
 
-    <!-- Card 3 -->
-    <div class="bg-surface-container-lowest rounded-xl p-6 border border-slate-200/50 hover:shadow-md transition-all group">
-      <div class="flex items-center gap-4 mb-4">
-        <div class="w-12 h-12 bg-secondary-container rounded-xl flex items-center justify-center">
-          <span class="material-symbols-outlined text-secondary">payments</span>
+    <!-- Liquidación -->
+    <div class="bg-surface-container-lowest rounded-xl p-6 border border-slate-200/50 hover:shadow-md transition-all flex flex-col">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 bg-secondary-container rounded-xl flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-on-secondary-container text-xl">payments</span>
         </div>
         <div>
-          <h3 class="font-headline font-bold text-base">Liquidación Mensual</h3>
+          <h3 class="font-headline font-bold text-sm">Liquidación Mensual</h3>
           <p class="text-xs text-on-surface-variant">Para sistema de liquidación</p>
         </div>
       </div>
-      <div class="space-y-3 mb-6">
+      <div class="space-y-3 flex-1 mb-5">
         <div>
-          <label class="text-[10px] font-bold text-on-surface-variant uppercase">Período cerrado</label>
-          <select class="w-full mt-1 bg-surface-container-low border-none rounded-lg px-3 py-2 text-sm">
-            <option>Mayo 2025 (cerrado)</option><option>Abril 2025 (cerrado)</option>
+          <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Período cerrado</label>
+          <select class="w-full mt-1 bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+            <option>Mayo 2025 (cerrado)</option><option>Abril 2025 (cerrado)</option><option>Marzo 2025 (cerrado)</option>
           </select>
         </div>
         <div>
-          <label class="text-[10px] font-bold text-on-surface-variant uppercase">Formato</label>
-          <select class="w-full mt-1 bg-surface-container-low border-none rounded-lg px-3 py-2 text-sm">
+          <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Formato</label>
+          <select class="w-full mt-1 bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option>Excel (.xlsx)</option><option>CSV</option>
           </select>
         </div>
       </div>
-      <button class="w-full py-2.5 bg-on-background text-surface font-bold text-xs uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+      <button onclick="exportar(this,'Liquidación Mensual')" class="w-full py-2.5 bg-on-background text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
         <span class="material-symbols-outlined text-sm">download</span> Exportar
       </button>
     </div>
 
-    <!-- Card 4 -->
-    <div class="bg-surface-container-lowest rounded-xl p-6 border border-slate-200/50 hover:shadow-md transition-all group">
-      <div class="flex items-center gap-4 mb-4">
-        <div class="w-12 h-12 bg-error-container/20 rounded-xl flex items-center justify-center">
-          <span class="material-symbols-outlined text-error">schedule</span>
+    <!-- Horas Extra -->
+    <div class="bg-surface-container-lowest rounded-xl p-6 border border-slate-200/50 hover:shadow-md transition-all flex flex-col">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 bg-error-container/20 rounded-xl flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-error text-xl">more_time</span>
         </div>
         <div>
-          <h3 class="font-headline font-bold text-base">Horas Extra</h3>
+          <h3 class="font-headline font-bold text-sm">Horas Extra</h3>
           <p class="text-xs text-on-surface-variant">Detalle de HE 50% y 100%</p>
         </div>
       </div>
-      <div class="space-y-3 mb-6">
+      <div class="space-y-3 flex-1 mb-5">
         <div>
-          <label class="text-[10px] font-bold text-on-surface-variant uppercase">Período</label>
-          <select class="w-full mt-1 bg-surface-container-low border-none rounded-lg px-3 py-2 text-sm">
+          <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Período</label>
+          <select class="w-full mt-1 bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option>Junio 2025</option><option>Mayo 2025</option><option>Abril 2025</option>
           </select>
         </div>
         <div>
-          <label class="text-[10px] font-bold text-on-surface-variant uppercase">Tipo</label>
-          <select class="w-full mt-1 bg-surface-container-low border-none rounded-lg px-3 py-2 text-sm">
+          <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Tipo</label>
+          <select class="w-full mt-1 bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option>Todas</option><option>HE 50%</option><option>HE 100%</option>
           </select>
         </div>
       </div>
-      <button class="w-full py-2.5 bg-error text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+      <button onclick="exportar(this,'Horas Extra')" class="w-full py-2.5 bg-error text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
         <span class="material-symbols-outlined text-sm">download</span> Exportar
       </button>
     </div>
 
-    <!-- Card 5 -->
-    <div class="bg-surface-container-lowest rounded-xl p-6 border border-slate-200/50 hover:shadow-md transition-all group">
-      <div class="flex items-center gap-4 mb-4">
-        <div class="w-12 h-12 bg-primary-container rounded-xl flex items-center justify-center">
-          <span class="material-symbols-outlined text-primary">groups</span>
+    <!-- Nómina -->
+    <div class="bg-surface-container-lowest rounded-xl p-6 border border-slate-200/50 hover:shadow-md transition-all flex flex-col">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 bg-primary-container rounded-xl flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-primary text-xl">groups</span>
         </div>
         <div>
-          <h3 class="font-headline font-bold text-base">Nómina de Empleados</h3>
+          <h3 class="font-headline font-bold text-sm">Nómina de Empleados</h3>
           <p class="text-xs text-on-surface-variant">Datos maestros del personal</p>
         </div>
       </div>
-      <div class="space-y-3 mb-6">
+      <div class="space-y-3 flex-1 mb-5">
         <div>
-          <label class="text-[10px] font-bold text-on-surface-variant uppercase">Sector</label>
-          <select class="w-full mt-1 bg-surface-container-low border-none rounded-lg px-3 py-2 text-sm">
-            <option>Todos</option><option>Administrativo</option><option>Planta</option>
+          <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Sector</label>
+          <select class="w-full mt-1 bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+            <option>Todos</option><option>Administrativo</option><option>Planta</option><option>Soporte</option>
           </select>
         </div>
         <div>
-          <label class="text-[10px] font-bold text-on-surface-variant uppercase">Formato</label>
-          <select class="w-full mt-1 bg-surface-container-low border-none rounded-lg px-3 py-2 text-sm">
+          <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Formato</label>
+          <select class="w-full mt-1 bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option>Excel (.xlsx)</option><option>CSV</option><option>PDF</option>
           </select>
         </div>
       </div>
-      <button class="w-full py-2.5 bg-primary text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+      <button onclick="exportar(this,'Nómina de Empleados')" class="w-full py-2.5 bg-primary text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
         <span class="material-symbols-outlined text-sm">download</span> Exportar
       </button>
     </div>
 
-    <!-- Card 6 -->
-    <div class="bg-surface-container-lowest rounded-xl p-6 border border-slate-200/50 hover:shadow-md transition-all group">
-      <div class="flex items-center gap-4 mb-4">
-        <div class="w-12 h-12 bg-surface-container-highest rounded-xl flex items-center justify-center">
-          <span class="material-symbols-outlined text-on-surface-variant">calendar_today</span>
+    <!-- Horarios -->
+    <div class="bg-surface-container-lowest rounded-xl p-6 border border-slate-200/50 hover:shadow-md transition-all flex flex-col">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 bg-surface-container-highest rounded-xl flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-on-surface-variant text-xl">calendar_today</span>
         </div>
         <div>
-          <h3 class="font-headline font-bold text-base">Horarios Asignados</h3>
+          <h3 class="font-headline font-bold text-sm">Horarios Asignados</h3>
           <p class="text-xs text-on-surface-variant">Asignaciones vigentes</p>
         </div>
       </div>
-      <div class="space-y-3 mb-6">
+      <div class="space-y-3 flex-1 mb-5">
         <div>
-          <label class="text-[10px] font-bold text-on-surface-variant uppercase">Tipo</label>
-          <select class="w-full mt-1 bg-surface-container-low border-none rounded-lg px-3 py-2 text-sm">
+          <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Tipo</label>
+          <select class="w-full mt-1 bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option>Todos</option><option>Horario fijo</option><option>Ciclo rotativo</option>
           </select>
         </div>
         <div>
-          <label class="text-[10px] font-bold text-on-surface-variant uppercase">Formato</label>
-          <select class="w-full mt-1 bg-surface-container-low border-none rounded-lg px-3 py-2 text-sm">
+          <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Formato</label>
+          <select class="w-full mt-1 bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option>Excel (.xlsx)</option><option>CSV</option>
           </select>
         </div>
       </div>
-      <button class="w-full py-2.5 bg-secondary text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-secondary-dim transition-colors flex items-center justify-center gap-2">
+      <button onclick="exportar(this,'Horarios Asignados')" class="w-full py-2.5 bg-on-secondary-container text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
         <span class="material-symbols-outlined text-sm">download</span> Exportar
       </button>
     </div>
   </div>
 
-  <!-- Recent exports -->
-  <div class="bg-surface-container-lowest rounded-xl p-6 border border-slate-200/50">
-    <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] mb-4 flex items-center gap-2">
-      <span class="material-symbols-outlined text-sm">history</span> EXPORTACIONES RECIENTES
-    </h3>
-    <div class="space-y-2">
-      <div class="flex items-center gap-4 p-3 rounded-lg bg-surface-container-low hover:bg-surface-container-high transition-colors">
-        <span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">description</span>
-        <div class="flex-1">
-          <p class="text-sm font-semibold">Reporte de Fichadas — Mayo 2025</p>
-          <p class="text-[11px] text-on-surface-variant">Excel · 05/06/2025 · Admin</p>
-        </div>
-        <button class="text-primary font-black text-[10px] uppercase tracking-widest border border-primary/20 px-3 py-1 rounded hover:bg-primary/5">Redownload</button>
-      </div>
-      <div class="flex items-center gap-4 p-3 rounded-lg bg-surface-container-low hover:bg-surface-container-high transition-colors">
-        <span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">description</span>
-        <div class="flex-1">
-          <p class="text-sm font-semibold">Liquidación Mensual — Mayo 2025</p>
-          <p class="text-[11px] text-on-surface-variant">Excel · 05/06/2025 · Admin</p>
-        </div>
-        <button class="text-primary font-black text-[10px] uppercase tracking-widest border border-primary/20 px-3 py-1 rounded hover:bg-primary/5">Redownload</button>
-      </div>
+  <!-- Historial de exportaciones -->
+  <div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
+    <div class="p-5 border-b border-slate-100">
+      <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">history</span> HISTORIAL DE EXPORTACIONES
+      </h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-surface-container-low">
+            <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Reporte</th>
+            <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Período</th>
+            <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Formato</th>
+            <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Fecha</th>
+            <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Usuario</th>
+            <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-5 py-3.5"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm text-on-secondary-container" style="font-variation-settings:'FILL' 1">description</span><span class="text-sm font-semibold">Reporte de Fichadas</span></div></td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">Mayo 2025</td>
+            <td class="px-5 py-3.5"><span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-full">XLSX</span></td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">05/06/2025 14:22</td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">Administrator</td>
+            <td class="px-5 py-3.5"><button onclick="mostrarToast('Descargando exportación...')" class="text-primary font-black text-[10px] uppercase tracking-widest border border-primary/20 px-3 py-1 rounded hover:bg-primary/5 transition-colors">Redownload</button></td>
+          </tr>
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-5 py-3.5"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm text-on-secondary-container" style="font-variation-settings:'FILL' 1">description</span><span class="text-sm font-semibold">Liquidación Mensual</span></div></td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">Mayo 2025</td>
+            <td class="px-5 py-3.5"><span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-full">XLSX</span></td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">05/06/2025 14:18</td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">Administrator</td>
+            <td class="px-5 py-3.5"><button onclick="mostrarToast('Descargando exportación...')" class="text-primary font-black text-[10px] uppercase tracking-widest border border-primary/20 px-3 py-1 rounded hover:bg-primary/5 transition-colors">Redownload</button></td>
+          </tr>
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-5 py-3.5"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm text-on-secondary-container" style="font-variation-settings:'FILL' 1">description</span><span class="text-sm font-semibold">Horas Extra</span></div></td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">Mayo 2025</td>
+            <td class="px-5 py-3.5"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-full">CSV</span></td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">04/06/2025 09:05</td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">Supervisor RRHH</td>
+            <td class="px-5 py-3.5"><button onclick="mostrarToast('Descargando exportación...')" class="text-primary font-black text-[10px] uppercase tracking-widest border border-primary/20 px-3 py-1 rounded hover:bg-primary/5 transition-colors">Redownload</button></td>
+          </tr>
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-5 py-3.5"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm text-on-secondary-container" style="font-variation-settings:'FILL' 1">description</span><span class="text-sm font-semibold">Nómina de Empleados</span></div></td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">—</td>
+            <td class="px-5 py-3.5"><span class="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded-full">PDF</span></td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">01/06/2025 11:40</td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">Administrator</td>
+            <td class="px-5 py-3.5"><button onclick="mostrarToast('Descargando exportación...')" class="text-primary font-black text-[10px] uppercase tracking-widest border border-primary/20 px-3 py-1 rounded hover:bg-primary/5 transition-colors">Redownload</button></td>
+          </tr>
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-5 py-3.5"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm text-on-secondary-container" style="font-variation-settings:'FILL' 1">description</span><span class="text-sm font-semibold">Reporte de Novedades</span></div></td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">Abril 2025</td>
+            <td class="px-5 py-3.5"><span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-full">XLSX</span></td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">07/05/2025 16:10</td>
+            <td class="px-5 py-3.5 text-sm text-on-surface-variant">Supervisor RRHH</td>
+            <td class="px-5 py-3.5"><button onclick="mostrarToast('Descargando exportación...')" class="text-primary font-black text-[10px] uppercase tracking-widest border border-primary/20 px-3 py-1 rounded hover:bg-primary/5 transition-colors">Redownload</button></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
+
 </main>
 
 <!-- Toast -->
@@ -321,32 +386,12 @@ function mostrarToast(msg) {
   setTimeout(function() { t.classList.add('hidden'); }, 3000);
 }
 
-var reportNames = [
-  'Reporte de Fichadas',
-  'Reporte de Novedades',
-  'Liquidación Mensual',
-  'Horas Extra',
-  'Nómina de Empleados',
-  'Horarios Asignados'
-];
-
-document.querySelectorAll('.grid button').forEach(function(btn, i) {
-  if (btn.textContent.trim().includes('Exportar')) {
-    btn.addEventListener('click', function() {
-      var card = btn.closest('.bg-surface-container-lowest');
-      var titulo = card ? card.querySelector('h3') : null;
-      var nombre = titulo ? titulo.textContent.trim() : (reportNames[i] || 'Reporte');
-      var fmt = card ? (card.querySelector('select:last-of-type') || card.querySelector('select')).value : 'Excel';
-      mostrarToast('Generando: ' + nombre + ' (' + fmt + ')...');
-    });
-  }
-});
-
-document.querySelectorAll('.space-y-2 button').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    mostrarToast('Descargando exportación anterior...');
-  });
-});
+function exportar(btn, nombre) {
+  var card = btn.closest('.bg-surface-container-lowest');
+  var selects = card ? card.querySelectorAll('select') : [];
+  var fmt = selects.length > 0 ? selects[selects.length - 1].value : 'Excel';
+  mostrarToast('Generando: ' + nombre + ' (' + fmt + ')...');
+}
 </script>
 </body>
 </html>

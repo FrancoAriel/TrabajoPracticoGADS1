@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html class="light" lang="es">
 <head>
 <meta charset="utf-8"/>
@@ -66,9 +66,6 @@ tailwind.config = {
     </a>
     <a href="horarios.html" data-nav="horarios.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold tracking-tight text-sm transition-all cursor-pointer active:scale-95">
       <span class="material-symbols-outlined">calendar_today</span><span>Horarios</span>
-    </a>
-    <a href="horarios.html#ciclos" data-nav="ciclos" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold tracking-tight text-sm transition-all cursor-pointer active:scale-95">
-      <span class="material-symbols-outlined">autorenew</span><span>Ciclos rotativos</span>
     </a>
     <a href="fichadas.html" data-nav="fichadas.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold tracking-tight text-sm transition-all cursor-pointer active:scale-95">
       <span class="material-symbols-outlined">fingerprint</span><span>Fichadas</span>
@@ -315,12 +312,14 @@ tailwind.config = {
     </div>
     <div class="p-4 border-t border-slate-100 flex items-center justify-between">
       <p id="contador-empleados" class="text-xs text-on-surface-variant">Mostrando 7 de 37 empleados</p>
-      <div class="flex gap-2">
-        <button class="px-3 py-1 text-xs font-bold border border-outline-variant/30 rounded hover:bg-surface-container-low transition-colors">Anterior</button>
-        <button class="px-3 py-1 text-xs font-bold bg-primary text-white rounded">1</button>
-        <button class="px-3 py-1 text-xs font-bold border border-outline-variant/30 rounded hover:bg-surface-container-low transition-colors">2</button>
-        <button class="px-3 py-1 text-xs font-bold border border-outline-variant/30 rounded hover:bg-surface-container-low transition-colors">3</button>
-        <button class="px-3 py-1 text-xs font-bold border border-outline-variant/30 rounded hover:bg-surface-container-low transition-colors">Siguiente</button>
+      <div class="flex items-center gap-1">
+        <button id="emp-prev" onclick="paginarEmp(-1)" disabled class="p-1.5 rounded-md border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+          <span class="material-symbols-outlined text-sm">chevron_left</span>
+        </button>
+        <span id="emp-pagina" class="text-xs font-bold text-on-surface-variant px-2">1 / 6</span>
+        <button id="emp-next" onclick="paginarEmp(1)" class="p-1.5 rounded-md border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+          <span class="material-symbols-outlined text-sm">chevron_right</span>
+        </button>
       </div>
     </div>
   </div>
@@ -509,42 +508,58 @@ function mostrarToast(msg, ok) {
   setTimeout(function() { t.classList.add('hidden'); }, 3000);
 }
 
-// Filtrado de tabla
-function filtrarEmpleados() {
+// Paginación empleados
+var empPagActual = 1;
+var empPorPagina = 7;
+
+function getFilasEmpFiltradas() {
   var busqueda = (document.getElementById('search-emp').value || '').toLowerCase().trim();
   var catFiltro = (document.getElementById('filtro-categoria').value || '').toLowerCase();
   var jorFiltro = (document.getElementById('filtro-jornada').value || '').toLowerCase();
   var estFiltro = (document.getElementById('filtro-estado').value || '').toLowerCase();
-
-  var filas = document.querySelectorAll('#tabla-empleados tbody tr:not(#fila-sin-resultados)');
-  var visibles = 0;
-
-  filas.forEach(function(fila) {
+  return Array.from(document.querySelectorAll('#tabla-empleados tbody tr:not(#fila-sin-resultados)')).filter(function(fila) {
     var legajo = fila.cells[0].textContent.trim().toLowerCase();
     var nombre = fila.cells[1].textContent.trim().toLowerCase();
     var categoria = fila.cells[2].textContent.trim().toLowerCase();
     var jornada = fila.cells[4].textContent.trim().toLowerCase();
     var estado = fila.cells[6].textContent.trim().toLowerCase();
-
-    var okBusqueda = !busqueda || legajo.includes(busqueda) || nombre.includes(busqueda);
-    var okCat = !catFiltro || categoria.includes(catFiltro);
-    var okJor = !jorFiltro || jornada.includes(jorFiltro);
-    var okEst = !estFiltro || estado.includes(estFiltro);
-
-    var mostrar = okBusqueda && okCat && okJor && okEst;
-    fila.style.display = mostrar ? '' : 'none';
-    if (mostrar) visibles++;
+    return (!busqueda || legajo.includes(busqueda) || nombre.includes(busqueda))
+        && (!catFiltro || categoria.includes(catFiltro))
+        && (!jorFiltro || jornada.includes(jorFiltro))
+        && (!estFiltro || estado.includes(estFiltro));
   });
+}
 
+function renderPaginaEmp(visibles) {
+  var total = visibles.length;
+  var totalPags = Math.max(1, Math.ceil(total / empPorPagina));
+  if (empPagActual > totalPags) empPagActual = totalPags;
+  var desde = (empPagActual - 1) * empPorPagina;
+  Array.from(document.querySelectorAll('#tabla-empleados tbody tr:not(#fila-sin-resultados)')).forEach(function(f) { f.style.display = 'none'; });
+  visibles.forEach(function(f, i) { f.style.display = (i >= desde && i < desde + empPorPagina) ? '' : 'none'; });
   var sinResultados = document.getElementById('fila-sin-resultados');
   var thead = document.getElementById('tabla-thead');
-  sinResultados.style.display = visibles === 0 ? '' : 'none';
+  sinResultados.style.display = total === 0 ? '' : 'none';
   sinResultados.classList.remove('hidden');
-  thead.style.display = visibles === 0 ? 'none' : '';
-
-  document.getElementById('contador-empleados').textContent =
-    'Mostrando ' + visibles + ' de 37 empleados';
+  thead.style.display = total === 0 ? 'none' : '';
+  document.getElementById('contador-empleados').textContent = total === 0 ? 'Sin resultados' : 'Mostrando ' + Math.min(empPorPagina, total - desde) + ' de ' + total + ' empleados';
+  document.getElementById('emp-pagina').textContent = empPagActual + ' / ' + totalPags;
+  document.getElementById('emp-prev').disabled = empPagActual === 1;
+  document.getElementById('emp-next').disabled = empPagActual === totalPags;
 }
+
+function filtrarEmpleados() {
+  empPagActual = 1;
+  renderPaginaEmp(getFilasEmpFiltradas());
+}
+
+function paginarEmp(dir) {
+  empPagActual += dir;
+  renderPaginaEmp(getFilasEmpFiltradas());
+}
+
+// Render inicial (después de que las variables estén asignadas)
+renderPaginaEmp(getFilasEmpFiltradas());
 
 function limpiarFiltros() {
   document.getElementById('search-emp').value = '';

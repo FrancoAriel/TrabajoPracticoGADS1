@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html class="light" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Gestión de Horarios y Ciclos - Executive Architect</title>
+<title>Horarios - Executive Architect</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -38,477 +38,1582 @@ tailwind.config = {
 </script>
 <style>
   body { font-family: 'Inter', sans-serif; }
-  .font-headline, h1, h2, h3 { font-family: 'Manrope', sans-serif; }
-  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
+  .font-headline { font-family: 'Manrope', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .tab-btn.active { color: #455f88; border-bottom-color: #455f88; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
 </style>
 </head>
-<body class="bg-surface text-on-surface">
+<body class="bg-background text-on-background antialiased overflow-x-hidden">
 
 <!-- SideNavBar -->
-<aside class="h-screen w-64 fixed left-0 top-0 bg-slate-100 flex flex-col py-6 px-4 z-50">
-  <div class="flex items-center gap-3 mb-10 px-2">
-    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
-      <span class="material-symbols-outlined">architecture</span>
-    </div>
-    <div>
-      <h2 class="font-black text-lg text-slate-900 leading-none">Executive Architect</h2>
-      <p class="text-[10px] text-on-surface-variant font-bold tracking-tighter opacity-70">Labor Management</p>
+<aside class="h-screen w-64 fixed left-0 top-0 bg-slate-100 flex flex-col py-6 z-50">
+  <div class="px-6 mb-8">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+        <span class="material-symbols-outlined">architecture</span>
+      </div>
+      <div>
+        <h2 class="text-lg font-black text-slate-900 leading-none font-headline">Executive Architect</h2>
+        <p class="text-[10px] uppercase tracking-tighter text-on-surface-variant font-bold mt-1">Labor Management</p>
+      </div>
     </div>
   </div>
-  <nav class="flex-1 space-y-1">
-    <a href="index.html" data-nav="index.html" class="nav-link flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-200/50 transition-all duration-200 cursor-pointer active:scale-95 rounded-md">
-      <span class="material-symbols-outlined">dashboard</span><span class="text-sm font-bold">Dashboard</span>
+  <nav class="flex-1 space-y-1 px-4">
+    <a href="index.html" data-nav="index.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold tracking-tight text-sm transition-all cursor-pointer active:scale-95">
+      <span class="material-symbols-outlined">dashboard</span><span>Dashboard</span>
     </a>
-    <a href="empleados.html" data-nav="empleados.html" class="nav-link flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-200/50 transition-all duration-200 cursor-pointer active:scale-95 rounded-md">
-      <span class="material-symbols-outlined">groups</span><span class="text-sm font-bold">Empleados</span>
+    <a href="empleados.html" data-nav="empleados.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold tracking-tight text-sm transition-all cursor-pointer active:scale-95">
+      <span class="material-symbols-outlined">groups</span><span>Empleados</span>
     </a>
-    <a href="horarios.html" data-nav="horarios.html" class="nav-link flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-200/50 transition-all duration-200 cursor-pointer active:scale-95 rounded-md">
-      <span class="material-symbols-outlined">calendar_today</span><span class="text-sm font-bold">Horarios</span>
+    <a href="horarios.html" data-nav="horarios.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold tracking-tight text-sm transition-all cursor-pointer active:scale-95">
+      <span class="material-symbols-outlined">calendar_today</span><span>Horarios</span>
     </a>
-    <a href="horarios.html#ciclos" data-nav="ciclos" class="nav-link flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-200/50 transition-all duration-200 cursor-pointer active:scale-95 rounded-md">
-      <span class="material-symbols-outlined">autorenew</span><span class="text-sm font-bold">Ciclos rotativos</span>
+    <a href="fichadas.html" data-nav="fichadas.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold tracking-tight text-sm transition-all cursor-pointer active:scale-95">
+      <span class="material-symbols-outlined">fingerprint</span><span>Fichadas</span>
     </a>
-    <a href="fichadas.html" data-nav="fichadas.html" class="nav-link flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-200/50 transition-all duration-200 cursor-pointer active:scale-95 rounded-md">
-      <span class="material-symbols-outlined">fingerprint</span><span class="text-sm font-bold">Fichadas</span>
+    <a href="novedades.html" data-nav="novedades.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold tracking-tight text-sm transition-all cursor-pointer active:scale-95">
+      <span class="material-symbols-outlined">notification_important</span><span>Novedades</span>
     </a>
-    <a href="novedades.html" data-nav="novedades.html" class="nav-link flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-200/50 transition-all duration-200 cursor-pointer active:scale-95 rounded-md">
-      <span class="material-symbols-outlined">notification_important</span><span class="text-sm font-bold">Novedades</span>
+    <a href="cierre.html" data-nav="cierre.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold tracking-tight text-sm transition-all cursor-pointer active:scale-95">
+      <span class="material-symbols-outlined">payments</span><span>Cierre mensual</span>
     </a>
-    <a href="cierre.html" data-nav="cierre.html" class="nav-link flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-200/50 transition-all duration-200 cursor-pointer active:scale-95 rounded-md">
-      <span class="material-symbols-outlined">payments</span><span class="text-sm font-bold">Cierre mensual</span>
-    </a>
-    <a href="exportaciones.html" data-nav="exportaciones.html" class="nav-link flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-200/50 transition-all duration-200 cursor-pointer active:scale-95 rounded-md">
-      <span class="material-symbols-outlined">output</span><span class="text-sm font-bold">Exportaciones</span>
+    <a href="exportaciones.html" data-nav="exportaciones.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold tracking-tight text-sm transition-all cursor-pointer active:scale-95">
+      <span class="material-symbols-outlined">output</span><span>Exportaciones</span>
     </a>
   </nav>
-  <div class="mt-auto space-y-4">
-    <button class="w-full py-3 px-4 bg-gradient-to-br from-primary to-primary-dim text-white rounded-md font-bold text-sm shadow-sm active:scale-95 transition-transform">Run Payroll</button>
-    <div class="pt-4 border-t border-slate-200 space-y-1">
-      <a href="#" class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-200/50 transition-all text-sm font-bold"><span class="material-symbols-outlined">help</span> Help Center</a>
-      <a href="login.html" class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-200/50 transition-all text-sm font-bold"><span class="material-symbols-outlined">logout</span> Sign Out</a>
+  <div class="mt-auto px-4 pt-6 border-t border-slate-200/50">
+    <button class="w-full mb-4 bg-gradient-to-br from-primary to-primary-dim text-white font-bold py-2.5 px-4 rounded-lg text-sm active:scale-95 transition-all">Run Payroll</button>
+    <div class="space-y-1">
+      <a href="#" class="flex items-center gap-3 px-3 py-2 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-colors"><span class="material-symbols-outlined">help</span><span>Support</span></a>
+      <a href="login.html" class="flex items-center gap-3 px-3 py-2 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-colors"><span class="material-symbols-outlined">logout</span><span>Sign Out</span></a>
     </div>
   </div>
 </aside>
 
-<!-- Main Content -->
-<main class="ml-64 min-h-screen">
-  <!-- TopNavBar -->
-  <header class="w-full top-0 sticky z-40 bg-slate-50">
-    <div class="flex items-center justify-between px-8 py-4 w-full max-w-screen-2xl mx-auto">
-      <div class="flex items-center gap-8">
-        <h1 class="text-xl font-bold tracking-tighter text-blue-900">Executive Architect</h1>
-        <nav class="hidden md:flex gap-6 items-end">
-          <a href="horarios.html" class="text-blue-700 border-b-2 border-blue-700 pb-2 text-sm font-semibold tracking-tight">Horarios</a>
-          <a href="horarios.html#ciclos" class="text-slate-500 pb-2 text-sm font-semibold tracking-tight hover:text-blue-800 transition-colors">Ciclos</a>
-          <a href="horarios.html#asignaciones" class="text-slate-500 pb-2 text-sm font-semibold tracking-tight hover:text-blue-800 transition-colors">Asignaciones</a>
-        </nav>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-64 h-16 z-40 bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/50 flex items-center justify-between px-8 w-[calc(100%-16rem)]">
+    <div class="flex items-center gap-6">
+    <h1 class="text-xl font-bold text-slate-800 font-headline">HORARIOS</h1>
+    <div class="flex items-center gap-2">
+      <div class="relative">
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><span class="material-symbols-outlined text-sm">search</span></span>
+        <input id="search-hor" class="pl-10 pr-4 py-1.5 bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-md text-xs w-56" placeholder="BUSCAR HORARIO..." type="text" onkeydown="if(event.key==='Enter')buscarActivo()"/>
       </div>
-      <div class="flex items-center gap-4">
-        <div class="relative">
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-sm">search</span>
-          <input class="bg-surface-container-low border-none rounded-full pl-10 pr-4 py-1.5 text-xs focus:ring-1 focus:ring-primary w-64" placeholder="Buscar horario o ciclo..." type="text"/>
-        </div>
-        <button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
-        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary text-xs font-bold">AD</div>
-      </div>
+      <button onclick="buscarActivo()" class="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-md hover:bg-primary/90 transition-colors">
+        <span class="material-symbols-outlined text-sm">search</span> Buscar
+      </button>
     </div>
-    <div class="bg-slate-200/50 h-[1px]"></div>
-  </header>
-
-  <div class="p-8 max-w-screen-2xl mx-auto space-y-8">
-    <!-- Section 1: Global Actions -->
-    <div class="flex flex-wrap items-center justify-between gap-4">
-      <div>
-        <h2 class="text-2xl font-extrabold tracking-tight text-on-background">Gestión de Horarios y Ciclos</h2>
-        <p class="text-on-surface-variant text-sm">Configure y administre las estructuras de tiempo laboral corporativo.</p>
-      </div>
-      <div class="flex gap-3">
-        <button class="px-4 py-2 bg-surface-container-high text-on-secondary-container rounded-md font-semibold text-sm hover:bg-surface-container-highest transition-colors flex items-center gap-2">
-          <span class="material-symbols-outlined text-sm">add</span> Nuevo horario
-        </button>
-        <button class="px-4 py-2 bg-surface-container-high text-on-secondary-container rounded-md font-semibold text-sm hover:bg-surface-container-highest transition-colors flex items-center gap-2">
-          <span class="material-symbols-outlined text-sm">autorenew</span> Nuevo ciclo
-        </button>
-        <button class="px-4 py-2 bg-primary text-white rounded-md font-semibold text-sm shadow-sm hover:bg-primary-dim transition-colors flex items-center gap-2">
-          <span class="material-symbols-outlined text-sm">person_add</span> Asignar horario
-        </button>
-        <button class="px-4 py-2 bg-primary text-white rounded-md font-semibold text-sm shadow-sm hover:bg-primary-dim transition-colors flex items-center gap-2">
-          <span class="material-symbols-outlined text-sm">group_add</span> Asignar ciclo
-        </button>
-      </div>
+  </div>
+  <div class="flex items-center gap-6">
+    <div class="flex gap-4">
+      <button class="text-slate-500 hover:text-blue-900 transition-all"><span class="material-symbols-outlined">notifications</span></button>
     </div>
+    <div class="flex items-center gap-3 pl-6 border-l border-slate-200/50">
+      <div class="text-right">
+        <p class="text-[10px] font-headline font-bold text-slate-900 leading-none">ADMINISTRATOR</p>
+        <p class="text-[9px] text-slate-500 font-headline uppercase tracking-widest mt-1">Super User</p>
+      </div>
+      <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary text-xs font-bold font-headline">AD</div>
+    </div>
+  </div>
+</header>
 
-    <!-- Section 2: Horarios List & Details -->
+<!-- Main -->
+<main class="ml-64 pt-20 px-8 pb-12 min-h-screen">
+
+  <!-- Page Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-extrabold tracking-tight text-on-background font-headline">Gestión de Horarios</h2>
+      <p class="text-on-surface-variant text-sm mt-1">Horarios fijos, ciclos rotativos y asignaciones al personal.</p>
+    </div>
+    <!-- Acciones dinámicas por tab -->
+    <div id="actions-horarios" class="flex items-center gap-3">
+      <button onclick="document.getElementById('modal-nuevo-horario').classList.remove('hidden')" class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md font-semibold text-sm shadow-sm hover:bg-primary/90 transition-colors">
+        <span class="material-symbols-outlined text-sm">add_circle</span> Nuevo horario
+      </button>
+    </div>
+    <div id="actions-ciclos" class="hidden items-center gap-3">
+      <button onclick="document.getElementById('modal-nuevo-ciclo').classList.remove('hidden')" class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md font-semibold text-sm shadow-sm hover:bg-primary/90 transition-colors">
+        <span class="material-symbols-outlined text-sm">add_circle</span> Nuevo ciclo
+      </button>
+    </div>
+    <div id="actions-asignaciones" class="hidden items-center gap-3">
+      <button onclick="document.getElementById('modal-asignar-ciclo').classList.remove('hidden')" class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md font-semibold text-sm shadow-sm hover:bg-primary/90 transition-colors">
+        <span class="material-symbols-outlined text-sm">groups</span> Asignar ciclo
+      </button>
+      <button onclick="document.getElementById('modal-asignar-horario').classList.remove('hidden')" class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md font-semibold text-sm shadow-sm hover:bg-primary/90 transition-colors">
+        <span class="material-symbols-outlined text-sm">person_add</span> Asignar horario
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Horarios activos</p>
+      <p class="text-2xl font-headline font-black text-primary">12</p>
+    </div>
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Ciclos activos</p>
+      <p class="text-2xl font-headline font-black text-tertiary">3</p>
+    </div>
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Asignaciones</p>
+      <p class="text-2xl font-headline font-black text-on-secondary-container">48</p>
+    </div>
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Sin asignar</p>
+      <p class="text-2xl font-headline font-black text-error">4</p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="border-b border-slate-200 mb-6">
+    <div class="flex gap-0">
+      <button data-tab="horarios" class="tab-btn active px-6 py-3 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-primary transition-colors flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">schedule</span> Horarios
+      </button>
+      <button data-tab="ciclos" class="tab-btn px-6 py-3 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-primary transition-colors flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">autorenew</span> Ciclos rotativos
+      </button>
+      <button data-tab="asignaciones" class="tab-btn px-6 py-3 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-primary transition-colors flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">person_pin</span> Asignaciones
+      </button>
+    </div>
+  </div>
+
+  <!-- Tab: Horarios -->
+  <div id="tab-horarios" class="tab-panel active">
     <div class="grid grid-cols-12 gap-6">
-      <div class="col-span-12 lg:col-span-8 bg-surface-container-low rounded-xl p-6 overflow-hidden">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-lg font-bold">Listado de Horarios</h3>
-          <span class="bg-primary-container text-on-primary-container text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">12 Registros</span>
+      <!-- Lista -->
+      <div class="col-span-12 lg:col-span-7 bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between gap-3">
+          <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2 shrink-0">
+            <span class="material-symbols-outlined text-sm">schedule</span> LISTADO DE HORARIOS
+          </h3>
+          <div class="flex gap-2 items-center">
+            <select id="filtro-tipo-hor" onchange="filtrarHorarios()" class="bg-surface-container-low border-none rounded-md pl-3 pr-7 py-1.5 text-xs font-medium text-on-surface-variant min-w-[7rem]">
+              <option value="">Todos los tipos</option>
+              <option>Fijo</option>
+              <option>Flexible</option>
+            </select>
+            <select id="filtro-estado-hor" onchange="filtrarHorarios()" class="bg-surface-container-low border-none rounded-md pl-3 pr-7 py-1.5 text-xs font-medium text-on-surface-variant min-w-[7rem]">
+              <option value="">Todos los estados</option>
+              <option>Activo</option>
+              <option>Inactivo</option>
+            </select>
+            <button onclick="limpiarFiltrosHor()" class="px-3 py-1.5 text-xs font-bold text-on-surface-variant border border-outline-variant/30 rounded-md hover:bg-surface-container-low transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">filter_alt_off</span>
+            </button>
+          </div>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-sm text-left border-separate border-spacing-y-2">
-            <thead>
-              <tr class="text-on-surface-variant text-xs uppercase tracking-widest font-bold">
-                <th class="pb-2 px-4">ID</th>
-                <th class="pb-2 px-4">Nombre</th>
-                <th class="pb-2 px-4">Tipo</th>
-                <th class="pb-2 px-4">Estado</th>
-                <th class="pb-2 px-4 text-right">Acciones</th>
+          <table class="w-full text-left border-collapse">
+            <thead id="horarios-thead">
+              <tr class="bg-surface-container-low">
+                <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">ID</th>
+                <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Nombre</th>
+                <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Tipo</th>
+                <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Estado</th>
               </tr>
             </thead>
-            <tbody>
-              <tr class="bg-surface-container-lowest hover:bg-surface-container-high transition-colors group">
-                <td class="py-3 px-4 rounded-l-lg font-mono text-primary font-bold">H-001</td>
-                <td class="py-3 px-4 font-semibold">Planta Mañana</td>
-                <td class="py-3 px-4"><span class="bg-surface-container text-on-surface px-2 py-1 rounded text-xs">Fijo</span></td>
-                <td class="py-3 px-4"><span class="w-2 h-2 inline-block rounded-full bg-on-secondary-container mr-2"></span>Activo</td>
-                <td class="py-3 px-4 rounded-r-lg text-right">
-                  <div class="flex justify-end gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
-                    <button class="material-symbols-outlined text-lg hover:text-primary" title="Editar">edit</button>
-                    <button class="material-symbols-outlined text-lg hover:text-primary" title="Duplicar">content_copy</button>
-                    <button class="material-symbols-outlined text-lg hover:text-primary" title="Ver días">calendar_view_day</button>
-                  </div>
-                </td>
-              </tr>
-              <tr class="bg-surface-container-lowest hover:bg-surface-container-high transition-colors group">
-                <td class="py-3 px-4 rounded-l-lg font-mono text-primary font-bold">H-002</td>
-                <td class="py-3 px-4 font-semibold">Soporte Nocturno</td>
-                <td class="py-3 px-4"><span class="bg-surface-container text-on-surface px-2 py-1 rounded text-xs">Fijo</span></td>
-                <td class="py-3 px-4"><span class="w-2 h-2 inline-block rounded-full bg-on-secondary-container mr-2"></span>Activo</td>
-                <td class="py-3 px-4 rounded-r-lg text-right">
-                  <div class="flex justify-end gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
-                    <button class="material-symbols-outlined text-lg">edit</button>
-                    <button class="material-symbols-outlined text-lg">content_copy</button>
-                    <button class="material-symbols-outlined text-lg">calendar_view_day</button>
-                  </div>
-                </td>
-              </tr>
-              <tr class="bg-surface-container-high border-2 border-primary/20 transition-colors group shadow-sm">
-                <td class="py-3 px-4 rounded-l-lg font-mono text-primary font-bold">H-003</td>
-                <td class="py-3 px-4 font-bold">Oficina central</td>
-                <td class="py-3 px-4"><span class="bg-primary-container text-on-primary-container px-2 py-1 rounded text-xs font-bold">Fijo</span></td>
-                <td class="py-3 px-4"><span class="w-2 h-2 inline-block rounded-full bg-on-secondary-container mr-2"></span>Seleccionado</td>
-                <td class="py-3 px-4 rounded-r-lg text-right">
-                  <div class="flex justify-end gap-2">
-                    <button class="material-symbols-outlined text-lg text-primary">edit</button>
-                    <button class="material-symbols-outlined text-lg text-primary">content_copy</button>
-                    <button class="material-symbols-outlined text-lg text-primary" style="font-variation-settings: 'FILL' 1;">calendar_view_day</button>
-                  </div>
-                </td>
-              </tr>
-              <tr class="bg-surface-container-lowest hover:bg-surface-container-high transition-colors group">
-                <td class="py-3 px-4 rounded-l-lg font-mono text-primary font-bold">H-004</td>
-                <td class="py-3 px-4 font-semibold">Planta Tarde</td>
-                <td class="py-3 px-4"><span class="bg-surface-container text-on-surface px-2 py-1 rounded text-xs">Fijo</span></td>
-                <td class="py-3 px-4"><span class="w-2 h-2 inline-block rounded-full bg-on-secondary-container mr-2"></span>Activo</td>
-                <td class="py-3 px-4 rounded-r-lg text-right">
-                  <div class="flex justify-end gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
-                    <button class="material-symbols-outlined text-lg">edit</button>
-                    <button class="material-symbols-outlined text-lg">content_copy</button>
-                    <button class="material-symbols-outlined text-lg">calendar_view_day</button>
-                  </div>
+            <tbody class="divide-y divide-slate-100">
+              <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarHorario(this,'H-001','Planta Mañana','Fijo','08:00','17:00',5,10,60)">
+                <td class="px-5 py-3.5 text-sm font-mono font-bold text-primary">H-001</td>
+                <td class="px-5 py-3.5 text-sm font-semibold">Planta Mañana</td>
+                <td class="px-5 py-3.5"><span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded-full uppercase">Fijo</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+                </tr>
+              <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarHorario(this,'H-002','Soporte Nocturno','Fijo','22:00','06:00',10,15,45)">
+                <td class="px-5 py-3.5 text-sm font-mono font-bold text-primary">H-002</td>
+                <td class="px-5 py-3.5 text-sm font-semibold">Soporte Nocturno</td>
+                <td class="px-5 py-3.5"><span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded-full uppercase">Fijo</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+                </tr>
+              <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarHorario(this,'H-003','Oficina Central','Fijo','09:00','18:00',5,10,60)">
+                <td class="px-5 py-3.5 text-sm font-mono font-bold text-primary">H-003</td>
+                <td class="px-5 py-3.5 text-sm font-semibold">Oficina Central</td>
+                <td class="px-5 py-3.5"><span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded-full uppercase">Fijo</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+                </tr>
+              <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarHorario(this,'H-004','Planta Tarde','Fijo','14:00','22:00',5,10,60)">
+                <td class="px-5 py-3.5 text-sm font-mono font-bold text-primary">H-004</td>
+                <td class="px-5 py-3.5 text-sm font-semibold">Planta Tarde</td>
+                <td class="px-5 py-3.5"><span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded-full uppercase">Fijo</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+                </tr>
+              <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarHorario(this,'H-005','Parcial Mañana','Fijo','09:00','13:00',5,5,0)">
+                <td class="px-5 py-3.5 text-sm font-mono font-bold text-primary">H-005</td>
+                <td class="px-5 py-3.5 text-sm font-semibold">Parcial Mañana</td>
+                <td class="px-5 py-3.5"><span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded-full uppercase">Fijo</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+                </tr>
+              <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarHorario(this,'H-006','Flexible Administrativo','Flexible','—','—',10,10,0,'semanal',null,40)">
+                <td class="px-5 py-3.5 text-sm font-mono font-bold text-primary">H-006</td>
+                <td class="px-5 py-3.5 text-sm font-semibold">Flexible Administrativo</td>
+                <td class="px-5 py-3.5"><span class="px-2 py-1 bg-primary-container text-on-primary-container text-[10px] font-bold rounded-full uppercase">Flexible</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+                </tr>
+              <tr id="fila-sin-resultados-hor" class="hidden">
+                <td colspan="4" class="px-6 py-12 text-center text-on-surface-variant text-sm">
+                  <span class="material-symbols-outlined text-3xl block mb-2 opacity-30">search_off</span>
+                  No se encontraron horarios con los filtros aplicados.
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-      </div>
-      <!-- Detail Card -->
-      <div class="col-span-12 lg:col-span-4 space-y-6">
-        <div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border-b-4 border-primary">
-          <div class="flex justify-between items-start mb-6">
-            <h3 class="text-lg font-bold">Detalle de Horario</h3>
-            <span class="text-xs font-mono font-bold text-outline">ID: H-003</span>
+        <div class="px-5 py-3 border-t border-slate-100 flex items-center justify-between">
+          <p id="contador-hor" class="text-xs text-on-surface-variant">Mostrando 5 de 12 horarios</p>
+          <div class="flex items-center gap-1">
+            <button id="hor-prev" onclick="paginarHor(-1)" class="p-1.5 rounded-md border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+              <span class="material-symbols-outlined text-sm">chevron_left</span>
+            </button>
+            <span id="hor-pagina" class="text-xs font-bold text-on-surface-variant px-2">1 / 3</span>
+            <button id="hor-next" onclick="paginarHor(1)" class="p-1.5 rounded-md border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+              <span class="material-symbols-outlined text-sm">chevron_right</span>
+            </button>
           </div>
-          <div class="space-y-4">
-            <div class="flex justify-between pb-3 border-b border-surface-container">
-              <span class="text-on-surface-variant text-sm">Nombre</span>
-              <span class="font-bold text-sm">Oficina central</span>
+        </div>
+      </div>
+
+      <!-- Detalle -->
+      <div class="col-span-12 lg:col-span-5 space-y-4">
+        <!-- Estado vacío horarios -->
+        <div id="det-hor-vacio" class="bg-surface-container-lowest rounded-xl border border-slate-200/50 flex flex-col items-center justify-center py-16 px-6 text-center">
+          <span class="material-symbols-outlined text-4xl text-outline-variant mb-3">touch_app</span>
+          <p class="text-sm font-semibold text-on-surface-variant">Ningún horario seleccionado</p>
+          <p class="text-xs text-on-surface-variant/60 mt-1">Hacé clic en una fila para ver el detalle</p>
+        </div>
+        <!-- Contenido detalle horario -->
+        <div id="det-hor-contenido" class="hidden space-y-4">
+        <div class="bg-surface-container-lowest rounded-xl border border-slate-200/50 overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">info</span> DETALLE
+            </h3>
+            <div class="flex items-center gap-2"><span class="text-xs font-mono font-bold text-on-surface-variant" id="det-hor-id"></span><button onclick="abrirEditar()" class="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-primary/90 transition-colors"><span class="material-symbols-outlined text-sm">edit</span> Editar</button></div></div><div class="p-5 space-y-3">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+              <span class="text-xs text-on-surface-variant">Nombre</span>
+              <span class="text-sm font-bold" id="det-hor-nombre">Oficina Central</span>
             </div>
-            <div class="flex justify-between pb-3 border-b border-surface-container">
-              <span class="text-on-surface-variant text-sm">Tipo</span>
-              <span class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded text-[10px] font-bold uppercase">fijo</span>
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+              <span class="text-xs text-on-surface-variant">Tipo</span>
+              <span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full uppercase" id="det-hor-tipo">Fijo</span>
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <!-- Horas objetivo (solo flexible) -->
+            <div id="det-hor-flex" class="hidden bg-primary-container/20 rounded-xl p-3.5 space-y-2">
+              <p class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">tune</span> Flexibilidad</p>
+              <div class="flex justify-between items-center">
+                <span class="text-xs text-on-surface-variant">Modo</span>
+                <span class="text-xs font-bold capitalize" id="det-hor-modo-flex">—</span>
+              </div>
+              <div id="det-hor-flex-diaria" class="flex justify-between items-center">
+                <span class="text-xs text-on-surface-variant">Horas diarias objetivo</span>
+                <span class="text-sm font-black text-primary" id="det-hor-h-diarias">—</span>
+              </div>
+              <div id="det-hor-flex-semanal" class="flex justify-between items-center">
+                <span class="text-xs text-on-surface-variant">Horas semanales objetivo</span>
+                <span class="text-sm font-black text-primary" id="det-hor-h-semanales">—</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
               <div class="bg-surface-container-low p-3 rounded-lg">
-                <p class="text-[10px] uppercase font-bold text-outline-variant mb-1">Tolerancia Ent.</p>
-                <p class="text-lg font-bold text-primary">5m</p>
+                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Tolerancia Entrada</p>
+                <p class="text-lg font-black text-primary" id="det-hor-tol-ent">5m</p>
               </div>
               <div class="bg-surface-container-low p-3 rounded-lg">
-                <p class="text-[10px] uppercase font-bold text-outline-variant mb-1">Tolerancia Sal.</p>
-                <p class="text-lg font-bold text-primary">10m</p>
+                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Tolerancia Salida</p>
+                <p class="text-lg font-black text-primary" id="det-hor-tol-sal">10m</p>
               </div>
             </div>
-            <div class="bg-tertiary-container/30 p-4 rounded-lg flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-tertiary">coffee</span>
-                <span class="text-sm font-semibold text-on-tertiary-container">Descanso Mínimo</span>
+            <div class="bg-tertiary-container/25 p-3.5 rounded-lg flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-tertiary text-sm">coffee</span>
+                <span class="text-xs font-semibold text-on-tertiary-container">Descanso mínimo</span>
               </div>
-              <span class="font-bold text-tertiary">60m</span>
-            </div>
-            <div class="bg-error-container/10 p-4 rounded-lg flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-error">timer</span>
-                <span class="text-sm font-semibold text-on-error-container">Umbral Horas Extras</span>
-              </div>
-              <span class="font-bold text-error">15m</span>
+              <span class="font-black text-tertiary text-sm" id="det-hor-descanso">60m</span>
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Section 3: Weekly Breakdown -->
-    <div class="bg-surface-container-lowest rounded-xl p-8 shadow-sm">
-      <div class="flex items-center justify-between mb-8">
-        <div class="flex items-center gap-4">
-          <div class="w-1.5 h-6 bg-primary rounded-full"></div>
-          <h3 class="text-xl font-bold tracking-tight">Desglose Semanal: Oficina central</h3>
-        </div>
-        <div class="flex gap-2">
-          <span class="flex items-center gap-1 text-xs text-on-surface-variant"><span class="w-2 h-2 bg-on-secondary-container rounded-full"></span> Laborable</span>
-          <span class="flex items-center gap-1 text-xs text-on-surface-variant ml-4"><span class="w-2 h-2 bg-outline-variant rounded-full"></span> No Laborable</span>
-        </div>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-7 gap-4">
-        <div class="bg-surface-container-low p-4 rounded-lg border-t-2 border-primary">
-          <p class="text-[10px] font-bold text-outline-variant uppercase mb-2">Día 1</p>
-          <div class="flex justify-between items-center mb-3">
-            <span class="font-bold">Lunes</span>
-            <span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+        <!-- Desglose semanal -->
+        <div class="bg-surface-container-lowest rounded-xl border border-slate-200/50 overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-100">
+            <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">calendar_view_week</span> DESGLOSE SEMANAL
+            </h3>
           </div>
-          <p class="text-xs text-on-surface-variant">08:00 - 17:00</p>
-        </div>
-        <div class="bg-surface-container-low p-4 rounded-lg border-t-2 border-primary">
-          <p class="text-[10px] font-bold text-outline-variant uppercase mb-2">Día 2</p>
-          <div class="flex justify-between items-center mb-3">
-            <span class="font-bold">Martes</span>
-            <span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-          </div>
-          <p class="text-xs text-on-surface-variant">08:00 - 17:00</p>
-        </div>
-        <div class="bg-surface-container-low p-4 rounded-lg border-t-2 border-primary">
-          <p class="text-[10px] font-bold text-outline-variant uppercase mb-2">Día 3</p>
-          <div class="flex justify-between items-center mb-3">
-            <span class="font-bold">Miércoles</span>
-            <span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-          </div>
-          <p class="text-xs text-on-surface-variant">08:00 - 17:00</p>
-        </div>
-        <div class="bg-surface-container-low p-4 rounded-lg border-t-2 border-primary">
-          <p class="text-[10px] font-bold text-outline-variant uppercase mb-2">Día 4</p>
-          <div class="flex justify-between items-center mb-3">
-            <span class="font-bold">Jueves</span>
-            <span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-          </div>
-          <p class="text-xs text-on-surface-variant">08:00 - 17:00</p>
-        </div>
-        <div class="bg-surface-container-low p-4 rounded-lg border-t-2 border-primary">
-          <p class="text-[10px] font-bold text-outline-variant uppercase mb-2">Día 5</p>
-          <div class="flex justify-between items-center mb-3">
-            <span class="font-bold">Viernes</span>
-            <span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-          </div>
-          <p class="text-xs text-on-surface-variant">08:00 - 16:00</p>
-        </div>
-        <div class="bg-surface-container-high/50 p-4 rounded-lg opacity-60">
-          <p class="text-[10px] font-bold text-outline-variant uppercase mb-2">Día 6</p>
-          <div class="flex justify-between items-center mb-3">
-            <span class="font-bold">Sábado</span>
-            <span class="material-symbols-outlined text-outline-variant">cancel</span>
-          </div>
-          <p class="text-xs italic">No Laborable</p>
-        </div>
-        <div class="bg-surface-container-high/50 p-4 rounded-lg opacity-60">
-          <p class="text-[10px] font-bold text-outline-variant uppercase mb-2">Día 7</p>
-          <div class="flex justify-between items-center mb-3">
-            <span class="font-bold">Domingo</span>
-            <span class="material-symbols-outlined text-outline-variant">cancel</span>
-          </div>
-          <p class="text-xs italic">No Laborable</p>
-        </div>
-      </div>
-      <div class="mt-6 pt-6 border-t border-surface-container flex items-center gap-6">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary text-sm">lock_clock</span>
-          <span class="text-xs font-semibold">Restricciones:</span>
-        </div>
-        <div class="flex gap-3">
-          <span class="text-[10px] px-2 py-0.5 bg-surface-container text-on-surface-variant rounded-full border border-outline-variant/20">Bloqueo Ent. Anticipada</span>
-          <span class="text-[10px] px-2 py-0.5 bg-surface-container text-on-surface-variant rounded-full border border-outline-variant/20">Check-out Obligatorio</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 4: Ciclos Rotativos -->
-    <div id="ciclos" class="grid grid-cols-12 gap-6">
-      <div class="col-span-12 lg:col-span-7 bg-surface-container-low rounded-xl p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-lg font-bold">Ciclos Rotativos</h3>
-          <button class="text-primary font-bold text-xs hover:underline">Configurar Reglas</button>
-        </div>
-        <div class="space-y-3">
-          <div class="bg-surface-container-lowest p-4 rounded-lg flex items-center justify-between group cursor-pointer hover:ring-1 hover:ring-primary/30 transition-all">
-            <div class="flex items-center gap-4">
-              <div class="w-10 h-10 bg-secondary-container flex items-center justify-center rounded-lg text-on-secondary-container">
-                <span class="material-symbols-outlined">sync</span>
-              </div>
-              <div>
-                <p class="font-mono text-[10px] font-bold text-outline">ID: C-001</p>
-                <p class="font-bold text-sm">4x2 Producción</p>
-              </div>
+          <div class="p-4 grid grid-cols-7 gap-1.5">
+            <div class="bg-primary-container/30 border-t-2 border-primary rounded-lg p-2 text-center">
+              <p class="text-[9px] font-black text-on-surface-variant uppercase">Lun</p>
+              <p class="text-[10px] font-bold text-primary mt-1">08:00</p>
+              <p class="text-[10px] text-on-surface-variant">17:00</p>
             </div>
-            <div class="flex items-center gap-8">
-              <div class="text-right">
-                <p class="text-[10px] uppercase font-bold text-outline-variant">Duración</p>
-                <p class="font-bold">6 días</p>
-              </div>
-              <span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+            <div class="bg-primary-container/30 border-t-2 border-primary rounded-lg p-2 text-center">
+              <p class="text-[9px] font-black text-on-surface-variant uppercase">Mar</p>
+              <p class="text-[10px] font-bold text-primary mt-1">08:00</p>
+              <p class="text-[10px] text-on-surface-variant">17:00</p>
             </div>
-          </div>
-          <div class="bg-primary-container p-4 rounded-lg flex items-center justify-between ring-1 ring-primary shadow-sm">
-            <div class="flex items-center gap-4">
-              <div class="w-10 h-10 bg-primary flex items-center justify-center rounded-lg text-white">
-                <span class="material-symbols-outlined">refresh</span>
-              </div>
-              <div>
-                <p class="font-mono text-[10px] font-bold text-on-primary-container">ID: C-002</p>
-                <p class="font-bold text-sm text-on-primary-container">Rotación planta A</p>
-              </div>
+            <div class="bg-primary-container/30 border-t-2 border-primary rounded-lg p-2 text-center">
+              <p class="text-[9px] font-black text-on-surface-variant uppercase">Mié</p>
+              <p class="text-[10px] font-bold text-primary mt-1">08:00</p>
+              <p class="text-[10px] text-on-surface-variant">17:00</p>
             </div>
-            <div class="flex items-center gap-8">
-              <div class="text-right">
-                <p class="text-[10px] uppercase font-bold text-on-primary-fixed-variant">Duración</p>
-                <p class="font-bold text-on-primary-container">14 días</p>
-              </div>
-              <span class="material-symbols-outlined text-primary">check_circle</span>
+            <div class="bg-primary-container/30 border-t-2 border-primary rounded-lg p-2 text-center">
+              <p class="text-[9px] font-black text-on-surface-variant uppercase">Jue</p>
+              <p class="text-[10px] font-bold text-primary mt-1">08:00</p>
+              <p class="text-[10px] text-on-surface-variant">17:00</p>
+            </div>
+            <div class="bg-primary-container/30 border-t-2 border-primary rounded-lg p-2 text-center">
+              <p class="text-[9px] font-black text-on-surface-variant uppercase">Vie</p>
+              <p class="text-[10px] font-bold text-primary mt-1">08:00</p>
+              <p class="text-[10px] text-on-surface-variant">16:00</p>
+            </div>
+            <div class="bg-surface-container-high/50 border-t-2 border-outline-variant rounded-lg p-2 text-center opacity-50">
+              <p class="text-[9px] font-black text-on-surface-variant uppercase">Sáb</p>
+              <p class="text-[10px] text-on-surface-variant mt-2">Hacé clic en una fila para ver el detalle</p>
+            </div>
+            <div class="bg-surface-container-high/50 border-t-2 border-outline-variant rounded-lg p-2 text-center opacity-50">
+              <p class="text-[9px] font-black text-on-surface-variant uppercase">Dom</p>
+              <p class="text-[10px] text-on-surface-variant mt-2">Hacé clic en una fila para ver el detalle</p>
             </div>
           </div>
         </div>
-      </div>
-      <!-- Cycle Detail -->
-      <div class="col-span-12 lg:col-span-5">
-        <div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm h-full border-t-4 border-tertiary">
-          <h3 class="text-lg font-bold mb-4">Detalle del Ciclo: C-002</h3>
-          <div class="bg-surface-container-low rounded-lg p-4 mb-6 flex justify-between items-center">
-            <div>
-              <p class="text-[10px] uppercase font-bold text-outline-variant">Configuración Activa</p>
-              <p class="text-sm font-semibold">Rotación planta A (Quincenal)</p>
-            </div>
-            <div class="text-right">
-              <p class="text-[10px] uppercase font-bold text-outline-variant">Total Días</p>
-              <p class="text-xl font-black text-tertiary">14</p>
-            </div>
-          </div>
-          <p class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-3">Mapeo de Días</p>
-          <div class="max-h-64 overflow-y-auto pr-2 space-y-1">
-            <div class="flex items-center justify-between p-2 rounded bg-surface border-l-4 border-primary"><span class="text-xs font-bold w-12">Día 1</span><span class="material-symbols-outlined text-xs text-outline">arrow_right_alt</span><span class="text-xs font-medium text-primary">H-001 (Mañana)</span></div>
-            <div class="flex items-center justify-between p-2 rounded bg-surface border-l-4 border-primary"><span class="text-xs font-bold w-12">Día 2</span><span class="material-symbols-outlined text-xs text-outline">arrow_right_alt</span><span class="text-xs font-medium text-primary">H-001 (Mañana)</span></div>
-            <div class="flex items-center justify-between p-2 rounded bg-surface border-l-4 border-tertiary"><span class="text-xs font-bold w-12">Día 3</span><span class="material-symbols-outlined text-xs text-outline">arrow_right_alt</span><span class="text-xs font-medium text-tertiary">H-004 (Tarde)</span></div>
-            <div class="flex items-center justify-between p-2 rounded bg-surface border-l-4 border-tertiary"><span class="text-xs font-bold w-12">Día 4</span><span class="material-symbols-outlined text-xs text-outline">arrow_right_alt</span><span class="text-xs font-medium text-tertiary">H-004 (Tarde)</span></div>
-            <div class="flex items-center justify-between p-2 rounded bg-surface border-l-4 border-outline-variant"><span class="text-xs font-bold w-12">Día 5</span><span class="material-symbols-outlined text-xs text-outline">arrow_right_alt</span><span class="text-xs font-medium text-on-surface-variant">Libre</span></div>
-            <div class="flex items-center justify-between p-2 rounded bg-surface border-l-4 border-outline-variant"><span class="text-xs font-bold w-12">Día 6</span><span class="material-symbols-outlined text-xs text-outline">arrow_right_alt</span><span class="text-xs font-medium text-on-surface-variant">Libre</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 5: Asignaciones Activas -->
-    <div id="asignaciones" class="bg-surface-container-low rounded-xl p-6">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-bold">Asignaciones Activas</h3>
-        <div class="flex gap-2">
-          <button class="bg-surface-container-lowest border border-outline-variant/30 p-2 rounded-lg material-symbols-outlined text-sm hover:bg-white transition-all">filter_list</button>
-          <button class="bg-surface-container-lowest border border-outline-variant/30 p-2 rounded-lg material-symbols-outlined text-sm hover:bg-white transition-all">download</button>
-        </div>
-      </div>
-      <div class="overflow-hidden rounded-xl border border-surface-container-highest">
-        <table class="w-full text-sm">
-          <thead class="bg-surface-container-high text-on-secondary-container">
-            <tr class="text-left">
-              <th class="py-4 px-6 font-bold uppercase text-[10px] tracking-widest">Legajo</th>
-              <th class="py-4 px-6 font-bold uppercase text-[10px] tracking-widest">Empleado</th>
-              <th class="py-4 px-6 font-bold uppercase text-[10px] tracking-widest">Tipo Asignación</th>
-              <th class="py-4 px-6 font-bold uppercase text-[10px] tracking-widest">Horario/Ciclo</th>
-              <th class="py-4 px-6 font-bold uppercase text-[10px] tracking-widest">Desde</th>
-              <th class="py-4 px-6 font-bold uppercase text-[10px] tracking-widest">Hasta</th>
-              <th class="py-4 px-6 font-bold uppercase text-[10px] tracking-widest">Estado</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-surface-container">
-            <tr class="hover:bg-surface-container-low transition-colors">
-              <td class="py-4 px-6 font-mono text-primary">#12093</td>
-              <td class="py-4 px-6">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary text-xs font-bold">CM</div>
-                  <span class="font-semibold">Carlos Méndez</span>
-                </div>
-              </td>
-              <td class="py-4 px-6"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container">HORARIO FIJO</span></td>
-              <td class="py-4 px-6 font-medium">H-003 Oficina central</td>
-              <td class="py-4 px-6 text-on-surface-variant">01/01/2024</td>
-              <td class="py-4 px-6 text-on-surface-variant italic">Indefinido</td>
-              <td class="py-4 px-6"><span class="flex items-center gap-1.5 text-on-secondary-container font-bold text-xs"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> activa</span></td>
-            </tr>
-            <tr class="hover:bg-surface-container-low transition-colors">
-              <td class="py-4 px-6 font-mono text-primary">#12105</td>
-              <td class="py-4 px-6">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-full bg-tertiary flex items-center justify-center text-on-tertiary text-xs font-bold">LF</div>
-                  <span class="font-semibold">Lucía Ferrero</span>
-                </div>
-              </td>
-              <td class="py-4 px-6"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container">CICLO ROTATIVO</span></td>
-              <td class="py-4 px-6 font-medium">C-002 Rotación planta A</td>
-              <td class="py-4 px-6 text-on-surface-variant">15/02/2024</td>
-              <td class="py-4 px-6 text-on-surface-variant">31/12/2024</td>
-              <td class="py-4 px-6"><span class="flex items-center gap-1.5 text-on-secondary-container font-bold text-xs"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> activa</span></td>
-            </tr>
-            <tr class="hover:bg-surface-container-low transition-colors">
-              <td class="py-4 px-6 font-mono text-primary">#11988</td>
-              <td class="py-4 px-6">
-                <a href="empleado-juan-perez.html" class="flex items-center gap-3 hover:text-primary">
-                  <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-primary text-xs font-bold">JP</div>
-                  <span class="font-semibold">Juan Perez</span>
-                </a>
-              </td>
-              <td class="py-4 px-6"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container">HORARIO FIJO</span></td>
-              <td class="py-4 px-6 font-medium">H-003 Oficina central</td>
-              <td class="py-4 px-6 text-on-surface-variant">01/06/2025</td>
-              <td class="py-4 px-6 text-on-surface-variant italic">Indefinido</td>
-              <td class="py-4 px-6"><span class="flex items-center gap-1.5 text-on-secondary-container font-bold text-xs"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> activa</span></td>
-            </tr>
-            <tr class="hover:bg-surface-container-low transition-colors">
-              <td class="py-4 px-6 font-mono text-primary">#11990</td>
-              <td class="py-4 px-6">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 text-xs font-bold">MP</div>
-                  <span class="font-semibold">Martín Paz</span>
-                </div>
-              </td>
-              <td class="py-4 px-6"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container">HORARIO FIJO</span></td>
-              <td class="py-4 px-6 font-medium">H-001 Planta Mañana</td>
-              <td class="py-4 px-6 text-on-surface-variant">10/01/2024</td>
-              <td class="py-4 px-6 text-on-surface-variant italic">Indefinido</td>
-              <td class="py-4 px-6"><span class="flex items-center gap-1.5 text-on-secondary-container font-bold text-xs"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> activa</span></td>
-            </tr>
-          </tbody>
-        </table>
+        </div><!-- /det-hor-contenido -->
       </div>
     </div>
   </div>
+
+  <!-- Tab: Ciclos -->
+  <div id="tab-ciclos" class="tab-panel">
+    <div class="grid grid-cols-12 gap-6">
+      <!-- Lista ciclos como tabla -->
+      <div class="col-span-12 lg:col-span-7 bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between gap-3">
+          <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2 shrink-0">
+            <span class="material-symbols-outlined text-sm">autorenew</span> LISTADO DE CICLOS
+          </h3>
+          <div class="flex gap-2 items-center">
+            <select id="filtro-estado-cic" onchange="filtrarCiclos()" class="bg-surface-container-low border-none rounded-md pl-3 pr-7 py-1.5 text-xs font-medium text-on-surface-variant min-w-[8rem]">
+              <option value="">Todos los estados</option>
+              <option>Activo</option>
+              <option>Inactivo</option>
+            </select>
+            <button onclick="filtrarCiclos(true)" class="px-3 py-1.5 text-xs font-bold text-on-surface-variant border border-outline-variant/30 rounded-md hover:bg-surface-container-low transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">filter_alt_off</span>
+            </button>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead id="ciclos-thead">
+              <tr class="bg-surface-container-low">
+                <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">ID</th>
+                <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Nombre</th>
+                <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider text-center">Duración</th>
+                <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-ciclos" class="divide-y divide-slate-100">
+              <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarCiclo(this,'C-001','4x2 Producción',6)">
+                <td class="px-5 py-3.5 text-sm font-mono font-bold text-primary">C-001</td>
+                <td class="px-5 py-3.5 text-sm font-semibold">4x2 Producción</td>
+                <td class="px-5 py-3.5 text-center"><span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded-full">6 días</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarCiclo(this,'C-002','Rotación Planta A',14)">
+                <td class="px-5 py-3.5 text-sm font-mono font-bold text-primary">C-002</td>
+                <td class="px-5 py-3.5 text-sm font-semibold">Rotación Planta A</td>
+                <td class="px-5 py-3.5 text-center"><span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded-full">14 días</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarCiclo(this,'C-003','Rotación Planta B',21)">
+                <td class="px-5 py-3.5 text-sm font-mono font-bold text-primary">C-003</td>
+                <td class="px-5 py-3.5 text-sm font-semibold">Rotación Planta B</td>
+                <td class="px-5 py-3.5 text-center"><span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded-full">21 días</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span> Activo</span></td>
+              </tr>
+              <tr id="fila-sin-resultados-cic" class="hidden">
+                <td colspan="4" class="px-6 py-12 text-center text-on-surface-variant text-sm">
+                  <span class="material-symbols-outlined text-3xl block mb-2 opacity-30">search_off</span>
+                  No se encontraron ciclos con los filtros aplicados.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-5 py-3 border-t border-slate-100 flex items-center justify-between">
+          <p id="contador-cic" class="text-xs text-on-surface-variant">Mostrando 3 ciclos</p>
+          <div class="flex items-center gap-1">
+            <button id="cic-prev" onclick="paginarCic(-1)" disabled class="p-1.5 rounded-md border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+              <span class="material-symbols-outlined text-sm">chevron_left</span>
+            </button>
+            <span id="cic-pagina" class="text-xs font-bold text-on-surface-variant px-2">1 / 1</span>
+            <button id="cic-next" onclick="paginarCic(1)" disabled class="p-1.5 rounded-md border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+              <span class="material-symbols-outlined text-sm">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalle ciclo -->
+      <div class="col-span-12 lg:col-span-5">
+        <!-- Estado vacío ciclos -->
+        <div id="det-cic-vacio" class="bg-surface-container-lowest rounded-xl border border-slate-200/50 flex flex-col items-center justify-center py-16 px-6 text-center">
+          <span class="material-symbols-outlined text-4xl text-outline-variant mb-3">touch_app</span>
+          <p class="text-sm font-semibold text-on-surface-variant">Ningún ciclo seleccionado</p>
+          <p class="text-xs text-on-surface-variant/60 mt-1">Hacé clic en una fila para ver el detalle</p>
+        </div>
+        <!-- Contenido detalle ciclo -->
+        <div id="det-cic-contenido" class="hidden">
+        <div class="bg-surface-container-lowest rounded-xl border border-slate-200/50 overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">info</span> DETALLE DEL CICLO
+            </h3>
+            <div class="flex items-center gap-2"><span class="text-xs font-mono font-bold text-on-surface-variant" id="det-cic-id"></span><button onclick="abrirEditarCiclo()" class="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-primary/90 transition-colors"><span class="material-symbols-outlined text-sm">edit</span> Editar</button></div></div><div class="p-5">
+            <div class="bg-surface-container-low rounded-xl p-4 mb-4 flex justify-between items-center">
+              <div>
+                <p class="text-[10px] uppercase font-bold text-on-surface-variant mb-0.5">Nombre</p>
+                <p class="text-sm font-bold" id="det-cic-nombre">Rotación Planta A</p>
+              </div>
+              <div class="text-right">
+                <p class="text-[10px] uppercase font-bold text-on-surface-variant mb-0.5">Total días</p>
+                <p class="text-2xl font-black text-tertiary" id="det-cic-dias">14</p>
+              </div>
+            </div>
+            <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3">Mapeo de días</p>
+            <div class="max-h-72 overflow-y-auto space-y-1.5 pr-1" id="det-cic-mapeo">
+              <div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low border-l-4 border-primary text-sm">
+                <span class="font-bold w-12 text-xs">Día 1</span>
+                <span class="material-symbols-outlined text-outline-variant text-sm">arrow_right_alt</span>
+                <span class="font-medium text-primary text-xs">H-001 · Mañana</span>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low border-l-4 border-primary text-sm">
+                <span class="font-bold w-12 text-xs">Día 2</span>
+                <span class="material-symbols-outlined text-outline-variant text-sm">arrow_right_alt</span>
+                <span class="font-medium text-primary text-xs">H-001 · Mañana</span>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low border-l-4 border-tertiary text-sm">
+                <span class="font-bold w-12 text-xs">Día 3</span>
+                <span class="material-symbols-outlined text-outline-variant text-sm">arrow_right_alt</span>
+                <span class="font-medium text-tertiary text-xs">H-004 · Tarde</span>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low border-l-4 border-tertiary text-sm">
+                <span class="font-bold w-12 text-xs">Día 4</span>
+                <span class="material-symbols-outlined text-outline-variant text-sm">arrow_right_alt</span>
+                <span class="font-medium text-tertiary text-xs">H-004 · Tarde</span>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-high/50 border-l-4 border-outline-variant text-sm opacity-60">
+                <span class="font-bold w-12 text-xs">Día 5</span>
+                <span class="material-symbols-outlined text-outline-variant text-sm">arrow_right_alt</span>
+                <span class="text-on-surface-variant text-xs">Libre</span>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-high/50 border-l-4 border-outline-variant text-sm opacity-60">
+                <span class="font-bold w-12 text-xs">Día 6</span>
+                <span class="material-symbols-outlined text-outline-variant text-sm">arrow_right_alt</span>
+                <span class="text-on-surface-variant text-xs">Libre</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div><!-- /det-cic-contenido -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Asignaciones -->
+  <div id="tab-asignaciones" class="tab-panel">
+    <div class="grid grid-cols-12 gap-6">
+
+      <!-- Lista asignaciones -->
+      <div class="col-span-12 lg:col-span-7 bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between gap-3">
+          <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2 shrink-0">
+            <span class="material-symbols-outlined text-sm">person_pin</span> ASIGNACIONES
+          </h3>
+          <div class="flex gap-2 items-center">
+            <select id="filtro-tipo-asig" onchange="filtrarAsig()" class="bg-surface-container-low border-none rounded-md pl-3 pr-7 py-1.5 text-xs font-medium text-on-surface-variant min-w-[9rem]">
+              <option value="">Todos los tipos</option>
+              <option value="horario">Horario fijo</option>
+              <option value="ciclo">Ciclo rotativo</option>
+            </select>
+            <select id="filtro-estado-asig" onchange="filtrarAsig()" class="bg-surface-container-low border-none rounded-md pl-3 pr-7 py-1.5 text-xs font-medium text-on-surface-variant min-w-[8rem]">
+              <option value="">Todos los estados</option>
+              <option value="activa">Activa</option>
+              <option value="vencida">Vencida</option>
+            </select>
+            <button onclick="filtrarAsig(true)" class="p-1.5 rounded-md border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low transition-colors">
+              <span class="material-symbols-outlined text-sm">filter_alt_off</span>
+            </button>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead id="asig-thead">
+              <tr class="bg-surface-container-low">
+                <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Legajo</th>
+                <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Empleado</th>
+                <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Tipo</th>
+                <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Horario / Ciclo</th>
+                <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-asig" class="divide-y divide-slate-100">
+              <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarAsig(this,'0093','Carlos Méndez','CM','bg-blue-100 text-primary','horario','H-003 · Oficina Central','01/01/2024','Indefinido','activa')">
+                <td class="px-5 py-3.5 text-sm font-mono font-bold text-primary">0093</td>
+                <td class="px-5 py-3.5"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-primary font-bold text-[10px]">CM</div><span class="text-sm font-semibold">Carlos Méndez</span></div></td>
+                <td class="px-5 py-3.5"><span class="asig-tipo px-2 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full uppercase">Horario fijo</span></td>
+                <td class="px-5 py-3.5 text-sm font-medium">H-003 · Oficina Central</td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span> Activa</span></td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarAsig(this,'0105','Lucía Ferrero','LF','bg-purple-100 text-tertiary','ciclo','C-002 · Rotación Planta A','15/02/2024','31/12/2025','activa')">
+                <td class="px-5 py-3.5 text-sm font-mono font-bold text-primary">0105</td>
+                <td class="px-5 py-3.5"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center text-tertiary font-bold text-[10px]">LF</div><span class="text-sm font-semibold">Lucía Ferrero</span></div></td>
+                <td class="px-5 py-3.5"><span class="asig-tipo px-2 py-1 bg-tertiary-container text-on-tertiary-container text-[10px] font-bold rounded-full uppercase">Ciclo rotativo</span></td>
+                <td class="px-5 py-3.5 text-sm font-medium">C-002 · Rotación Planta A</td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span> Activa</span></td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarAsig(this,'0042','Juan Perez','JP','bg-blue-100 text-primary','horario','H-003 · Oficina Central','01/06/2025','Indefinido','activa')">
+                <td class="px-5 py-3.5 text-sm font-mono font-bold text-primary">0042</td>
+                <td class="px-5 py-3.5"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-primary font-bold text-[10px]">JP</div><a href="empleado-juan-perez.html" onclick="event.stopPropagation()" class="text-sm font-semibold hover:text-primary hover:underline">Juan Perez</a></div></td>
+                <td class="px-5 py-3.5"><span class="asig-tipo px-2 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full uppercase">Horario fijo</span></td>
+                <td class="px-5 py-3.5 text-sm font-medium">H-003 · Oficina Central</td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span> Activa</span></td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarAsig(this,'0090','Martín Paz','MP','bg-slate-200 text-slate-600','horario','H-001 · Planta Mañana','10/01/2024','Indefinido','activa')">
+                <td class="px-5 py-3.5 text-sm font-mono font-bold text-primary">0090</td>
+                <td class="px-5 py-3.5"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold text-[10px]">MP</div><span class="text-sm font-semibold">Martín Paz</span></div></td>
+                <td class="px-5 py-3.5"><span class="asig-tipo px-2 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full uppercase">Horario fijo</span></td>
+                <td class="px-5 py-3.5 text-sm font-medium">H-001 · Planta Mañana</td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span> Activa</span></td>
+              </tr>
+              <tr id="fila-sin-resultados-asig" class="hidden">
+                <td colspan="5" class="px-6 py-12 text-center text-on-surface-variant text-sm">
+                  <span class="material-symbols-outlined text-3xl block mb-2 opacity-30">search_off</span>
+                  No se encontraron asignaciones con los filtros aplicados.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-5 py-3 border-t border-slate-100 flex items-center justify-between">
+          <p id="contador-asig" class="text-xs text-on-surface-variant">Mostrando 4 asignaciones</p>
+          <div class="flex items-center gap-1">
+            <button id="asig-prev" onclick="paginarAsig(-1)" disabled class="p-1.5 rounded-md border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+              <span class="material-symbols-outlined text-sm">chevron_left</span>
+            </button>
+            <span id="asig-pagina" class="text-xs font-bold text-on-surface-variant px-2">1 / 1</span>
+            <button id="asig-next" onclick="paginarAsig(1)" disabled class="p-1.5 rounded-md border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+              <span class="material-symbols-outlined text-sm">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalle asignación -->
+      <div class="col-span-12 lg:col-span-5">
+        <!-- Estado vacío -->
+        <div id="det-asig-vacio" class="bg-surface-container-lowest rounded-xl border border-slate-200/50 flex flex-col items-center justify-center py-16 px-6 text-center">
+          <span class="material-symbols-outlined text-4xl text-outline-variant mb-3">touch_app</span>
+          <p class="text-sm font-semibold text-on-surface-variant">Ninguna asignación seleccionada</p>
+          <p class="text-xs text-on-surface-variant/60 mt-1">Hacé clic en una fila para ver el detalle</p>
+        </div>
+        <!-- Contenido detalle -->
+        <div id="det-asig-contenido" class="hidden bg-surface-container-lowest rounded-xl border border-slate-200/50 overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">info</span> DETALLE DE ASIGNACIÓN
+            </h3>
+            <button onclick="event.stopPropagation();document.getElementById('modal-editar-asig').classList.remove('hidden')" class="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-primary/90 transition-colors">
+              <span class="material-symbols-outlined text-sm">edit</span> Editar
+            </button>
+          </div>
+          <div class="p-5 space-y-4">
+            <!-- Empleado -->
+            <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+              <div id="det-asig-avatar" class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-primary font-black text-sm shrink-0">CM</div>
+              <div>
+                <p class="text-sm font-bold" id="det-asig-nombre">—</p>
+                <p class="text-xs font-mono text-on-surface-variant" id="det-asig-legajo">—</p>
+              </div>
+            </div>
+            <!-- Tipo -->
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+              <span class="text-xs text-on-surface-variant">Tipo</span>
+              <span id="det-asig-tipo-badge" class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full uppercase">—</span>
+            </div>
+            <!-- Horario / Ciclo -->
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+              <span class="text-xs text-on-surface-variant">Asignado</span>
+              <span class="text-sm font-bold" id="det-asig-recurso">—</span>
+            </div>
+            <!-- Fechas -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="bg-surface-container-low p-3 rounded-lg">
+                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Desde</p>
+                <p class="text-sm font-black text-primary" id="det-asig-desde">—</p>
+              </div>
+              <div class="bg-surface-container-low p-3 rounded-lg">
+                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Hasta</p>
+                <p class="text-sm font-black text-on-background" id="det-asig-hasta">—</p>
+              </div>
+            </div>
+            <!-- Estado -->
+            <div class="flex justify-between items-center pt-1">
+              <span class="text-xs text-on-surface-variant">Estado</span>
+              <span id="det-asig-estado" class="inline-flex items-center gap-1.5 text-[10px] font-bold text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span> Activa</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </main>
+
+<!-- Modal: Editar Asignación -->
+<div id="modal-editar-asig" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-editar-asig')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100 sticky top-0 bg-white z-10">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Editar asignación</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Modificá la asignación del empleado.</p>
+      </div>
+      <button onclick="cerrarModal('modal-editar-asig')" class="text-slate-400 hover:text-slate-700"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form onsubmit="guardar('modal-editar-asig','Asignación actualizada correctamente.',event)" class="px-8 py-6 space-y-5">
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Empleado</label>
+        <input readonly id="edit-asig-empleado" type="text" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm text-on-surface-variant cursor-not-allowed"/>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tipo *</label>
+        <select required id="edit-asig-tipo" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+          <option value="horario">Horario fijo</option>
+          <option value="ciclo">Ciclo rotativo</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Horario / Ciclo *</label>
+        <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+          <option>H-001 · Planta Mañana</option>
+          <option>H-002 · Soporte Nocturno</option>
+          <option>H-003 · Oficina Central</option>
+          <option>H-004 · Planta Tarde</option>
+          <option>C-001 · 4x2 Producción</option>
+          <option>C-002 · Rotación Planta A</option>
+          <option>C-003 · Rotación Planta B</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha desde *</label>
+          <input required id="edit-asig-desde" type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha hasta</label>
+          <input id="edit-asig-hasta" type="date" placeholder="Indefinido" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+      </div>
+      <div class="flex justify-end gap-3 pt-2">
+        <button type="button" onclick="cerrarModal('modal-editar-asig')" class="px-5 py-2.5 rounded-lg border border-outline-variant/40 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="px-5 py-2.5 rounded-lg bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-colors">Guardar cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Editar Horario -->
+<div id="modal-editar-horario" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-editar-horario')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100 sticky top-0 bg-white z-10">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Editar Horario <span id="edit-hor-id-title" class="text-primary font-mono"></span></h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Modificá la configuración del horario seleccionado.</p>
+      </div>
+      <button onclick="cerrarModal('modal-editar-horario')" class="text-slate-400 hover:text-slate-700"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form onsubmit="guardar('modal-editar-horario','Horario actualizado correctamente.',event)" class="px-8 py-6 space-y-5">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="col-span-2">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Nombre *</label>
+          <input required id="edit-hor-nombre" type="text" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tipo *</label>
+          <select required id="edit-hor-tipo" onchange="toggleFlexibleEdit()" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option>Fijo</option>
+            <option>Flexible</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Descanso mínimo</label>
+          <div class="relative">
+            <input id="edit-hor-descanso" type="number" min="0" max="120" class="w-full px-3 py-2.5 pr-12 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant font-bold">min</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel flexible edit -->
+      <div id="panel-flexible-edit" class="hidden bg-primary-container/20 border border-primary/20 rounded-xl p-4 space-y-4">
+        <p class="text-[11px] font-black text-primary uppercase tracking-wider flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">tune</span> Configuración de flexibilidad</p>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Modo de flexibilidad *</label>
+          <div class="flex gap-3">
+            <label class="flex-1 flex items-center gap-2 p-3 border border-outline-variant/40 bg-white rounded-lg cursor-pointer hover:bg-surface-container-low has-[:checked]:border-primary has-[:checked]:bg-primary-container/20">
+              <input type="radio" name="modo-flex-edit" value="diaria" class="accent-primary" onchange="toggleModoFlexEdit()"/>
+              <div><p class="text-sm font-semibold">Diaria</p><p class="text-[10px] text-on-surface-variant">Objetivo por día</p></div>
+            </label>
+            <label class="flex-1 flex items-center gap-2 p-3 border border-outline-variant/40 bg-white rounded-lg cursor-pointer hover:bg-surface-container-low has-[:checked]:border-primary has-[:checked]:bg-primary-container/20">
+              <input type="radio" name="modo-flex-edit" value="semanal" class="accent-primary" onchange="toggleModoFlexEdit()"/>
+              <div><p class="text-sm font-semibold">Semanal</p><p class="text-[10px] text-on-surface-variant">Objetivo por semana</p></div>
+            </label>
+          </div>
+        </div>
+        <div id="campo-horas-diarias-edit" class="hidden">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Horas objetivo diarias *</label>
+          <div class="relative">
+            <input id="edit-h-diarias" type="number" min="1" max="12" step="0.5" class="w-full px-3 py-2.5 pr-10 bg-white border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant font-bold">h</span>
+          </div>
+        </div>
+        <div id="campo-horas-semanales-edit" class="hidden">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Horas objetivo semanales *</label>
+          <div class="relative">
+            <input id="edit-h-semanales" type="number" min="1" max="60" step="0.5" class="w-full px-3 py-2.5 pr-10 bg-white border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant font-bold">h</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Días -->
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-3">Días laborables *</label>
+        <div class="space-y-2">
+          <div class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center text-[10px] font-bold text-on-surface-variant uppercase tracking-wider pb-1 border-b border-slate-100">
+            <span>Día</span><span>Entrada</span><span>Salida</span>
+          </div>
+          <div class="space-y-1.5">
+            <label class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center cursor-pointer"><span class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked class="accent-primary edit-dia-check"/> Lunes</span><input type="time" value="09:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/><input type="time" value="18:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/></label>
+            <label class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center cursor-pointer"><span class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked class="accent-primary edit-dia-check"/> Martes</span><input type="time" value="09:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/><input type="time" value="18:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/></label>
+            <label class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center cursor-pointer"><span class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked class="accent-primary edit-dia-check"/> Miércoles</span><input type="time" value="09:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/><input type="time" value="18:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/></label>
+            <label class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center cursor-pointer"><span class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked class="accent-primary edit-dia-check"/> Jueves</span><input type="time" value="09:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/><input type="time" value="18:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/></label>
+            <label class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center cursor-pointer"><span class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked class="accent-primary edit-dia-check"/> Viernes</span><input type="time" value="09:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/><input type="time" value="16:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/></label>
+            <label class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center cursor-pointer opacity-50"><span class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" class="accent-primary edit-dia-check"/> Sábado</span><input type="time" disabled class="px-2 py-1.5 bg-surface-container-high border border-outline-variant/20 rounded-lg text-xs opacity-50"/><input type="time" disabled class="px-2 py-1.5 bg-surface-container-high border border-outline-variant/20 rounded-lg text-xs opacity-50"/></label>
+            <label class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center cursor-pointer opacity-50"><span class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" class="accent-primary edit-dia-check"/> Domingo</span><input type="time" disabled class="px-2 py-1.5 bg-surface-container-high border border-outline-variant/20 rounded-lg text-xs opacity-50"/><input type="time" disabled class="px-2 py-1.5 bg-surface-container-high border border-outline-variant/20 rounded-lg text-xs opacity-50"/></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tolerancia entrada</label>
+          <div class="relative"><input id="edit-hor-tol-ent" type="number" min="0" max="60" class="w-full px-3 py-2.5 pr-12 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/><span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant font-bold">min</span></div>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tolerancia salida</label>
+          <div class="relative"><input id="edit-hor-tol-sal" type="number" min="0" max="60" class="w-full px-3 py-2.5 pr-12 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/><span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant font-bold">min</span></div>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-2 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-editar-horario')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">save</span> Guardar cambios
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Nuevo Horario -->
+<div id="modal-nuevo-horario" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-nuevo-horario')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100 sticky top-0 bg-white z-10">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Nuevo Horario</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Definí la estructura de un horario laboral.</p>
+      </div>
+      <button onclick="cerrarModal('modal-nuevo-horario')" class="text-slate-400 hover:text-slate-700"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form onsubmit="guardar('modal-nuevo-horario','Horario creado correctamente.',event)" class="px-8 py-6 space-y-5">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="col-span-2">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Nombre *</label>
+          <input required type="text" placeholder="Ej: Planta Mañana" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tipo *</label>
+          <select required id="tipo-horario" onchange="toggleFlexible()" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option value="">Seleccionar...</option>
+            <option>Fijo</option>
+            <option>Flexible</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Descanso mínimo</label>
+          <div class="relative">
+            <input type="number" min="0" max="120" placeholder="60" class="w-full px-3 py-2.5 pr-12 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant font-bold">min</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel flexible -->
+      <div id="panel-flexible" class="hidden bg-primary-container/20 border border-primary/20 rounded-xl p-4 space-y-4">
+        <p class="text-[11px] font-black text-primary uppercase tracking-wider flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">tune</span> Configuración de flexibilidad
+        </p>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Modo de flexibilidad *</label>
+          <div class="flex gap-3">
+            <label class="flex-1 flex items-center gap-2 p-3 border border-outline-variant/40 bg-white rounded-lg cursor-pointer hover:bg-surface-container-low has-[:checked]:border-primary has-[:checked]:bg-primary-container/20">
+              <input type="radio" name="modo-flex" value="diaria" class="accent-primary" onchange="toggleModoFlex()" required/>
+              <div>
+                <p class="text-sm font-semibold">Diaria</p>
+                <p class="text-[10px] text-on-surface-variant">Objetivo por día</p>
+              </div>
+            </label>
+            <label class="flex-1 flex items-center gap-2 p-3 border border-outline-variant/40 bg-white rounded-lg cursor-pointer hover:bg-surface-container-low has-[:checked]:border-primary has-[:checked]:bg-primary-container/20">
+              <input type="radio" name="modo-flex" value="semanal" class="accent-primary" onchange="toggleModoFlex()"/>
+              <div>
+                <p class="text-sm font-semibold">Semanal</p>
+                <p class="text-[10px] text-on-surface-variant">Objetivo por semana</p>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div id="campo-horas-diarias" class="hidden">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Horas objetivo diarias *</label>
+          <div class="relative">
+            <input type="number" min="1" max="12" step="0.5" placeholder="8" class="w-full px-3 py-2.5 pr-10 bg-white border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant font-bold">h</span>
+          </div>
+        </div>
+        <div id="campo-horas-semanales" class="hidden">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Horas objetivo semanales *</label>
+          <div class="relative">
+            <input type="number" min="1" max="60" step="0.5" placeholder="40" class="w-full px-3 py-2.5 pr-10 bg-white border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant font-bold">h</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Días y horarios -->
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-3">Días laborables *</label>
+        <div class="space-y-2">
+          <div class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center text-[10px] font-bold text-on-surface-variant uppercase tracking-wider pb-1 border-b border-slate-100">
+            <span>Día</span><span>Entrada</span><span>Salida</span>
+          </div>
+          <div id="dias-horario" class="space-y-1.5">
+            <!-- Lunes -->
+            <label class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center cursor-pointer group">
+              <span class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked class="accent-primary dia-check" data-dia="lun"/> Lunes</span>
+              <input type="time" value="09:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/>
+              <input type="time" value="18:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/>
+            </label>
+            <label class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center cursor-pointer">
+              <span class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked class="accent-primary dia-check"/> Martes</span>
+              <input type="time" value="09:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/>
+              <input type="time" value="18:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/>
+            </label>
+            <label class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center cursor-pointer">
+              <span class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked class="accent-primary dia-check"/> Miércoles</span>
+              <input type="time" value="09:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/>
+              <input type="time" value="18:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/>
+            </label>
+            <label class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center cursor-pointer">
+              <span class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked class="accent-primary dia-check"/> Jueves</span>
+              <input type="time" value="09:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/>
+              <input type="time" value="18:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/>
+            </label>
+            <label class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center cursor-pointer">
+              <span class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked class="accent-primary dia-check"/> Viernes</span>
+              <input type="time" value="09:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/>
+              <input type="time" value="16:00" class="px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"/>
+            </label>
+            <label class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center cursor-pointer opacity-50">
+              <span class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" class="accent-primary dia-check"/> Sábado</span>
+              <input type="time" disabled class="px-2 py-1.5 bg-surface-container-high border border-outline-variant/20 rounded-lg text-xs opacity-50"/>
+              <input type="time" disabled class="px-2 py-1.5 bg-surface-container-high border border-outline-variant/20 rounded-lg text-xs opacity-50"/>
+            </label>
+            <label class="grid grid-cols-[7rem_1fr_1fr] gap-3 items-center cursor-pointer opacity-50">
+              <span class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" class="accent-primary dia-check"/> Domingo</span>
+              <input type="time" disabled class="px-2 py-1.5 bg-surface-container-high border border-outline-variant/20 rounded-lg text-xs opacity-50"/>
+              <input type="time" disabled class="px-2 py-1.5 bg-surface-container-high border border-outline-variant/20 rounded-lg text-xs opacity-50"/>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tolerancias -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tolerancia entrada</label>
+          <div class="relative">
+            <input type="number" min="0" max="60" placeholder="5" class="w-full px-3 py-2.5 pr-12 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant font-bold">min</span>
+          </div>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tolerancia salida</label>
+          <div class="relative">
+            <input type="number" min="0" max="60" placeholder="10" class="w-full px-3 py-2.5 pr-12 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant font-bold">min</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-2 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-nuevo-horario')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">add_circle</span> Crear horario
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Editar Ciclo -->
+<div id="modal-editar-ciclo" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-editar-ciclo')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100 sticky top-0 bg-white z-10">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Editar Ciclo <span id="edit-cic-id-title" class="text-primary font-mono"></span></h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Modificá la configuración del ciclo seleccionado.</p>
+      </div>
+      <button onclick="cerrarModal('modal-editar-ciclo')" class="text-slate-400 hover:text-slate-700"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form onsubmit="guardar('modal-editar-ciclo','Ciclo actualizado correctamente.',event)" class="px-8 py-6 space-y-5">
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Nombre *</label>
+        <input required id="edit-cic-nombre" type="text" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Duración del ciclo (días) *</label>
+        <input required id="edit-cic-duracion" type="number" min="2" max="60" oninput="generarMapeoEdit()" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-3">Mapeo de días *</label>
+        <div id="mapeo-dias-edit" class="space-y-1.5 max-h-56 overflow-y-auto pr-1"></div>
+      </div>
+      <div class="p-3 bg-tertiary-container/20 rounded-lg border border-tertiary/20 flex items-start gap-2">
+        <span class="material-symbols-outlined text-tertiary text-sm mt-0.5">info</span>
+        <p class="text-[11px] text-on-tertiary-container">Cada día puede asignarse a un horario existente o marcarse como <strong>Libre</strong>.</p>
+      </div>
+      <div class="flex gap-3 pt-2 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-editar-ciclo')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">save</span> Guardar cambios
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Nuevo Ciclo -->
+<div id="modal-nuevo-ciclo" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-nuevo-ciclo')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100 sticky top-0 bg-white z-10">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Nuevo Ciclo Rotativo</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Definí la estructura y el mapeo de días del ciclo.</p>
+      </div>
+      <button onclick="cerrarModal('modal-nuevo-ciclo')" class="text-slate-400 hover:text-slate-700"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form onsubmit="guardar('modal-nuevo-ciclo','Ciclo creado correctamente.',event)" class="px-8 py-6 space-y-5">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="col-span-2">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Nombre *</label>
+          <input required type="text" placeholder="Ej: Rotación Planta A" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Duración del ciclo (días) *</label>
+          <input required id="ciclo-duracion" type="number" min="2" max="60" placeholder="14" oninput="generarMapeo()" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+      </div>
+
+      <!-- Mapeo dinámico -->
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-3">Mapeo de días *</label>
+        <div id="mapeo-dias" class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+          <p class="text-xs text-on-surface-variant italic">Ingresá la duración para configurar los días.</p>
+        </div>
+      </div>
+
+      <div class="p-3 bg-tertiary-container/20 rounded-lg border border-tertiary/20 flex items-start gap-2">
+        <span class="material-symbols-outlined text-tertiary text-sm mt-0.5">info</span>
+        <p class="text-[11px] text-on-tertiary-container">Cada día puede asignarse a un horario existente o marcarse como <strong>Libre</strong>.</p>
+      </div>
+
+      <div class="flex gap-3 pt-2 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-nuevo-ciclo')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">add_circle</span> Crear ciclo
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Asignar Horario -->
+<div id="modal-asignar-horario" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-asignar-horario')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Asignar Horario</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Asigná un horario fijo a un empleado.</p>
+      </div>
+      <button onclick="cerrarModal('modal-asignar-horario')" class="text-slate-400 hover:text-slate-700"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form onsubmit="guardar('modal-asignar-horario','Horario asignado correctamente.',event)" class="px-8 py-6 space-y-4">
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Empleado *</label>
+        <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+          <option value="">Seleccionar empleado...</option>
+          <option>0042 · Juan Perez</option>
+          <option>0018 · Ana Gomez</option>
+          <option>0027 · Martin Sosa</option>
+          <option>0031 · Luis Diaz</option>
+          <option>0050 · Carla Ruiz</option>
+          <option>0093 · Carlos Méndez</option>
+          <option>0105 · Lucía Ferrero</option>
+          <option>0158 · Maria Alvez</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Horario *</label>
+        <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+          <option value="">Seleccionar horario...</option>
+          <option>H-001 · Planta Mañana (08:00–17:00)</option>
+          <option>H-002 · Soporte Nocturno (22:00–06:00)</option>
+          <option>H-003 · Oficina Central (09:00–18:00)</option>
+          <option>H-004 · Planta Tarde (14:00–22:00)</option>
+          <option>H-005 · Parcial Mañana (09:00–13:00)</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha desde *</label>
+          <input required type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha hasta</label>
+          <input type="date" placeholder="Indefinido" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+      </div>
+      <div class="p-3 bg-surface-container-low rounded-lg flex items-start gap-2">
+        <span class="material-symbols-outlined text-on-surface-variant text-sm mt-0.5">info</span>
+        <p class="text-[11px] text-on-surface-variant">Si ya existe una asignación activa para el empleado, será reemplazada desde la fecha indicada.</p>
+      </div>
+      <div class="flex gap-3 pt-2 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-asignar-horario')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">person_add</span> Confirmar asignación
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Asignar Ciclo -->
+<div id="modal-asignar-ciclo" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-asignar-ciclo')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Asignar Ciclo Rotativo</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Vinculá un empleado a un ciclo rotativo.</p>
+      </div>
+      <button onclick="cerrarModal('modal-asignar-ciclo')" class="text-slate-400 hover:text-slate-700"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form onsubmit="guardar('modal-asignar-ciclo','Ciclo asignado correctamente.',event)" class="px-8 py-6 space-y-4">
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Empleado *</label>
+        <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+          <option value="">Seleccionar empleado...</option>
+          <option>0042 · Juan Perez</option>
+          <option>0018 · Ana Gomez</option>
+          <option>0027 · Martin Sosa</option>
+          <option>0031 · Luis Diaz</option>
+          <option>0050 · Carla Ruiz</option>
+          <option>0093 · Carlos Méndez</option>
+          <option>0105 · Lucía Ferrero</option>
+          <option>0158 · Maria Alvez</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Ciclo *</label>
+        <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+          <option value="">Seleccionar ciclo...</option>
+          <option>C-001 · 4x2 Producción (6 días)</option>
+          <option>C-002 · Rotación Planta A (14 días)</option>
+          <option>C-003 · Rotación Planta B (21 días)</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha inicio *</label>
+          <input required type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Día de inicio del ciclo</label>
+          <input type="number" min="1" max="60" placeholder="1" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha hasta</label>
+        <input type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+      </div>
+      <div class="p-3 bg-surface-container-low rounded-lg flex items-start gap-2">
+        <span class="material-symbols-outlined text-on-surface-variant text-sm mt-0.5">info</span>
+        <p class="text-[11px] text-on-surface-variant">El "Día de inicio" indica en qué posición del ciclo arranca el empleado (por defecto Día 1).</p>
+      </div>
+      <div class="flex gap-3 pt-2 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-asignar-ciclo')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">groups</span> Confirmar asignación
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold">
+  <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+  <span id="toast-msg">Acción completada</span>
+</div>
 
 <script>
 (function() {
   var page = location.pathname.split('/').pop() || 'index.html';
   document.querySelectorAll('.nav-link[data-nav]').forEach(function(el) {
     if (el.dataset.nav === page) {
-      el.classList.add('bg-slate-200', 'text-blue-900', 'border-r-4', 'border-blue-700');
-      el.classList.remove('text-slate-600', 'hover:bg-slate-200/50');
+      el.classList.add('bg-slate-300', 'text-blue-900', 'border-r-4', 'border-blue-700');
+      el.classList.remove('text-slate-600', 'hover:bg-slate-200');
     }
   });
 })();
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+    // Acciones
+    ['horarios','ciclos','asignaciones'].forEach(function(t) {
+      var el = document.getElementById('actions-' + t);
+      el.classList.add('hidden');
+      el.classList.remove('flex');
+    });
+    var actEl = document.getElementById('actions-' + tab);
+    actEl.classList.remove('hidden');
+    actEl.classList.add('flex');
+    // Placeholder del buscador
+    var searchInput = document.getElementById('search-hor');
+    if (searchInput) {
+      searchInput.value = '';
+      if (tab === 'horarios') searchInput.placeholder = 'BUSCAR HORARIO...';
+      else if (tab === 'ciclos') searchInput.placeholder = 'BUSCAR CICLO...';
+      else if (tab === 'asignaciones') searchInput.placeholder = 'BUSCAR EMPLEADO...';
+    }
+  });
+});
+
+function abrirModal(id) { document.getElementById(id).classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); document.body.style.overflow = ''; }
+
+function guardar(modalId, msg, e) {
+  e.preventDefault();
+  cerrarModal(modalId);
+  e.target.reset();
+  if (document.getElementById('mapeo-dias')) document.getElementById('mapeo-dias').innerHTML = '<p class="text-xs text-on-surface-variant italic">Ingresá la duración para configurar los días.</p>';
+  mostrarToast(msg);
+}
+
+// Botones de acción
+
+document.querySelectorAll('#actions-asignaciones button').forEach(function(btn, i) {
+  btn.addEventListener('click', function() {
+    abrirModal(i === 0 ? 'modal-asignar-ciclo' : 'modal-asignar-horario');
+  });
+});
+
+function toggleModoFlex() {
+  var modo = document.querySelector('input[name="modo-flex"]:checked');
+  document.getElementById('campo-horas-diarias').classList.toggle('hidden', !modo || modo.value !== 'diaria');
+  document.getElementById('campo-horas-semanales').classList.toggle('hidden', !modo || modo.value !== 'semanal');
+}
+
+function toggleFlexible() {
+  var tipo = document.getElementById('tipo-horario').value;
+  document.getElementById('panel-flexible').classList.toggle('hidden', tipo !== 'Flexible');
+}
+
+// Habilitar/deshabilitar inputs de día según checkbox
+document.querySelectorAll('.dia-check').forEach(function(chk) {
+  chk.addEventListener('change', function() {
+    var row = chk.closest('label');
+    var inputs = row.querySelectorAll('input[type="time"]');
+    inputs.forEach(function(inp) { inp.disabled = !chk.checked; });
+    row.classList.toggle('opacity-50', !chk.checked);
+  });
+});
+
+// Mapeo dinámico de días para nuevo ciclo
+var horariosOpts = '<option value="">Libre</option><option>H-001 · Planta Mañana</option><option>H-002 · Soporte Nocturno</option><option>H-003 · Oficina Central</option><option>H-004 · Planta Tarde</option><option>H-005 · Parcial Mañana</option>';
+function generarMapeo() {
+  var n = parseInt(document.getElementById('ciclo-duracion').value);
+  var cont = document.getElementById('mapeo-dias');
+  if (!n || n < 2) { cont.innerHTML = '<p class="text-xs text-on-surface-variant italic">Ingresá la duración para configurar los días.</p>'; return; }
+  var html = '';
+  for (var i = 1; i <= n; i++) {
+    html += '<div class="flex items-center gap-3">'
+      + '<span class="text-xs font-bold w-10 text-on-surface-variant">Día ' + i + '</span>'
+      + '<span class="material-symbols-outlined text-outline-variant text-sm">arrow_right_alt</span>'
+      + '<select class="flex-1 px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30">' + horariosOpts + '</select>'
+      + '</div>';
+  }
+  cont.innerHTML = html;
+}
+
+function generarMapeoEdit() {
+  var n = parseInt(document.getElementById('edit-cic-duracion').value);
+  var cont = document.getElementById('mapeo-dias-edit');
+  if (!n || n < 2) { cont.innerHTML = '<p class="text-xs text-on-surface-variant italic">Ingresá la duración para configurar los días.</p>'; return; }
+  var html = '';
+  for (var i = 1; i <= n; i++) {
+    html += '<div class="flex items-center gap-3"><span class="text-xs font-bold w-10 text-on-surface-variant">Día ' + i + '</span>'
+      + '<span class="material-symbols-outlined text-outline-variant text-sm">arrow_right_alt</span>'
+      + '<select class="flex-1 px-2 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30">' + horariosOpts + '</select></div>';
+  }
+  cont.innerHTML = html;
+}
+
+
+function mostrarToast(msg) {
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(function() { t.classList.add('hidden'); }, 3000);
+}
+
+// Filtros y paginación de horarios
+var horPagActual = 1;
+var horPorPagina = 5;
+
+function buscarActivo() {
+  var tabActivo = document.querySelector('.tab-btn.active');
+  if (!tabActivo) return;
+  var tab = tabActivo.dataset.tab;
+  if (tab === 'horarios') filtrarHorarios();
+  else if (tab === 'ciclos') filtrarCiclos();
+  else if (tab === 'asignaciones') filtrarAsig();
+}
+
+function getFilasHorFiltradas() {
+  var busqueda = (document.getElementById('search-hor').value || '').toLowerCase().trim();
+  var tipo = (document.getElementById('filtro-tipo-hor').value || '').toLowerCase();
+  var estado = (document.getElementById('filtro-estado-hor').value || '').toLowerCase();
+  return Array.from(document.querySelectorAll('#tab-horarios tbody tr:not(#fila-sin-resultados-hor)')).filter(function(f) {
+    var id = f.cells[0].textContent.trim().toLowerCase();
+    var nombre = f.cells[1].textContent.trim().toLowerCase();
+    return (!busqueda || id.includes(busqueda) || nombre.includes(busqueda))
+        && (!tipo || f.cells[2].textContent.trim().toLowerCase().includes(tipo))
+        && (!estado || f.cells[3].textContent.trim().toLowerCase().includes(estado));
+  });
+}
+
+function filtrarHorarios() {
+  Array.from(document.querySelectorAll('#tab-horarios tbody tr:not(#fila-sin-resultados-hor)')).forEach(function(f) { f.style.display = 'none'; });
+  horPagActual = 1;
+  renderPaginaHor(getFilasHorFiltradas());
+}
+
+function renderPaginaHor(visibles) {
+  var total = visibles.length;
+  var totalPags = Math.max(1, Math.ceil(total / horPorPagina));
+  if (horPagActual > totalPags) horPagActual = totalPags;
+  var desde = (horPagActual - 1) * horPorPagina;
+  var hasta = desde + horPorPagina;
+  visibles.forEach(function(f, i) { f.style.display = (i >= desde && i < hasta) ? '' : 'none'; });
+  var sinRes = document.getElementById('fila-sin-resultados-hor');
+  sinRes.style.display = total === 0 ? '' : 'none';
+  sinRes.classList.remove('hidden');
+  document.getElementById('horarios-thead').style.display = total === 0 ? 'none' : '';
+  document.getElementById('contador-hor').textContent = total === 0 ? 'Sin resultados' : 'Mostrando ' + Math.min(horPorPagina, total - desde) + ' de ' + total + ' horarios';
+  document.getElementById('hor-pagina').textContent = horPagActual + ' / ' + totalPags;
+  document.getElementById('hor-prev').disabled = horPagActual === 1;
+  document.getElementById('hor-next').disabled = horPagActual === totalPags;
+}
+
+function paginarHor(dir) {
+  horPagActual += dir;
+  renderPaginaHor(getFilasHorFiltradas());
+}
+
+function limpiarFiltrosHor() {
+  document.getElementById('search-hor').value = '';
+  document.getElementById('filtro-tipo-hor').value = '';
+  document.getElementById('filtro-estado-hor').value = '';
+  filtrarHorarios();
+}
+
+
+var horarioSeleccionado = {};
+
+function abrirEditar(btn) {
+  var d = horarioSeleccionado;
+  document.getElementById('edit-hor-id-title').textContent = d.id || '';
+  document.getElementById('edit-hor-nombre').value = d.nombre || '';
+  document.getElementById('edit-hor-tipo').value = d.tipo || 'Fijo';
+  document.getElementById('edit-hor-descanso').value = d.descanso || '';
+  document.getElementById('edit-hor-tol-ent').value = d.tolEnt || '';
+  document.getElementById('edit-hor-tol-sal').value = d.tolSal || '';
+  toggleFlexibleEdit();
+  if (d.tipo === 'Flexible' && d.modoFlex) {
+    var radio = document.querySelector('input[name="modo-flex-edit"][value="' + d.modoFlex + '"]');
+    if (radio) { radio.checked = true; toggleModoFlexEdit(); }
+    if (d.hDiarias) document.getElementById('edit-h-diarias').value = d.hDiarias;
+    if (d.hSemanales) document.getElementById('edit-h-semanales').value = d.hSemanales;
+  }
+  abrirModal('modal-editar-horario');
+}
+
+function toggleFlexibleEdit() {
+  var tipo = document.getElementById('edit-hor-tipo').value;
+  document.getElementById('panel-flexible-edit').classList.toggle('hidden', tipo !== 'Flexible');
+}
+function toggleModoFlexEdit() {
+  var modo = document.querySelector('input[name="modo-flex-edit"]:checked');
+  document.getElementById('campo-horas-diarias-edit').classList.toggle('hidden', !modo || modo.value !== 'diaria');
+  document.getElementById('campo-horas-semanales-edit').classList.toggle('hidden', !modo || modo.value !== 'semanal');
+}
+
+document.querySelectorAll('.edit-dia-check').forEach(function(chk) {
+  chk.addEventListener('change', function() {
+    var row = chk.closest('label');
+    var inputs = row.querySelectorAll('input[type="time"]');
+    inputs.forEach(function(inp) { inp.disabled = !chk.checked; });
+    row.classList.toggle('opacity-50', !chk.checked);
+  });
+});
+
+function seleccionarHorario(fila, id, nombre, tipo, desde, hasta, tolEnt, tolSal, descanso, modoFlex, hDiarias, hSemanales) {
+  document.querySelectorAll('#tab-horarios tbody tr').forEach(function(r) {
+    r.classList.remove('bg-primary-container/20');
+    var td = r.querySelector('td:first-child');
+    if (td) { td.classList.remove('border-l-4', 'border-primary'); }
+  });
+  fila.classList.add('bg-primary-container/20');
+  var primerTd = fila.querySelector('td:first-child');
+  if (primerTd) { primerTd.classList.add('border-l-4', 'border-primary'); }
+  document.getElementById('det-hor-vacio').classList.add('hidden');
+  document.getElementById('det-hor-contenido').classList.remove('hidden');
+  horarioSeleccionado = { id, nombre, tipo, tolEnt, tolSal, descanso, modoFlex, hDiarias, hSemanales };
+  document.getElementById('det-hor-id').textContent = id;
+  document.getElementById('det-hor-nombre').textContent = nombre;
+  document.getElementById('det-hor-tipo').textContent = tipo;
+  document.getElementById('det-hor-tol-ent').textContent = tolEnt + 'm';
+  document.getElementById('det-hor-tol-sal').textContent = tolSal + 'm';
+  document.getElementById('det-hor-descanso').textContent = descanso > 0 ? descanso + 'm' : '—';
+
+  var esFlexible = tipo === 'Flexible';
+  document.getElementById('det-hor-flex').classList.toggle('hidden', !esFlexible);
+  if (esFlexible) {
+    document.getElementById('det-hor-modo-flex').textContent = modoFlex === 'diaria' ? 'Diaria' : 'Semanal';
+    document.getElementById('det-hor-flex-diaria').style.display = modoFlex === 'diaria' ? '' : 'none';
+    document.getElementById('det-hor-flex-semanal').style.display = modoFlex === 'semanal' ? '' : 'none';
+    document.getElementById('det-hor-h-diarias').textContent = hDiarias ? hDiarias + 'h' : '—';
+    document.getElementById('det-hor-h-semanales').textContent = hSemanales ? hSemanales + 'h' : '—';
+  }
+}
+
+// Paginación ciclos
+var cicPagActual = 1;
+var cicPorPagina = 5;
+
+function getFilasCicFiltradas() {
+  var busqueda = (document.getElementById('search-hor').value || '').toLowerCase().trim();
+  var estado = (document.getElementById('filtro-estado-cic').value || '').toLowerCase();
+  return Array.from(document.querySelectorAll('#tabla-ciclos tr:not(#fila-sin-resultados-cic)')).filter(function(f) {
+    var id = f.cells[0].textContent.trim().toLowerCase();
+    var nombre = f.cells[1].textContent.trim().toLowerCase();
+    return (!busqueda || id.includes(busqueda) || nombre.includes(busqueda))
+        && (!estado || f.cells[3].textContent.trim().toLowerCase().includes(estado));
+  });
+}
+
+function renderPaginaCic(visibles) {
+  var total = visibles.length;
+  var totalPags = Math.max(1, Math.ceil(total / cicPorPagina));
+  if (cicPagActual > totalPags) cicPagActual = totalPags;
+  var desde = (cicPagActual - 1) * cicPorPagina;
+  Array.from(document.querySelectorAll('#tabla-ciclos tr:not(#fila-sin-resultados-cic)')).forEach(function(f) { f.style.display = 'none'; });
+  visibles.forEach(function(f, i) { f.style.display = (i >= desde && i < desde + cicPorPagina) ? '' : 'none'; });
+  var sinRes = document.getElementById('fila-sin-resultados-cic');
+  sinRes.style.display = total === 0 ? '' : 'none';
+  sinRes.classList.remove('hidden');
+  document.getElementById('ciclos-thead').style.display = total === 0 ? 'none' : '';
+  document.getElementById('contador-cic').textContent = total === 0 ? 'Sin resultados' : 'Mostrando ' + Math.min(cicPorPagina, total - desde) + ' de ' + total + ' ciclos';
+  document.getElementById('cic-pagina').textContent = cicPagActual + ' / ' + totalPags;
+  document.getElementById('cic-prev').disabled = cicPagActual === 1;
+  document.getElementById('cic-next').disabled = cicPagActual === totalPags;
+}
+
+function filtrarCiclos(limpiar) {
+  if (limpiar) {
+    document.getElementById('search-hor').value = '';
+    document.getElementById('filtro-estado-cic').value = '';
+  }
+  cicPagActual = 1;
+  renderPaginaCic(getFilasCicFiltradas());
+}
+
+function paginarCic(dir) {
+  cicPagActual += dir;
+  renderPaginaCic(getFilasCicFiltradas());
+}
+
+var cicloSeleccionado = {};
+
+function abrirEditarCiclo() {
+  var d = cicloSeleccionado;
+  document.getElementById('edit-cic-id-title').textContent = d.id || '';
+  document.getElementById('edit-cic-nombre').value = d.nombre || '';
+  document.getElementById('edit-cic-duracion').value = d.dias || '';
+  generarMapeoEdit();
+  abrirModal('modal-editar-ciclo');
+}
+
+function seleccionarCiclo(fila, id, nombre, dias) {
+  document.querySelectorAll('#tabla-ciclos tr').forEach(function(r) {
+    r.classList.remove('bg-primary-container/20');
+    var td = r.querySelector('td:first-child');
+    if (td) { td.classList.remove('border-l-4', 'border-primary'); }
+  });
+  fila.classList.add('bg-primary-container/20');
+  var primerTd = fila.querySelector('td:first-child');
+  if (primerTd) { primerTd.classList.add('border-l-4', 'border-primary'); }
+  document.getElementById('det-cic-vacio').classList.add('hidden');
+  document.getElementById('det-cic-contenido').classList.remove('hidden');
+  cicloSeleccionado = { id, nombre, dias };
+  document.getElementById('det-cic-id').textContent = id;
+  document.getElementById('det-cic-nombre').textContent = nombre;
+  document.getElementById('det-cic-dias').textContent = dias;
+}
+
+// Render inicial (aquí todas las variables ya tienen sus valores asignados)
+renderPaginaHor(getFilasHorFiltradas());
+renderPaginaCic(getFilasCicFiltradas());
+
+// -- Asignaciones ----------------------------------------------
+var asigPagActual = 1;
+var asigPorPagina = 6;
+
+function getFilasAsigFiltradas() {
+  var busqueda = (document.getElementById('search-hor').value || '').toLowerCase().trim();
+  var tipo = (document.getElementById('filtro-tipo-asig').value || '').toLowerCase();
+  var est  = (document.getElementById('filtro-estado-asig').value || '').toLowerCase();
+  return Array.from(document.querySelectorAll('#tabla-asig tr:not(#fila-sin-resultados-asig)')).filter(function(fila) {
+    var nombre = (fila.cells[1] || {}).textContent.trim().toLowerCase();
+    var legajo = (fila.cells[0] || {}).textContent.trim().toLowerCase();
+    var tipoBadge = (fila.querySelector('.asig-tipo') || {}).textContent || '';
+    var estadoCel = (fila.cells[4] || {}).textContent || '';
+    var busqOk = !busqueda || nombre.includes(busqueda) || legajo.includes(busqueda);
+    var tipoOk = !tipo || (tipo === 'horario' ? tipoBadge.toLowerCase().includes('horario') : tipoBadge.toLowerCase().includes('ciclo'));
+    var estOk  = !est  || estadoCel.toLowerCase().includes(est);
+    return busqOk && tipoOk && estOk;
+  });
+}
+
+function renderPaginaAsig(visibles) {
+  var total = visibles.length;
+  var totalPags = Math.max(1, Math.ceil(total / asigPorPagina));
+  if (asigPagActual > totalPags) asigPagActual = totalPags;
+  var desde = (asigPagActual - 1) * asigPorPagina;
+  Array.from(document.querySelectorAll('#tabla-asig tr:not(#fila-sin-resultados-asig)')).forEach(function(f) { f.style.display = 'none'; });
+  visibles.forEach(function(f, i) { f.style.display = (i >= desde && i < desde + asigPorPagina) ? '' : 'none'; });
+  var sinRes = document.getElementById('fila-sin-resultados-asig');
+  sinRes.style.display = total === 0 ? '' : 'none';
+  sinRes.classList.remove('hidden');
+  document.getElementById('asig-thead').style.display = total === 0 ? 'none' : '';
+  document.getElementById('contador-asig').textContent = 'Mostrando ' + total + ' asignacion' + (total !== 1 ? 'es' : '');
+  document.getElementById('asig-pagina').textContent = asigPagActual + ' / ' + totalPags;
+  document.getElementById('asig-prev').disabled = asigPagActual <= 1;
+  document.getElementById('asig-next').disabled = asigPagActual >= totalPags;
+}
+
+function filtrarAsig(limpiar) {
+  if (limpiar) {
+    document.getElementById('search-hor').value = '';
+    document.getElementById('filtro-tipo-asig').value = '';
+    document.getElementById('filtro-estado-asig').value = '';
+  }
+  asigPagActual = 1;
+  renderPaginaAsig(getFilasAsigFiltradas());
+}
+
+function paginarAsig(dir) {
+  asigPagActual += dir;
+  renderPaginaAsig(getFilasAsigFiltradas());
+}
+
+function seleccionarAsig(fila, legajo, nombre, iniciales, avatarClases, tipo, recurso, desde, hasta, estado) {
+  document.querySelectorAll('#tabla-asig tr:not(#fila-sin-resultados-asig)').forEach(function(r) {
+    r.classList.remove('bg-primary-container/20');
+    var td = r.querySelector('td:first-child');
+    if (td) td.classList.remove('border-l-4', 'border-primary');
+  });
+  fila.classList.add('bg-primary-container/20');
+  var primerTd = fila.querySelector('td:first-child');
+  if (primerTd) primerTd.classList.add('border-l-4', 'border-primary');
+
+  document.getElementById('det-asig-vacio').classList.add('hidden');
+  document.getElementById('det-asig-contenido').classList.remove('hidden');
+
+  var av = document.getElementById('det-asig-avatar');
+  av.textContent = iniciales;
+  av.className = 'w-10 h-10 rounded-full flex items-center justify-center font-black text-sm shrink-0 ' + avatarClases;
+
+  document.getElementById('det-asig-nombre').textContent = nombre;
+  document.getElementById('det-asig-legajo').textContent = 'Legajo ' + legajo;
+  document.getElementById('det-asig-recurso').textContent = recurso;
+  document.getElementById('det-asig-desde').textContent = desde;
+  document.getElementById('det-asig-hasta').textContent = hasta;
+
+  var tipoBadge = document.getElementById('det-asig-tipo-badge');
+  if (tipo === 'ciclo') {
+    tipoBadge.textContent = 'Ciclo rotativo';
+    tipoBadge.className = 'px-2 py-0.5 bg-tertiary-container text-on-tertiary-container text-[10px] font-bold rounded-full uppercase';
+  } else {
+    tipoBadge.textContent = 'Horario fijo';
+    tipoBadge.className = 'px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full uppercase';
+  }
+
+  document.getElementById('edit-asig-empleado').value = nombre + ' · ' + legajo;
+  document.getElementById('edit-asig-tipo').value = tipo;
+}
+
+renderPaginaAsig(getFilasAsigFiltradas());
 </script>
 </body>
 </html>
