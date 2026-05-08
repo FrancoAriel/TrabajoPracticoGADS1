@@ -54,14 +54,12 @@ tailwind.config = {
     <a href="index.html" data-nav="index.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
     <a href="empleados.html" data-nav="empleados.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">groups</span><span>Empleados</span></a>
     <a href="horarios.html" data-nav="horarios.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">calendar_today</span><span>Horarios</span></a>
-    <a href="horarios.html#ciclos" data-nav="ciclos" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">autorenew</span><span>Ciclos rotativos</span></a>
     <a href="fichadas.html" data-nav="fichadas.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">fingerprint</span><span>Fichadas</span></a>
     <a href="novedades.html" data-nav="novedades.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">notification_important</span><span>Novedades</span></a>
     <a href="cierre.html" data-nav="cierre.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">payments</span><span>Cierre mensual</span></a>
     <a href="exportaciones.html" data-nav="exportaciones.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">output</span><span>Exportaciones</span></a>
   </nav>
   <div class="mt-auto px-4 pt-6 border-t border-slate-200/50">
-    <button class="w-full mb-4 bg-gradient-to-br from-primary to-primary-dim text-white font-bold py-2.5 px-4 rounded-lg text-sm">Run Payroll</button>
     <div class="space-y-1">
       <a href="#" class="flex items-center gap-3 px-3 py-2 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-colors"><span class="material-symbols-outlined">help</span><span>Support</span></a>
       <a href="login.html" class="flex items-center gap-3 px-3 py-2 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-colors"><span class="material-symbols-outlined">logout</span><span>Sign Out</span></a>
@@ -85,123 +83,262 @@ tailwind.config = {
 
 <!-- Main -->
 <main class="ml-64 pt-20 px-8 pb-12 min-h-screen">
-  <div class="flex items-center justify-between mb-8">
+
+  <!-- Page Header -->
+  <div class="flex items-center justify-between mb-6">
     <div>
       <h2 class="text-2xl font-extrabold tracking-tight text-on-background font-headline">Cierre Mensual</h2>
       <p class="text-on-surface-variant text-sm mt-1">Proceso de cierre y liquidación de horas del período.</p>
     </div>
-    <div class="flex gap-2 items-center px-4 py-2 bg-tertiary-container/40 rounded-lg">
-      <span class="material-symbols-outlined text-tertiary text-sm">pending</span>
-      <span class="text-xs font-bold text-on-tertiary-container uppercase tracking-widest">Período abierto: Junio 2025</span>
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 px-4 py-2 bg-tertiary-container/40 rounded-lg">
+        <span class="material-symbols-outlined text-tertiary text-sm">pending</span>
+        <span class="text-xs font-bold text-on-tertiary-container uppercase tracking-widest">Período abierto: Junio 2025</span>
+      </div>
+      <button disabled class="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-sm font-bold rounded-md opacity-40 cursor-not-allowed">
+        <span class="material-symbols-outlined text-sm">lock</span> Ejecutar cierre
+      </button>
     </div>
   </div>
 
-  <!-- Period Status -->
-  <div class="grid grid-cols-3 gap-6 mb-8">
-    <div class="bg-surface-container-lowest rounded-xl p-6 border-l-4 border-on-secondary-container">
-      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-2">Mayo 2025</p>
-      <p class="text-xl font-headline font-black text-on-secondary-container mb-1">CERRADO</p>
-      <p class="text-xs text-on-surface-variant">Cerrado el 05/06/2025</p>
-      <a href="exportaciones.html" class="mt-4 flex items-center gap-1 text-xs font-bold text-primary hover:underline">
-        <span class="material-symbols-outlined text-sm">download</span> Exportar liquidación
+  <!-- Stats -->
+  <div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Horas trabajadas</p>
+      <p class="text-2xl font-headline font-black text-primary">1.240</p>
+    </div>
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">HE 50% acumuladas</p>
+      <p class="text-2xl font-headline font-black text-tertiary">42h 30m</p>
+    </div>
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">HE 100% acumuladas</p>
+      <p class="text-2xl font-headline font-black text-error">8h 00m</p>
+    </div>
+    <div class="bg-surface-container-highest p-5 rounded-lg">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Novedades pendientes</p>
+      <p class="text-2xl font-headline font-black text-on-secondary-container">9</p>
+    </div>
+  </div>
+
+  <!-- Períodos anteriores -->
+  <div class="grid grid-cols-3 gap-4 mb-6">
+    <div class="bg-surface-container-lowest rounded-xl p-5 border border-slate-200/50 border-l-4 border-l-green-600 flex items-center justify-between">
+      <div>
+        <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Mayo 2025</p>
+        <p class="text-sm font-black text-green-700">CERRADO</p>
+        <p class="text-xs text-on-surface-variant mt-0.5">Cerrado el 05/06/2025</p>
+      </div>
+      <a href="exportaciones.html" class="flex items-center gap-1 text-xs font-bold text-primary hover:underline shrink-0">
+        <span class="material-symbols-outlined text-sm">download</span> Exportar
       </a>
     </div>
-    <div class="bg-slate-900 rounded-xl p-6 text-white relative overflow-hidden">
-      <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl opacity-10">point_of_sale</span>
-      <p class="text-[10px] font-headline font-bold text-slate-400 tracking-widest uppercase mb-2">Junio 2025</p>
-      <p class="text-xl font-headline font-black mb-1">EN PROGRESO</p>
-      <p class="text-xs text-slate-400">9 novedades pendientes de aprobación</p>
-      <a href="novedades.html" class="mt-4 flex items-center gap-1 text-xs font-bold text-blue-300 hover:underline">
+    <div class="bg-slate-900 rounded-xl p-5 text-white relative overflow-hidden">
+      <span class="material-symbols-outlined absolute -right-3 -bottom-3 text-7xl opacity-10">point_of_sale</span>
+      <p class="text-[10px] font-headline font-bold text-slate-400 tracking-widest uppercase mb-1">Junio 2025</p>
+      <p class="text-sm font-black">EN PROGRESO</p>
+      <p class="text-xs text-slate-400 mt-0.5">9 novedades pendientes</p>
+      <a href="novedades.html" class="mt-3 flex items-center gap-1 text-xs font-bold text-blue-300 hover:underline">
         <span class="material-symbols-outlined text-sm">arrow_forward</span> Revisar novedades
       </a>
     </div>
-    <div class="bg-surface-container-highest rounded-xl p-6 opacity-60">
-      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-2">Julio 2025</p>
-      <p class="text-xl font-headline font-black text-on-surface-variant mb-1">PENDIENTE</p>
-      <p class="text-xs text-on-surface-variant">Aún no iniciado</p>
+    <div class="bg-surface-container-highest rounded-xl p-5 opacity-50">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Julio 2025</p>
+      <p class="text-sm font-black text-on-surface-variant">PENDIENTE</p>
+      <p class="text-xs text-on-surface-variant mt-0.5">Aún no iniciado</p>
     </div>
   </div>
 
-  <!-- Period Summary -->
-  <div class="bg-surface-container-lowest rounded-xl p-8 mb-8 border border-slate-200/50">
-    <div class="flex items-center justify-between mb-6">
-      <h3 class="text-lg font-bold font-headline flex items-center gap-2">
-        <span class="material-symbols-outlined text-primary">analytics</span> Resumen del Período Actual — Junio 2025
-      </h3>
-      <span class="text-[10px] font-bold uppercase tracking-widest text-tertiary bg-tertiary-container/30 px-3 py-1 rounded-full">BORRADOR</span>
+  <!-- Desglose por empleado + detalle -->
+  <div class="grid grid-cols-12 gap-6 mb-6">
+
+    <!-- Tabla empleados -->
+    <div class="col-span-12 lg:col-span-7 bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between gap-3">
+        <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2 shrink-0">
+          <span class="material-symbols-outlined text-sm">analytics</span> DESGLOSE POR EMPLEADO — JUNIO 2025
+        </h3>
+        <span class="text-[10px] font-bold uppercase tracking-widest text-tertiary bg-tertiary-container/30 px-3 py-1 rounded-full shrink-0">BORRADOR</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-surface-container-low">
+              <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Empleado</th>
+              <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider text-center">Hs norm.</th>
+              <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider text-center">HE 50%</th>
+              <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider text-center">HE 100%</th>
+              <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider text-center">Ausencias</th>
+              <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider text-center">Estado</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarCierre(this,'Juan Perez','0042','176h','2h 30m','0','1 día','ok')">
+              <td class="px-5 py-3.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-primary font-bold text-[10px]">JP</div>
+                  <div><p class="text-sm font-semibold">Juan Perez</p><p class="text-xs font-mono text-on-surface-variant">0042</p></div>
+                </div>
+              </td>
+              <td class="px-5 py-3.5 text-center text-sm font-bold text-primary">176h</td>
+              <td class="px-5 py-3.5 text-center text-sm font-bold text-tertiary">2h 30m</td>
+              <td class="px-5 py-3.5 text-center text-sm text-on-surface-variant">—</td>
+              <td class="px-5 py-3.5 text-center text-sm text-on-surface-variant">1 día</td>
+              <td class="px-5 py-3.5 text-center"><span class="inline-flex items-center gap-1 text-[10px] font-bold text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>OK</span></td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarCierre(this,'Ana Gomez','0018','168h','0','0','0','pendiente')">
+              <td class="px-5 py-3.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center text-tertiary font-bold text-[10px]">AG</div>
+                  <div><p class="text-sm font-semibold">Ana Gomez</p><p class="text-xs font-mono text-on-surface-variant">0018</p></div>
+                </div>
+              </td>
+              <td class="px-5 py-3.5 text-center text-sm font-bold text-primary">168h</td>
+              <td class="px-5 py-3.5 text-center text-sm text-on-surface-variant">—</td>
+              <td class="px-5 py-3.5 text-center text-sm text-on-surface-variant">—</td>
+              <td class="px-5 py-3.5 text-center text-sm text-on-surface-variant">—</td>
+              <td class="px-5 py-3.5 text-center"><span class="inline-flex items-center gap-1 text-[10px] font-bold text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>Pendiente</span></td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarCierre(this,'Martin Sosa','0027','184h','8h','2h','0','ok')">
+              <td class="px-5 py-3.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-primary font-bold text-[10px]">MS</div>
+                  <div><p class="text-sm font-semibold">Martin Sosa</p><p class="text-xs font-mono text-on-surface-variant">0027</p></div>
+                </div>
+              </td>
+              <td class="px-5 py-3.5 text-center text-sm font-bold text-primary">184h</td>
+              <td class="px-5 py-3.5 text-center text-sm font-bold text-tertiary">8h</td>
+              <td class="px-5 py-3.5 text-center text-sm font-bold text-error">2h</td>
+              <td class="px-5 py-3.5 text-center text-sm text-on-surface-variant">—</td>
+              <td class="px-5 py-3.5 text-center"><span class="inline-flex items-center gap-1 text-[10px] font-bold text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>OK</span></td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarCierre(this,'Luis Diaz','0031','160h','0','0','1 día','pendiente')">
+              <td class="px-5 py-3.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold text-[10px]">LD</div>
+                  <div><p class="text-sm font-semibold">Luis Diaz</p><p class="text-xs font-mono text-on-surface-variant">0031</p></div>
+                </div>
+              </td>
+              <td class="px-5 py-3.5 text-center text-sm font-bold text-primary">160h</td>
+              <td class="px-5 py-3.5 text-center text-sm text-on-surface-variant">—</td>
+              <td class="px-5 py-3.5 text-center text-sm text-on-surface-variant">—</td>
+              <td class="px-5 py-3.5 text-center text-sm text-on-surface-variant">1 día</td>
+              <td class="px-5 py-3.5 text-center"><span class="inline-flex items-center gap-1 text-[10px] font-bold text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>Pendiente</span></td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarCierre(this,'Carlos Méndez','0093','176h','24h','6h','0','ok')">
+              <td class="px-5 py-3.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-primary font-bold text-[10px]">CM</div>
+                  <div><p class="text-sm font-semibold">Carlos Méndez</p><p class="text-xs font-mono text-on-surface-variant">0093</p></div>
+                </div>
+              </td>
+              <td class="px-5 py-3.5 text-center text-sm font-bold text-primary">176h</td>
+              <td class="px-5 py-3.5 text-center text-sm font-bold text-tertiary">24h</td>
+              <td class="px-5 py-3.5 text-center text-sm font-bold text-error">6h</td>
+              <td class="px-5 py-3.5 text-center text-sm text-on-surface-variant">—</td>
+              <td class="px-5 py-3.5 text-center"><span class="inline-flex items-center gap-1 text-[10px] font-bold text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>OK</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-      <div class="text-center p-4 bg-surface-container-low rounded-lg">
-        <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Total horas trabajadas</p>
-        <p class="text-2xl font-headline font-black text-primary">1,240</p>
-        <p class="text-[10px] text-on-surface-variant mt-1">hrs acumuladas</p>
+
+    <!-- Detalle empleado -->
+    <div class="col-span-12 lg:col-span-5">
+      <div id="det-cierre-vacio" class="bg-surface-container-lowest rounded-xl border border-slate-200/50 flex flex-col items-center justify-center py-16 px-6 text-center">
+        <span class="material-symbols-outlined text-4xl text-outline-variant mb-3">touch_app</span>
+        <p class="text-sm font-semibold text-on-surface-variant">Ningún empleado seleccionado</p>
+        <p class="text-xs text-on-surface-variant/60 mt-1">Hacé clic en una fila para ver el desglose</p>
       </div>
-      <div class="text-center p-4 bg-surface-container-low rounded-lg">
-        <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">HE 50% acumuladas</p>
-        <p class="text-2xl font-headline font-black text-tertiary">42h 30m</p>
-        <p class="text-[10px] text-on-surface-variant mt-1">pendiente aprobación</p>
-      </div>
-      <div class="text-center p-4 bg-surface-container-low rounded-lg">
-        <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">HE 100% acumuladas</p>
-        <p class="text-2xl font-headline font-black text-error">8h 00m</p>
-        <p class="text-[10px] text-on-surface-variant mt-1">pendiente aprobación</p>
-      </div>
-      <div class="text-center p-4 bg-surface-container-low rounded-lg">
-        <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Ausencias justificadas</p>
-        <p class="text-2xl font-headline font-black text-on-secondary-container">3</p>
-        <p class="text-[10px] text-on-surface-variant mt-1">días aprobados</p>
+      <div id="det-cierre-contenido" class="hidden bg-surface-container-lowest rounded-xl border border-slate-200/50 overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">person</span> DESGLOSE INDIVIDUAL
+          </h3>
+          <span class="text-xs font-mono font-bold text-on-surface-variant" id="det-cierre-legajo">—</span>
+        </div>
+        <div class="p-5 space-y-3">
+          <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+            <div id="det-cierre-avatar" class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-primary font-black text-sm shrink-0">JP</div>
+            <div>
+              <p class="text-sm font-bold" id="det-cierre-nombre">—</p>
+              <p class="text-xs text-on-surface-variant">Período: Junio 2025</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-surface-container-low p-3 rounded-lg">
+              <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Horas normales</p>
+              <p class="text-xl font-black text-primary" id="det-cierre-hs-norm">—</p>
+            </div>
+            <div class="bg-surface-container-low p-3 rounded-lg">
+              <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Ausencias</p>
+              <p class="text-xl font-black text-on-background" id="det-cierre-ausencias">—</p>
+            </div>
+            <div class="bg-tertiary-container/25 p-3 rounded-lg">
+              <p class="text-[10px] font-bold text-on-tertiary-container uppercase mb-1">HE 50%</p>
+              <p class="text-xl font-black text-tertiary" id="det-cierre-he50">—</p>
+            </div>
+            <div class="bg-error-container/15 p-3 rounded-lg">
+              <p class="text-[10px] font-bold text-error uppercase mb-1">HE 100%</p>
+              <p class="text-xl font-black text-error" id="det-cierre-he100">—</p>
+            </div>
+          </div>
+          <div class="flex justify-between items-center pt-1">
+            <span class="text-xs text-on-surface-variant">Estado del desglose</span>
+            <span id="det-cierre-estado">—</span>
+          </div>
+          <a href="novedades.html" class="flex items-center justify-center gap-1.5 w-full py-2.5 border border-outline-variant/40 rounded-lg text-xs font-bold text-primary hover:bg-surface-container-low transition-colors mt-2">
+            <span class="material-symbols-outlined text-sm">open_in_new</span> Ver novedades del empleado
+          </a>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Checklist -->
-  <div class="bg-surface-container-lowest rounded-xl p-8 border border-slate-200/50">
-    <h3 class="text-lg font-bold font-headline mb-6 flex items-center gap-2">
-      <span class="material-symbols-outlined text-primary">checklist</span> Checklist de Cierre
+  <div class="bg-surface-container-lowest rounded-xl p-6 border border-slate-200/50">
+    <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2 mb-5">
+      <span class="material-symbols-outlined text-sm">checklist</span> CHECKLIST DE CIERRE
     </h3>
-    <div class="space-y-3">
-      <div class="flex items-center gap-4 p-4 bg-on-secondary-container/5 rounded-lg border border-on-secondary-container/20">
-        <span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+    <div class="space-y-2.5">
+      <div class="flex items-center gap-4 p-4 bg-green-50 rounded-lg border border-green-200">
+        <span class="material-symbols-outlined text-green-600 shrink-0" style="font-variation-settings: 'FILL' 1;">check_circle</span>
         <div class="flex-1">
-          <p class="text-sm font-bold">Novedades del período 1-10 aprobadas</p>
+          <p class="text-sm font-bold">Novedades del período 1–10 aprobadas</p>
           <p class="text-xs text-on-surface-variant">4 novedades procesadas</p>
         </div>
-        <span class="text-[10px] font-bold text-on-secondary-container uppercase">Completado</span>
+        <span class="text-[10px] font-bold text-green-700 uppercase shrink-0">Completado</span>
       </div>
       <div class="flex items-center gap-4 p-4 bg-tertiary-container/20 rounded-lg border border-tertiary/20">
-        <span class="material-symbols-outlined text-tertiary">pending</span>
+        <span class="material-symbols-outlined text-tertiary shrink-0">pending</span>
         <div class="flex-1">
           <p class="text-sm font-bold">Aprobar novedades pendientes</p>
           <p class="text-xs text-on-surface-variant">9 novedades esperando revisión</p>
         </div>
-        <a href="novedades.html" class="text-[10px] font-bold text-primary uppercase hover:underline flex items-center gap-1">
+        <a href="novedades.html" class="text-[10px] font-bold text-primary uppercase hover:underline flex items-center gap-1 shrink-0">
           Ir a novedades <span class="material-symbols-outlined text-xs">arrow_forward</span>
         </a>
       </div>
-      <div class="flex items-center gap-4 p-4 bg-surface-container-low rounded-lg opacity-60">
-        <span class="material-symbols-outlined text-outline-variant">radio_button_unchecked</span>
+      <div class="flex items-center gap-4 p-4 bg-surface-container-low rounded-lg opacity-50">
+        <span class="material-symbols-outlined text-outline-variant shrink-0">radio_button_unchecked</span>
         <div class="flex-1">
           <p class="text-sm font-bold">Validar totales con RRHH</p>
           <p class="text-xs text-on-surface-variant">Pendiente de novedades aprobadas</p>
         </div>
-        <span class="text-[10px] font-bold text-on-surface-variant uppercase">Pendiente</span>
+        <span class="text-[10px] font-bold text-on-surface-variant uppercase shrink-0">Pendiente</span>
       </div>
-      <div class="flex items-center gap-4 p-4 bg-surface-container-low rounded-lg opacity-60">
-        <span class="material-symbols-outlined text-outline-variant">radio_button_unchecked</span>
+      <div class="flex items-center gap-4 p-4 bg-surface-container-low rounded-lg opacity-50">
+        <span class="material-symbols-outlined text-outline-variant shrink-0">radio_button_unchecked</span>
         <div class="flex-1">
           <p class="text-sm font-bold">Exportar liquidación final</p>
           <p class="text-xs text-on-surface-variant">Disponible al cerrar el período</p>
         </div>
-        <span class="text-[10px] font-bold text-on-surface-variant uppercase">Pendiente</span>
+        <span class="text-[10px] font-bold text-on-surface-variant uppercase shrink-0">Pendiente</span>
       </div>
     </div>
-    <div class="mt-8 flex gap-4">
-      <button class="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white text-[11px] font-bold tracking-widest uppercase rounded shadow-lg hover:-translate-y-0.5 transition-all opacity-50 cursor-not-allowed" disabled>
-        <span class="material-symbols-outlined text-sm">lock</span> Ejecutar cierre mensual
-      </button>
-      <p class="text-xs text-on-surface-variant self-center">Disponible cuando todas las novedades estén aprobadas</p>
-    </div>
+    <p class="text-xs text-on-surface-variant mt-5">El botón "Ejecutar cierre" se habilitará cuando todas las novedades estén aprobadas.</p>
   </div>
+
 </main>
 
 <script>
@@ -214,6 +351,36 @@ tailwind.config = {
     }
   });
 })();
+
+function seleccionarCierre(fila, nombre, legajo, hsNorm, he50, he100, ausencias, estado) {
+  document.querySelectorAll('tbody tr').forEach(function(r) {
+    r.classList.remove('bg-primary-container/20');
+    var td = r.querySelector('td:first-child');
+    if (td) td.classList.remove('border-l-4', 'border-primary');
+  });
+  fila.classList.add('bg-primary-container/20');
+  var td = fila.querySelector('td:first-child');
+  if (td) td.classList.add('border-l-4', 'border-primary');
+
+  document.getElementById('det-cierre-vacio').classList.add('hidden');
+  document.getElementById('det-cierre-contenido').classList.remove('hidden');
+
+  var iniciales = nombre.split(' ').map(function(p) { return p[0]; }).join('').substring(0, 2).toUpperCase();
+  var av = document.getElementById('det-cierre-avatar');
+  av.textContent = iniciales;
+
+  document.getElementById('det-cierre-legajo').textContent = legajo;
+  document.getElementById('det-cierre-nombre').textContent = nombre;
+  document.getElementById('det-cierre-hs-norm').textContent = hsNorm;
+  document.getElementById('det-cierre-he50').textContent = he50 === '0' ? '—' : he50;
+  document.getElementById('det-cierre-he100').textContent = he100 === '0' ? '—' : he100;
+  document.getElementById('det-cierre-ausencias').textContent = ausencias === '0' ? '—' : ausencias;
+
+  var estadoHtml = estado === 'ok'
+    ? '<span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>OK — Sin novedades pendientes</span>'
+    : '<span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>Tiene novedades pendientes</span>';
+  document.getElementById('det-cierre-estado').innerHTML = estadoHtml;
+}
 </script>
 </body>
 </html>

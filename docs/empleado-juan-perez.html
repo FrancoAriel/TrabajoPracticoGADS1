@@ -46,95 +46,57 @@ tailwind.config = {
 <body class="text-on-background">
 
 <!-- SideNavBar -->
-<aside class="h-full w-64 fixed left-0 top-0 bg-slate-100 flex flex-col py-6 z-50">
+<aside class="h-screen w-64 fixed left-0 top-0 bg-slate-100 flex flex-col py-6 z-50">
   <div class="px-6 mb-8">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary">
+      <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
         <span class="material-symbols-outlined">architecture</span>
       </div>
       <div>
-        <h1 class="text-lg font-bold text-slate-900 leading-tight font-headline">Executive Architect</h1>
-        <p class="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Labor Management</p>
+        <h2 class="text-lg font-black text-slate-900 leading-none font-headline">Executive Architect</h2>
+        <p class="text-[10px] uppercase tracking-tighter text-on-surface-variant font-bold mt-1">Labor Management</p>
       </div>
     </div>
   </div>
-  <nav class="flex-1 space-y-1 px-3">
-    <a href="index.html" data-nav="index.html" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
-      <span class="material-symbols-outlined">dashboard</span><span>Dashboard</span>
-    </a>
-    <a href="empleados.html" data-nav="empleados.html" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
-      <span class="material-symbols-outlined">groups</span><span>Empleados</span>
-    </a>
-    <a href="horarios.html" data-nav="horarios.html" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
-      <span class="material-symbols-outlined">calendar_today</span><span>Horarios</span>
-    </a>
-    <a href="horarios.html#ciclos" data-nav="ciclos" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
-      <span class="material-symbols-outlined">autorenew</span><span>Ciclos rotativos</span>
-    </a>
-    <a href="fichadas.html" data-nav="fichadas.html" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
-      <span class="material-symbols-outlined">fingerprint</span><span>Fichadas</span>
-    </a>
-    <a href="novedades.html" data-nav="novedades.html" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
-      <span class="material-symbols-outlined">notification_important</span><span>Novedades</span>
-    </a>
-    <a href="cierre.html" data-nav="cierre.html" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
-      <span class="material-symbols-outlined">payments</span><span>Cierre mensual</span>
-    </a>
-    <a href="exportaciones.html" data-nav="exportaciones.html" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors font-medium text-sm">
-      <span class="material-symbols-outlined">output</span><span>Exportaciones</span>
-    </a>
+  <nav class="flex-1 space-y-1 px-4">
+    <a href="index.html" data-nav="index.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
+    <a href="empleados.html" data-nav="empleados.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">groups</span><span>Empleados</span></a>
+    <a href="horarios.html" data-nav="horarios.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">calendar_today</span><span>Horarios</span></a>
+    <a href="fichadas.html" data-nav="fichadas.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">fingerprint</span><span>Fichadas</span></a>
+    <a href="novedades.html" data-nav="novedades.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">notification_important</span><span>Novedades</span></a>
+    <a href="cierre.html" data-nav="cierre.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">payments</span><span>Cierre mensual</span></a>
+    <a href="exportaciones.html" data-nav="exportaciones.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">output</span><span>Exportaciones</span></a>
   </nav>
-  <div class="px-3 pt-6 border-t border-slate-200 space-y-1">
-    <button class="w-full mb-3 bg-gradient-to-br from-primary to-primary-dim text-white font-bold py-2.5 px-4 rounded-lg text-sm">Run Payroll</button>
-    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium">
-      <span class="material-symbols-outlined text-xl">settings</span><span>Settings</span>
-    </a>
-    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium">
-      <span class="material-symbols-outlined text-xl">help</span><span>Support</span>
-    </a>
-    <a href="login.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium">
-      <span class="material-symbols-outlined text-xl">logout</span><span>Sign Out</span>
-    </a>
+  <div class="mt-auto px-4 pt-6 border-t border-slate-200/50">
+    <div class="space-y-1">
+      <a href="#" class="flex items-center gap-3 px-3 py-2 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-colors"><span class="material-symbols-outlined">help</span><span>Support</span></a>
+      <a href="login.html" class="flex items-center gap-3 px-3 py-2 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-colors"><span class="material-symbols-outlined">logout</span><span>Sign Out</span></a>
+    </div>
   </div>
 </aside>
 
 <!-- TopNavBar -->
-<header class="flex justify-between items-center w-full px-8 py-3 ml-64 top-0 sticky z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200/50">
-  <div class="flex items-center gap-4">
-    <a href="empleados.html" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-sm font-medium">
-      <span class="material-symbols-outlined text-lg">arrow_back</span> Empleados
+<header class="fixed top-0 right-0 left-64 h-16 z-40 bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/50 flex items-center justify-between px-8 w-[calc(100%-16rem)]">
+  <div class="flex items-center gap-3">
+    <a href="empleados.html" class="flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition-colors text-sm font-bold">
+      <span class="material-symbols-outlined text-lg">arrow_back</span>
     </a>
     <span class="text-slate-300">/</span>
+    <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider"><a href="empleados.html" class="hover:text-primary transition-colors">Empleados</a></span>
+    <span class="text-slate-300">/</span>
     <span class="text-sm font-bold text-on-background">Juan Perez</span>
-    <div class="relative group ml-4">
-      <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-        <span class="material-symbols-outlined text-lg">search</span>
-      </span>
-      <input class="bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary w-56" placeholder="Buscar empleado..." type="text"/>
-    </div>
   </div>
-  <div class="flex items-center gap-6">
-    <div class="flex items-center gap-4 border-r border-slate-200 pr-6">
-      <button class="text-slate-500 hover:text-primary transition-colors relative">
-        <span class="material-symbols-outlined">notifications</span>
-        <span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span>
-      </button>
-      <button class="text-slate-500 hover:text-primary transition-colors">
-        <span class="material-symbols-outlined">mail</span>
-      </button>
+  <div class="flex items-center gap-3 pl-6 border-l border-slate-200/50">
+    <div class="text-right">
+      <p class="text-[10px] font-headline font-bold text-slate-900 leading-none">ADMINISTRATOR</p>
+      <p class="text-[9px] text-slate-500 font-headline uppercase tracking-widest mt-1">Super User</p>
     </div>
-    <div class="flex items-center gap-3">
-      <div class="text-right">
-        <p class="text-sm font-bold text-slate-900 leading-none">Admin User</p>
-        <p class="text-[11px] text-slate-500">Supervisión RRHH</p>
-      </div>
-      <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary text-sm font-bold font-headline">AD</div>
-    </div>
+    <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary text-xs font-bold font-headline">AD</div>
   </div>
 </header>
 
 <!-- Main Content -->
-<main class="ml-64 p-8 bg-surface min-h-screen">
+<main class="ml-64 pt-20 px-8 pb-12 min-h-screen">
   <!-- Profile Header -->
   <section class="bg-surface-container-lowest rounded-xl p-8 mb-6 flex items-start gap-8">
     <div class="relative">
@@ -143,53 +105,71 @@ tailwind.config = {
         Activo
       </div>
     </div>
-    <div class="flex-1">
-      <div class="flex items-end justify-between mb-6">
-        <div>
-          <h2 class="font-headline text-3xl font-extrabold text-on-background tracking-tight">Juan Perez</h2>
-          <p class="text-on-surface-variant font-medium flex items-center gap-2">
-            Legajo 0042 <span class="w-1 h-1 bg-outline rounded-full"></span> Administrativo
-          </p>
+      <div class="flex-1">
+          <div class="flex items-start justify-between mb-6">
+            <div>
+              <h2 class="font-headline text-3xl font-extrabold text-on-background tracking-tight">Juan Perez</h2>
+              <p class="text-on-surface-variant font-medium flex items-center gap-2 mt-1">
+                Legajo <span class="font-mono font-bold text-primary">0042</span>
+                <span class="w-1 h-1 bg-outline rounded-full"></span>
+                Administrativo
+                <span class="w-1 h-1 bg-outline rounded-full"></span>
+                <span class="flex items-center gap-1 text-on-secondary-container font-bold"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> Activo</span>
+              </p>
+            </div>
+            <button id="btn-editar-empleado" onclick="abrirModal('modal-editar-empleado')" class="primary-gradient text-on-primary px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[0.98] transition-transform">
+              <span class="material-symbols-outlined text-lg">edit</span> Editar empleado
+            </button>
+          </div>
+          <div class="grid grid-cols-4 gap-y-5 gap-x-8 border-t border-slate-100 pt-6">
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">DNI</p>
+              <p class="text-sm font-semibold font-mono text-on-surface">30.111.222</p>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">CUIL</p>
+              <p class="text-sm font-semibold font-mono text-on-surface">20-30111222-3</p>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Fecha de ingreso</p>
+              <p class="text-sm font-semibold text-on-surface">10/03/2023</p>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Categoría laboral</p>
+              <p class="text-sm font-semibold text-on-surface">Administrativo</p>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Convenio</p>
+              <p class="text-sm font-semibold text-on-surface">Comercio (130/75)</p>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Tipo de jornada</p>
+              <p class="text-sm font-semibold text-on-surface">Completa</p>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Modalidad fichada</p>
+              <p class="text-sm font-semibold text-on-surface">Biométrico</p>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Horario activo</p>
+              <p class="text-sm font-semibold text-on-surface">H-003 Oficina central</p>
+            </div>
+          </div>
         </div>
-        <div class="flex gap-2">
-          <button class="primary-gradient text-on-primary px-6 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[0.98] transition-transform">
-            <span class="material-symbols-outlined text-lg">edit</span> Editar empleado
-          </button>
-        </div>
-      </div>
-      <div class="grid grid-cols-4 gap-y-4 gap-x-8 border-t border-slate-100 pt-6">
-        <div>
-          <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">DNI</p>
-          <p class="text-sm font-semibold text-on-surface">30111222</p>
-        </div>
-        <div>
-          <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">CUIL</p>
-          <p class="text-sm font-semibold text-on-surface">20-30111222-3</p>
-        </div>
-        <div>
-          <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Fecha de Ingreso</p>
-          <p class="text-sm font-semibold text-on-surface">10/03/2023</p>
-        </div>
-        <div>
-          <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Tipo de Contrato</p>
-          <p class="text-sm font-semibold text-on-surface">Comercio, jornada completa</p>
-        </div>
-      </div>
-    </div>
   </section>
 
   <!-- Action Bar -->
   <section class="flex flex-wrap gap-3 mb-8">
-    <button class="bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
+    <button onclick="abrirModal('modal-asignar-horario')" class="bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
       <span class="material-symbols-outlined text-lg">schedule</span> Asignar horario
     </button>
-    <button class="bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
+    <button onclick="abrirModal('modal-asignar-horario')" class="bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
       <span class="material-symbols-outlined text-lg">sync_alt</span> Asignar ciclo
     </button>
-    <button class="bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
+    <button onclick="abrirModal('modal-cargar-novedad')" class="bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
       <span class="material-symbols-outlined text-lg">assignment_add</span> Cargar novedad
     </button>
-    <button class="bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
+    <button onclick="abrirModal('modal-fichada-manual')" class="bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
       <span class="material-symbols-outlined text-lg">fingerprint</span> Cargar fichada manual
     </button>
     <a href="fichadas.html" class="bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 ml-auto">
@@ -423,7 +403,7 @@ tailwind.config = {
               <td class="px-4 py-4 text-on-surface-variant">#890</td>
               <td class="px-4 py-4 font-semibold">Justificación</td>
               <td class="px-4 py-4">10/06 - 1 día</td>
-              <td class="px-4 py-4"><span class="flex items-center gap-1.5 text-on-secondary-container font-bold"><span class="w-1.5 h-1.5 bg-on-secondary-container rounded-full"></span> Aprobado</span></td>
+              <td class="px-4 py-4"><span class="flex items-center gap-1.5 text-green-700 font-bold"><span class="w-1.5 h-1.5 bg-green-600 rounded-full"></span> Aprobado</span></td>
               <td class="px-4 py-4"><button class="material-symbols-outlined text-primary hover:scale-110 transition-transform">visibility</button></td>
             </tr>
             <tr>
@@ -440,16 +420,445 @@ tailwind.config = {
   </div>
 </main>
 
+<!-- Modal: Editar Empleado -->
+<div id="modal-editar-empleado" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-editar-empleado')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Editar Empleado</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Legajo 0042 — los cambios quedan registrados con trazabilidad.</p>
+      </div>
+      <button onclick="cerrarModal('modal-editar-empleado')" class="text-slate-400 hover:text-slate-700 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form onsubmit="guardarEdicion(event)" class="px-8 py-6 space-y-5">
+
+      <!-- Nombre y Apellido -->
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Nombre *</label>
+          <input required type="text" value="Juan" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Apellido *</label>
+          <input required type="text" value="Perez" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+      </div>
+
+      <!-- DNI, Sexo y CUIL -->
+      <div class="grid grid-cols-3 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">DNI *</label>
+          <input id="edit-dni" required type="text" maxlength="8" value="30111222"
+            class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+            oninput="calcularCUILEdit()"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Sexo *</label>
+          <select id="edit-sexo" required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" onchange="calcularCUILEdit()">
+            <option value="M" selected>Masculino</option>
+            <option value="F">Femenino</option>
+            <option value="X">No binario / X</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">CUIL <span class="normal-case font-normal text-on-surface-variant ml-1">(calculado)</span></label>
+          <input id="edit-cuil" type="text" value="20-30111222-3" readonly
+            class="w-full px-3 py-2.5 bg-surface-container-highest border border-outline-variant/20 rounded-lg text-sm font-mono font-bold text-primary cursor-default"/>
+        </div>
+      </div>
+
+      <!-- Fecha de ingreso y Categoría laboral -->
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha de ingreso *</label>
+          <input required type="date" value="2023-03-10" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Categoría laboral *</label>
+          <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option selected>Administrativo</option>
+            <option>Operario / Planta</option>
+            <option>Técnico</option>
+            <option>Supervisor</option>
+            <option>Gerencia</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Convenio y Tipo de jornada -->
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Convenio colectivo</label>
+          <select class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option value="">Sin convenio / No aplica</option>
+            <option selected>Comercio (130/75)</option>
+            <option>Metalúrgico (260/75)</option>
+            <option>Gastronómico (389/04)</option>
+            <option>Construcción (76/75)</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tipo de jornada *</label>
+          <select id="edit-jornada" required onchange="toggleJornadaParcialEdit()" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option value="completa" selected>Completa</option>
+            <option value="parcial">Parcial</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Panel jornada parcial (edición) -->
+      <div id="edit-panel-parcial" class="hidden rounded-xl border border-primary/20 bg-primary-container/10 overflow-hidden">
+        <div class="flex items-center gap-2 px-5 py-3 bg-primary-container/30 border-b border-primary/20">
+          <span class="material-symbols-outlined text-sm text-primary">schedule</span>
+          <span class="text-[11px] font-extrabold text-primary uppercase tracking-wider">Horas de jornada parcial</span>
+        </div>
+        <div class="px-5 py-4">
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Horas diarias *</label>
+          <div class="flex items-center gap-3">
+            <input id="edit-parcial-horas" type="number" min="1" max="7" step="0.5" placeholder="Ej: 4"
+              class="w-32 px-3 py-2.5 bg-white border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+              oninput="if(parseFloat(this.value)>=8)this.value=7;if(this.value&&parseFloat(this.value)<1)this.value=1"/>
+            <span class="text-sm text-on-surface-variant font-medium">hs / día <span class="text-on-surface-variant/60">(máx. 7)</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Horario y Modalidad -->
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Horario asignado</label>
+          <select class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option value="">Sin asignar</option>
+            <option>H-001 Planta Mañana</option>
+            <option>H-002 Soporte Nocturno</option>
+            <option selected>H-003 Oficina central</option>
+            <option>C-001 4x2 Producción</option>
+            <option>C-002 Rotación planta A</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Modalidad de fichada</label>
+          <select class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option selected>Biométrico</option>
+            <option>App móvil</option>
+            <option>PIN / Teclado</option>
+            <option>QR</option>
+            <option>Manual</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-4 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-editar-empleado')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">save</span> Guardar cambios
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Asignar Horario -->
+<div id="modal-asignar-horario" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-asignar-horario')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Asignar Horario</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Juan Perez — Legajo 0042</p>
+      </div>
+      <button onclick="cerrarModal('modal-asignar-horario')" class="text-slate-400 hover:text-slate-700 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form onsubmit="guardarHorario(event)" class="px-8 py-6 space-y-4">
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Horario a asignar *</label>
+        <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+          <option value="">Seleccionar horario...</option>
+          <optgroup label="Horarios fijos">
+            <option>H-001 Planta Mañana (Lun-Vie 06:00-14:00)</option>
+            <option selected>H-003 Oficina central (Lun-Vie 09:00-18:00)</option>
+            <option>H-002 Soporte Nocturno (Lun-Vie 22:00-06:00)</option>
+          </optgroup>
+          <optgroup label="Ciclos rotativos">
+            <option>C-001 4x2 Producción</option>
+            <option>C-002 Rotación planta A</option>
+          </optgroup>
+        </select>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Vigencia desde *</label>
+        <input required type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+      </div>
+      <div class="flex gap-3 pt-2 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-asignar-horario')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">schedule</span> Asignar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Cargar Novedad -->
+<div id="modal-cargar-novedad" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-cargar-novedad')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Cargar Novedad</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Juan Perez — Legajo 0042</p>
+      </div>
+      <button onclick="cerrarModal('modal-cargar-novedad')" class="text-slate-400 hover:text-slate-700 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form onsubmit="guardarNovedadEmp(event)" class="px-8 py-6 space-y-4">
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tipo de novedad *</label>
+        <select id="emp-nov-tipo" required onchange="toggleCantidadNovEmp()" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+          <option value="">Seleccionar tipo...</option>
+          <optgroup label="Horas extra">
+            <option value="horas_extra_50">Horas extra 50%</option>
+            <option value="horas_extra_100">Horas extra 100%</option>
+            <option value="tardanza">Tardanza</option>
+          </optgroup>
+          <optgroup label="Ausencias y licencias">
+            <option value="justificacion">Justificación de ausencia</option>
+            <option value="ausencia">Ausencia injustificada</option>
+            <option value="licencia_enfermedad">Licencia por enfermedad</option>
+            <option value="licencia_examen">Licencia por examen</option>
+            <option value="vacaciones">Vacaciones parciales</option>
+            <option value="permiso_especial">Permiso especial</option>
+          </optgroup>
+          <optgroup label="Disciplinarias">
+            <option value="suspension">Suspensión disciplinaria</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha desde *</label>
+          <input required type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha hasta</label>
+          <input type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+      </div>
+      <!-- Cantidad condicional -->
+      <div id="emp-nov-campo-horas" class="hidden">
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Cantidad de horas *</label>
+        <div class="flex items-center gap-2">
+          <input type="number" min="0.5" step="0.5" placeholder="Ej: 2" class="w-28 px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+          <span class="text-sm text-on-surface-variant">hs</span>
+        </div>
+      </div>
+      <div id="emp-nov-campo-minutos" class="hidden">
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Minutos de tardanza *</label>
+        <div class="flex items-center gap-2">
+          <input type="number" min="1" step="1" placeholder="Ej: 15" class="w-28 px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+          <span class="text-sm text-on-surface-variant">min</span>
+        </div>
+      </div>
+      <div id="emp-nov-campo-dias" class="hidden">
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Cantidad de días *</label>
+        <div class="flex items-center gap-2">
+          <input type="number" min="1" step="1" placeholder="Ej: 3" class="w-28 px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+          <span class="text-sm text-on-surface-variant">días</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha de creación</label>
+          <input type="date" id="emp-nov-fecha-creacion" readonly class="w-full px-3 py-2.5 bg-surface-container-highest border border-outline-variant/20 rounded-lg text-sm font-mono text-on-surface-variant cursor-default"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Creado por</label>
+          <select class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option>Administrator</option>
+            <option>Supervisor RRHH</option>
+            <option>Jefe de área</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Observación</label>
+        <textarea rows="2" placeholder="Detalle adicional (opcional)..." class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none"></textarea>
+      </div>
+      <div class="flex gap-3 pt-2 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-cargar-novedad')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">add</span> Cargar novedad
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Cargar Fichada Manual -->
+<div id="modal-fichada-manual" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-fichada-manual')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Cargar Fichada Manual</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Juan Perez — Legajo 0042</p>
+      </div>
+      <button onclick="cerrarModal('modal-fichada-manual')" class="text-slate-400 hover:text-slate-700 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form onsubmit="guardarFichadaManual(event)" class="px-8 py-6 space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha *</label>
+          <input required type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Hora *</label>
+          <input required type="time" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tipo *</label>
+        <div class="flex gap-3">
+          <label class="flex-1 flex items-center gap-2 p-3 border border-outline-variant/40 rounded-lg cursor-pointer hover:bg-surface-container-low has-[:checked]:border-primary has-[:checked]:bg-primary-container/20">
+            <input type="radio" name="tipo-f-manual" value="entrada" class="accent-primary" required/>
+            <span class="material-symbols-outlined text-sm text-green-600">login</span>
+            <span class="text-sm font-semibold">Entrada</span>
+          </label>
+          <label class="flex-1 flex items-center gap-2 p-3 border border-outline-variant/40 rounded-lg cursor-pointer hover:bg-surface-container-low has-[:checked]:border-error has-[:checked]:bg-error-container/10">
+            <input type="radio" name="tipo-f-manual" value="salida" class="accent-error"/>
+            <span class="material-symbols-outlined text-sm text-red-600">logout</span>
+            <span class="text-sm font-semibold">Salida</span>
+          </label>
+        </div>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Motivo *</label>
+        <textarea required rows="2" placeholder="Describí el motivo del registro manual..." class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none"></textarea>
+      </div>
+      <div class="flex gap-3 pt-2 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-fichada-manual')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">fingerprint</span> Registrar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold">
+  <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;" id="toast-icon">check_circle</span>
+  <span id="toast-msg">Acción completada</span>
+</div>
+
 <script>
-// This page is under Empleados section
 (function() {
   document.querySelectorAll('.nav-link[data-nav]').forEach(function(el) {
     if (el.dataset.nav === 'empleados.html') {
-      el.classList.add('bg-slate-300', 'text-slate-900', 'font-semibold');
+      el.classList.add('bg-slate-300', 'text-blue-900', 'border-r-4', 'border-blue-700');
       el.classList.remove('text-slate-600', 'hover:bg-slate-200');
     }
   });
+
+  // Fecha de creación auto-rellenada
+  var hoy = new Date().toISOString().slice(0, 10);
+  var fc = document.getElementById('emp-nov-fecha-creacion');
+  if (fc) fc.value = hoy;
 })();
+
+function abrirModal(id) {
+  document.getElementById(id).classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function cerrarModal(id) {
+  document.getElementById(id).classList.add('hidden');
+  document.body.style.overflow = '';
+}
+function mostrarToast(msg) {
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(function() { t.classList.add('hidden'); }, 3000);
+}
+
+
+function calcularCUILEdit() {
+  var dni = document.getElementById('edit-dni').value.replace(/\D/g, '');
+  var sexo = document.getElementById('edit-sexo').value;
+  var cuil = document.getElementById('edit-cuil');
+  if (dni.length < 7 || !sexo) { cuil.value = ''; return; }
+  var prefijos = { M: '20', F: '27', X: '23' };
+  var prefijo = prefijos[sexo];
+  var base = prefijo + dni.padStart(8, '0');
+  var pesos = [5,4,3,2,7,6,5,4,3,2];
+  var suma = 0;
+  for (var i = 0; i < 10; i++) suma += parseInt(base[i]) * pesos[i];
+  var verificador = 11 - (suma % 11);
+  if (verificador === 11) verificador = 0;
+  if (verificador === 10) {
+    prefijo = '23'; base = prefijo + dni.padStart(8, '0'); suma = 0;
+    for (var j = 0; j < 10; j++) suma += parseInt(base[j]) * pesos[j];
+    verificador = 11 - (suma % 11);
+    if (verificador === 11) verificador = 0;
+  }
+  cuil.value = prefijo + '-' + dni.padStart(8, '0') + '-' + verificador;
+}
+
+function toggleJornadaParcialEdit() {
+  var val = document.getElementById('edit-jornada').value;
+  var panel = document.getElementById('edit-panel-parcial');
+  var input = document.getElementById('edit-parcial-horas');
+  if (val === 'parcial') { panel.classList.remove('hidden'); input.required = true; }
+  else { panel.classList.add('hidden'); input.required = false; input.value = ''; }
+}
+
+function guardarEdicion(e) {
+  e.preventDefault();
+  cerrarModal('modal-editar-empleado');
+  mostrarToast('Datos del empleado actualizados correctamente.');
+}
+function guardarHorario(e) {
+  e.preventDefault();
+  cerrarModal('modal-asignar-horario');
+  e.target.reset();
+  mostrarToast('Horario asignado correctamente.');
+}
+function toggleCantidadNovEmp() {
+  var tipo = document.getElementById('emp-nov-tipo').value;
+  var horas   = ['horas_extra_50','horas_extra_100'];
+  var minutos = ['tardanza'];
+  var dias    = ['justificacion','ausencia','licencia_enfermedad','licencia_examen','vacaciones','permiso_especial','suspension'];
+  document.getElementById('emp-nov-campo-horas').classList.toggle('hidden', !horas.includes(tipo));
+  document.getElementById('emp-nov-campo-minutos').classList.toggle('hidden', !minutos.includes(tipo));
+  document.getElementById('emp-nov-campo-dias').classList.toggle('hidden', !dias.includes(tipo));
+}
+
+function guardarNovedadEmp(e) {
+  e.preventDefault();
+  cerrarModal('modal-cargar-novedad');
+  e.target.reset();
+  // Restaurar fecha de creación tras reset
+  var hoy = new Date().toISOString().slice(0, 10);
+  var fc = document.getElementById('emp-nov-fecha-creacion');
+  if (fc) fc.value = hoy;
+  toggleCantidadNovEmp();
+  mostrarToast('Novedad cargada. Estado: Pendiente.');
+}
+function guardarFichadaManual(e) {
+  e.preventDefault();
+  cerrarModal('modal-fichada-manual');
+  e.target.reset();
+  mostrarToast('Fichada manual registrada correctamente.');
+}
 </script>
 </body>
 </html>

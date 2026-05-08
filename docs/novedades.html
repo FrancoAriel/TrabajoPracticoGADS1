@@ -54,14 +54,12 @@ tailwind.config = {
     <a href="index.html" data-nav="index.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
     <a href="empleados.html" data-nav="empleados.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">groups</span><span>Empleados</span></a>
     <a href="horarios.html" data-nav="horarios.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">calendar_today</span><span>Horarios</span></a>
-    <a href="horarios.html#ciclos" data-nav="ciclos" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">autorenew</span><span>Ciclos rotativos</span></a>
     <a href="fichadas.html" data-nav="fichadas.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">fingerprint</span><span>Fichadas</span></a>
     <a href="novedades.html" data-nav="novedades.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">notification_important</span><span>Novedades</span></a>
     <a href="cierre.html" data-nav="cierre.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">payments</span><span>Cierre mensual</span></a>
     <a href="exportaciones.html" data-nav="exportaciones.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold text-sm transition-all cursor-pointer active:scale-95"><span class="material-symbols-outlined">output</span><span>Exportaciones</span></a>
   </nav>
   <div class="mt-auto px-4 pt-6 border-t border-slate-200/50">
-    <button class="w-full mb-4 bg-gradient-to-br from-primary to-primary-dim text-white font-bold py-2.5 px-4 rounded-lg text-sm">Run Payroll</button>
     <div class="space-y-1">
       <a href="#" class="flex items-center gap-3 px-3 py-2 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-colors"><span class="material-symbols-outlined">help</span><span>Support</span></a>
       <a href="login.html" class="flex items-center gap-3 px-3 py-2 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-colors"><span class="material-symbols-outlined">logout</span><span>Sign Out</span></a>
@@ -73,9 +71,14 @@ tailwind.config = {
 <header class="fixed top-0 right-0 left-64 h-16 z-40 bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/50 flex items-center justify-between px-8 w-[calc(100%-16rem)]">
   <div class="flex items-center gap-6">
     <h1 class="text-xl font-bold text-slate-800 font-headline">NOVEDADES</h1>
-    <div class="relative">
-      <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><span class="material-symbols-outlined text-sm">search</span></span>
-      <input class="pl-10 pr-4 py-1.5 bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-md text-xs w-64" placeholder="BUSCAR NOVEDAD..." type="text"/>
+    <div class="flex items-center gap-2">
+      <div class="relative">
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><span class="material-symbols-outlined text-sm">search</span></span>
+        <input id="search-nov" class="pl-10 pr-4 py-1.5 bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-md text-xs w-64" placeholder="BUSCAR POR EMPLEADO O ID..." type="text" onkeydown="if(event.key==='Enter')filtrarNov()"/>
+      </div>
+      <button onclick="filtrarNov()" class="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-md hover:bg-primary/90 transition-colors">
+        <span class="material-symbols-outlined text-sm">search</span> Buscar
+      </button>
     </div>
   </div>
   <div class="flex items-center gap-3 pl-6 border-l border-slate-200/50">
@@ -95,7 +98,7 @@ tailwind.config = {
       <p class="text-on-surface-variant text-sm mt-1">Revisión y aprobación de novedades del período.</p>
     </div>
     <div class="flex gap-3">
-      <button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md font-semibold text-sm shadow-sm hover:bg-primary-dim transition-colors">
+      <button onclick="abrirNovedad()" class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md font-semibold text-sm shadow-sm hover:bg-primary/90 transition-colors">
         <span class="material-symbols-outlined text-sm">add</span> Nueva novedad
       </button>
     </div>
@@ -108,11 +111,11 @@ tailwind.config = {
       <p class="text-2xl font-headline font-black text-tertiary">9</p>
     </div>
     <div class="bg-surface-container-highest p-5 rounded-lg">
-      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Aprobadas hoy</p>
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Aprobadas del mes</p>
       <p class="text-2xl font-headline font-black text-on-secondary-container">4</p>
     </div>
     <div class="bg-surface-container-highest p-5 rounded-lg">
-      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Rechazadas hoy</p>
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Rechazadas del mes</p>
       <p class="text-2xl font-headline font-black text-error">1</p>
     </div>
     <div class="bg-surface-container-highest p-5 rounded-lg">
@@ -121,108 +124,341 @@ tailwind.config = {
     </div>
   </div>
 
-  <!-- Novedades Table -->
-  <div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
-    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
-      <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
-        <span class="material-symbols-outlined text-sm">playlist_add_check</span> NOVEDADES DEL PERÍODO
-      </h3>
-      <div class="flex gap-2">
-        <select class="bg-surface-container-low border-none rounded-md px-3 py-1.5 text-xs font-medium text-on-surface-variant">
-          <option>Todos los tipos</option>
-          <option>Horas extra 50%</option>
-          <option>Horas extra 100%</option>
-          <option>Justificación</option>
-          <option>Ausencia</option>
-          <option>Tardanza</option>
-        </select>
-        <select class="bg-surface-container-low border-none rounded-md px-3 py-1.5 text-xs font-medium text-on-surface-variant">
-          <option>Todos los estados</option>
-          <option>Pendiente</option>
-          <option>Aprobado</option>
-          <option>Rechazado</option>
-        </select>
+  <!-- Grid principal -->
+  <div class="grid grid-cols-12 gap-6">
+
+    <!-- Lista novedades -->
+    <div class="col-span-12 lg:col-span-7 bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between gap-3">
+        <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2 shrink-0">
+          <span class="material-symbols-outlined text-sm">playlist_add_check</span> NOVEDADES DEL PERÍODO
+        </h3>
+        <div class="flex gap-2 items-center">
+          <select id="filtro-tipo-nov" onchange="filtrarNov()" class="bg-surface-container-low border-none rounded-md pl-3 pr-7 py-1.5 text-xs font-medium text-on-surface-variant min-w-[8rem]">
+            <option value="">Todos los tipos</option>
+            <option value="horas_extra_50">Horas extra 50%</option>
+            <option value="horas_extra_100">Horas extra 100%</option>
+            <option value="justificacion">Justificación</option>
+            <option value="ausencia">Ausencia</option>
+            <option value="tardanza">Tardanza</option>
+          </select>
+          <select id="filtro-estado-nov" onchange="filtrarNov()" class="bg-surface-container-low border-none rounded-md pl-3 pr-7 py-1.5 text-xs font-medium text-on-surface-variant min-w-[8rem]">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="aprobado">Aprobado</option>
+            <option value="rechazado">Rechazado</option>
+          </select>
+          <button onclick="filtrarNov(true)" class="p-1.5 rounded-md border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low transition-colors">
+            <span class="material-symbols-outlined text-sm">filter_alt_off</span>
+          </button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead id="nov-thead">
+            <tr class="bg-surface-container-low">
+              <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">ID</th>
+              <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Empleado</th>
+              <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Tipo</th>
+              <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Fecha</th>
+              <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Estado</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-nov" class="divide-y divide-slate-100">
+            <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarNov(this,'#889','Juan Perez','0042','horas_extra_50','12/06/2025','30 min','Automática','pendiente','—','12/06/2025','Sistema')">
+              <td class="px-5 py-3.5 text-xs font-mono font-bold text-primary">#889</td>
+              <td class="px-5 py-3.5"><span class="text-sm font-semibold">Juan Perez</span><span class="text-xs text-on-surface-variant ml-1.5">0042</span></td>
+              <td class="px-5 py-3.5"><span class="nov-tipo px-2 py-0.5 bg-tertiary-container/40 text-on-tertiary-container text-[10px] font-bold rounded-full uppercase">horas_extra_50</span></td>
+              <td class="px-5 py-3.5 text-sm text-on-surface-variant">12/06/2025</td>
+              <td class="px-5 py-3.5"><span class="nov-estado inline-flex items-center gap-1.5 text-[10px] font-bold text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>Pendiente</span></td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarNov(this,'#890','Juan Perez','0042','justificacion','10/06/2025','1 día','Manual','aprobado','Certificado médico presentado.','10/06/2025','Administrator')">
+              <td class="px-5 py-3.5 text-xs font-mono font-bold text-primary">#890</td>
+              <td class="px-5 py-3.5"><span class="text-sm font-semibold">Juan Perez</span><span class="text-xs text-on-surface-variant ml-1.5">0042</span></td>
+              <td class="px-5 py-3.5"><span class="nov-tipo px-2 py-0.5 bg-secondary-container/40 text-on-secondary-container text-[10px] font-bold rounded-full uppercase">justificacion</span></td>
+              <td class="px-5 py-3.5 text-sm text-on-surface-variant">10/06/2025</td>
+              <td class="px-5 py-3.5"><span class="nov-estado inline-flex items-center gap-1.5 text-[10px] font-bold text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>Aprobado</span></td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarNov(this,'#891','Juan Perez','0042','tardanza','12/06/2025','15 min','Automática','rechazado','No aplica criterio de tolerancia.','12/06/2025','Sistema')">
+              <td class="px-5 py-3.5 text-xs font-mono font-bold text-primary">#891</td>
+              <td class="px-5 py-3.5"><span class="text-sm font-semibold">Juan Perez</span><span class="text-xs text-on-surface-variant ml-1.5">0042</span></td>
+              <td class="px-5 py-3.5"><span class="nov-tipo px-2 py-0.5 bg-tertiary-container/40 text-on-tertiary-container text-[10px] font-bold rounded-full uppercase">tardanza</span></td>
+              <td class="px-5 py-3.5 text-sm text-on-surface-variant">12/06/2025</td>
+              <td class="px-5 py-3.5"><span class="nov-estado inline-flex items-center gap-1.5 text-[10px] font-bold text-error"><span class="w-1.5 h-1.5 rounded-full bg-error"></span>Rechazado</span></td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarNov(this,'#892','Ana Gomez','0018','justificacion','12/06/2025','1 día','Manual','pendiente','Solicita justificación por enfermedad.','12/06/2025','Supervisor RRHH')">
+              <td class="px-5 py-3.5 text-xs font-mono font-bold text-primary">#892</td>
+              <td class="px-5 py-3.5"><span class="text-sm font-semibold">Ana Gomez</span><span class="text-xs text-on-surface-variant ml-1.5">0018</span></td>
+              <td class="px-5 py-3.5"><span class="nov-tipo px-2 py-0.5 bg-secondary-container/40 text-on-secondary-container text-[10px] font-bold rounded-full uppercase">justificacion</span></td>
+              <td class="px-5 py-3.5 text-sm text-on-surface-variant">12/06/2025</td>
+              <td class="px-5 py-3.5"><span class="nov-estado inline-flex items-center gap-1.5 text-[10px] font-bold text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>Pendiente</span></td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarNov(this,'#893','Luis Diaz','0031','ausencia','12/06/2025','1 día','Automática','pendiente','—','12/06/2025','Sistema')">
+              <td class="px-5 py-3.5 text-xs font-mono font-bold text-primary">#893</td>
+              <td class="px-5 py-3.5"><span class="text-sm font-semibold">Luis Diaz</span><span class="text-xs text-on-surface-variant ml-1.5">0031</span></td>
+              <td class="px-5 py-3.5"><span class="nov-tipo px-2 py-0.5 bg-error-container/20 text-error text-[10px] font-bold rounded-full uppercase">ausencia</span></td>
+              <td class="px-5 py-3.5 text-sm text-on-surface-variant">12/06/2025</td>
+              <td class="px-5 py-3.5"><span class="nov-estado inline-flex items-center gap-1.5 text-[10px] font-bold text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>Pendiente</span></td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="seleccionarNov(this,'#894','Martin Sosa','0027','horas_extra_100','11/06/2025','2h','Automática','aprobado','—','11/06/2025','Sistema')">
+              <td class="px-5 py-3.5 text-xs font-mono font-bold text-primary">#894</td>
+              <td class="px-5 py-3.5"><span class="text-sm font-semibold">Martin Sosa</span><span class="text-xs text-on-surface-variant ml-1.5">0027</span></td>
+              <td class="px-5 py-3.5"><span class="nov-tipo px-2 py-0.5 bg-primary-container/40 text-on-primary-container text-[10px] font-bold rounded-full uppercase">horas_extra_100</span></td>
+              <td class="px-5 py-3.5 text-sm text-on-surface-variant">11/06/2025</td>
+              <td class="px-5 py-3.5"><span class="nov-estado inline-flex items-center gap-1.5 text-[10px] font-bold text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>Aprobado</span></td>
+            </tr>
+            <tr id="fila-sin-resultados-nov" class="hidden">
+              <td colspan="5" class="px-6 py-12 text-center text-on-surface-variant text-sm">
+                <span class="material-symbols-outlined text-3xl block mb-2 opacity-30">search_off</span>
+                No se encontraron novedades con los filtros aplicados.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="px-5 py-3 border-t border-slate-100 flex items-center justify-between">
+        <p id="contador-nov" class="text-xs text-on-surface-variant">Mostrando 6 novedades</p>
+        <div class="flex items-center gap-1">
+          <button id="nov-prev" onclick="paginarNov(-1)" disabled class="p-1.5 rounded-md border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+            <span class="material-symbols-outlined text-sm">chevron_left</span>
+          </button>
+          <span id="nov-pagina" class="text-xs font-bold text-on-surface-variant px-2">1 / 1</span>
+          <button id="nov-next" onclick="paginarNov(1)" disabled class="p-1.5 rounded-md border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+            <span class="material-symbols-outlined text-sm">chevron_right</span>
+          </button>
+        </div>
       </div>
     </div>
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="bg-surface-container-low">
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">ID</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Empleado</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Tipo</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Fecha</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Cantidad</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Estado</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Origen</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Acción</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100">
-          <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-xs font-mono text-on-surface-variant">#889</td>
-            <td class="px-6 py-4"><a href="empleado-juan-perez.html" class="text-sm font-bold hover:text-primary hover:underline">Juan Perez</a><span class="text-xs text-on-surface-variant ml-2">0042</span></td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-tertiary-container/30 text-on-tertiary-container text-[10px] font-bold rounded-full uppercase">horas_extra_50</span></td>
-            <td class="px-6 py-4 text-sm">12/06/2025</td>
-            <td class="px-6 py-4 text-sm font-bold">30 min</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1 text-[10px] font-bold text-tertiary"><span class="w-2 h-2 rounded-full bg-tertiary"></span> PENDIENTE</span></td>
-            <td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">automatica</td>
-            <td class="px-6 py-4 flex gap-2">
-              <button class="text-on-secondary-container font-black text-[10px] uppercase tracking-widest border border-on-secondary-container/20 px-2 py-1 rounded hover:bg-on-secondary-container/10">Aprobar</button>
-              <button class="text-error font-black text-[10px] uppercase tracking-widest border border-error/20 px-2 py-1 rounded hover:bg-error/5">Rechazar</button>
-            </td>
-          </tr>
-          <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-xs font-mono text-on-surface-variant">#890</td>
-            <td class="px-6 py-4"><a href="empleado-juan-perez.html" class="text-sm font-bold hover:text-primary hover:underline">Juan Perez</a><span class="text-xs text-on-surface-variant ml-2">0042</span></td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold rounded-full uppercase">justificacion</span></td>
-            <td class="px-6 py-4 text-sm">10/06/2025</td>
-            <td class="px-6 py-4 text-sm font-bold">1 día</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1 text-[10px] font-bold text-on-secondary-container"><span class="w-2 h-2 rounded-full bg-on-secondary-container"></span> APROBADO</span></td>
-            <td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">manual</td>
-            <td class="px-6 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest border border-primary/20 px-3 py-1 rounded">Ver</button></td>
-          </tr>
-          <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-xs font-mono text-on-surface-variant">#891</td>
-            <td class="px-6 py-4"><a href="empleado-juan-perez.html" class="text-sm font-bold hover:text-primary hover:underline">Juan Perez</a><span class="text-xs text-on-surface-variant ml-2">0042</span></td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-tertiary-container/30 text-on-tertiary-container text-[10px] font-bold rounded-full uppercase">tardanza</span></td>
-            <td class="px-6 py-4 text-sm">12/06/2025</td>
-            <td class="px-6 py-4 text-sm font-bold">15 min</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1 text-[10px] font-bold text-error"><span class="w-2 h-2 rounded-full bg-error"></span> RECHAZADO</span></td>
-            <td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">automatica</td>
-            <td class="px-6 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest border border-primary/20 px-3 py-1 rounded">Ver</button></td>
-          </tr>
-          <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-xs font-mono text-on-surface-variant">#892</td>
-            <td class="px-6 py-4"><span class="text-sm font-bold">Ana Gomez</span><span class="text-xs text-on-surface-variant ml-2">0018</span></td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold rounded-full uppercase">justificacion</span></td>
-            <td class="px-6 py-4 text-sm">12/06/2025</td>
-            <td class="px-6 py-4 text-sm font-bold">1 día</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1 text-[10px] font-bold text-tertiary"><span class="w-2 h-2 rounded-full bg-tertiary"></span> PENDIENTE</span></td>
-            <td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">manual</td>
-            <td class="px-6 py-4 flex gap-2">
-              <button class="text-on-secondary-container font-black text-[10px] uppercase tracking-widest border border-on-secondary-container/20 px-2 py-1 rounded hover:bg-on-secondary-container/10">Aprobar</button>
-              <button class="text-error font-black text-[10px] uppercase tracking-widest border border-error/20 px-2 py-1 rounded hover:bg-error/5">Rechazar</button>
-            </td>
-          </tr>
-          <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-xs font-mono text-on-surface-variant">#893</td>
-            <td class="px-6 py-4"><span class="text-sm font-bold">Luis Diaz</span><span class="text-xs text-on-surface-variant ml-2">0031</span></td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-error-container/10 text-error text-[10px] font-bold rounded-full uppercase">ausencia</span></td>
-            <td class="px-6 py-4 text-sm">12/06/2025</td>
-            <td class="px-6 py-4 text-sm font-bold">1 día</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1 text-[10px] font-bold text-tertiary"><span class="w-2 h-2 rounded-full bg-tertiary"></span> PENDIENTE</span></td>
-            <td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">automatica</td>
-            <td class="px-6 py-4 flex gap-2">
-              <button class="text-on-secondary-container font-black text-[10px] uppercase tracking-widest border border-on-secondary-container/20 px-2 py-1 rounded hover:bg-on-secondary-container/10">Aprobar</button>
-              <button class="text-error font-black text-[10px] uppercase tracking-widest border border-error/20 px-2 py-1 rounded hover:bg-error/5">Rechazar</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+
+    <!-- Detalle novedad -->
+    <div class="col-span-12 lg:col-span-5">
+      <!-- Estado vacío -->
+      <div id="det-nov-vacio" class="bg-surface-container-lowest rounded-xl border border-slate-200/50 flex flex-col items-center justify-center py-16 px-6 text-center">
+        <span class="material-symbols-outlined text-4xl text-outline-variant mb-3">touch_app</span>
+        <p class="text-sm font-semibold text-on-surface-variant">Ninguna novedad seleccionada</p>
+        <p class="text-xs text-on-surface-variant/60 mt-1">Hacé clic en una fila para ver el detalle</p>
+      </div>
+      <!-- Contenido detalle -->
+      <div id="det-nov-contenido" class="hidden bg-surface-container-lowest rounded-xl border border-slate-200/50 overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">info</span> DETALLE DE NOVEDAD
+          </h3>
+          <span class="text-xs font-mono font-bold text-on-surface-variant" id="det-nov-id">—</span>
+        </div>
+        <div class="p-5 space-y-3">
+          <!-- Empleado -->
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+            <span class="text-xs text-on-surface-variant">Empleado</span>
+            <div class="text-right">
+              <span class="text-sm font-bold" id="det-nov-nombre">—</span>
+              <span class="text-xs font-mono text-on-surface-variant ml-1.5" id="det-nov-legajo">—</span>
+            </div>
+          </div>
+          <!-- Tipo -->
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+            <span class="text-xs text-on-surface-variant">Tipo</span>
+            <span id="det-nov-tipo-badge" class="px-2 py-0.5 bg-tertiary-container/40 text-on-tertiary-container text-[10px] font-bold rounded-full uppercase">—</span>
+          </div>
+          <!-- Fecha y Cantidad -->
+          <div class="grid grid-cols-2 gap-3 pb-3 border-b border-slate-100">
+            <div class="bg-surface-container-low p-3 rounded-lg">
+              <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Fecha</p>
+              <p class="text-sm font-black text-primary" id="det-nov-fecha">—</p>
+            </div>
+            <div class="bg-surface-container-low p-3 rounded-lg">
+              <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Cantidad</p>
+              <p class="text-sm font-black text-on-background" id="det-nov-cantidad">—</p>
+            </div>
+          </div>
+          <!-- Origen, creación y Estado -->
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+            <span class="text-xs text-on-surface-variant">Origen</span>
+            <span class="text-xs font-semibold uppercase" id="det-nov-origen">—</span>
+          </div>
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+            <span class="text-xs text-on-surface-variant">Fecha de creación</span>
+            <span class="text-xs font-semibold" id="det-nov-fecha-creacion">—</span>
+          </div>
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+            <span class="text-xs text-on-surface-variant">Creado por</span>
+            <span class="text-xs font-semibold" id="det-nov-creador">—</span>
+          </div>
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+            <span class="text-xs text-on-surface-variant">Estado</span>
+            <span id="det-nov-estado">—</span>
+          </div>
+          <!-- Observación -->
+          <div class="bg-surface-container-low rounded-lg p-3">
+            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1.5">Observación</p>
+            <p class="text-xs text-on-background" id="det-nov-obs">—</p>
+          </div>
+          <!-- Acciones (solo pendientes) -->
+          <div id="det-nov-acciones" class="hidden flex gap-3 pt-1">
+            <button onclick="aprobarNovDet()" class="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-on-secondary-container/15 border border-on-secondary-container/30 text-on-secondary-container font-bold text-xs rounded-lg hover:bg-on-secondary-container/25 transition-colors">
+              <span class="material-symbols-outlined text-sm">check_circle</span> Aprobar
+            </button>
+            <button onclick="rechazarNovDet()" class="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-error/10 border border-error/25 text-error font-bold text-xs rounded-lg hover:bg-error/15 transition-colors">
+              <span class="material-symbols-outlined text-sm">cancel</span> Rechazar
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
+
   </div>
 </main>
+
+<!-- Modal: Nueva Novedad -->
+<div id="modal-nueva-novedad" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-nueva-novedad')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100 sticky top-0 bg-white z-10">
+      <div>
+        <h3 class="text-lg font-extrabold font-headline text-on-background">Nueva novedad</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">Cargá una novedad manual para un empleado.</p>
+      </div>
+      <button onclick="cerrarModal('modal-nueva-novedad')" class="text-slate-400 hover:text-slate-700 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form onsubmit="guardarNovedad(event)" class="px-8 py-6 space-y-5">
+
+      <!-- Empleado -->
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Empleado *</label>
+        <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+          <option value="">Seleccionar empleado...</option>
+          <option>0042 · Juan Perez</option>
+          <option>0018 · Ana Gomez</option>
+          <option>0027 · Martin Sosa</option>
+          <option>0031 · Luis Diaz</option>
+          <option>0050 · Carla Ruiz</option>
+          <option>0093 · Carlos Méndez</option>
+          <option>0105 · Lucía Ferrero</option>
+          <option>0158 · Maria Alvez</option>
+        </select>
+      </div>
+
+      <!-- Tipo -->
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tipo de novedad *</label>
+        <select required id="nov-tipo-select" onchange="toggleCantidadNov()" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+          <option value="">Seleccionar tipo...</option>
+          <optgroup label="Horas extra">
+            <option value="horas_extra_50">Horas extra 50%</option>
+            <option value="horas_extra_100">Horas extra 100%</option>
+          </optgroup>
+          <optgroup label="Ausencias y licencias">
+            <option value="justificacion">Justificación de ausencia</option>
+            <option value="ausencia">Ausencia injustificada</option>
+            <option value="licencia_enfermedad">Licencia por enfermedad</option>
+            <option value="licencia_examen">Licencia por examen</option>
+            <option value="vacaciones">Vacaciones parciales</option>
+            <option value="permiso_especial">Permiso especial</option>
+          </optgroup>
+          <optgroup label="Disciplinarias">
+            <option value="tardanza">Tardanza</option>
+            <option value="suspension">Suspensión disciplinaria</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- Fecha -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha desde *</label>
+          <input required type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha hasta</label>
+          <input type="date" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+      </div>
+
+      <!-- Cantidad (condicional) -->
+      <div id="nov-campo-horas" class="hidden">
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Cantidad de horas *</label>
+        <div class="relative">
+          <input type="number" min="0.5" max="24" step="0.5" placeholder="Ej: 2" class="w-full px-3 py-2.5 pr-12 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant">hs</span>
+        </div>
+      </div>
+      <div id="nov-campo-minutos" class="hidden">
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Cantidad de minutos *</label>
+        <div class="relative">
+          <input type="number" min="1" max="480" placeholder="Ej: 15" class="w-full px-3 py-2.5 pr-16 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant">min</span>
+        </div>
+      </div>
+      <div id="nov-campo-dias" class="hidden">
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Cantidad de días *</label>
+        <div class="relative">
+          <input type="number" min="1" max="365" placeholder="Ej: 1" class="w-full px-3 py-2.5 pr-16 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant">días</span>
+        </div>
+      </div>
+
+      <!-- Fecha creación y creado por -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Fecha de creación *</label>
+          <input required type="date" id="nov-fecha-creacion" class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Creado por *</label>
+          <select required class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+            <option>Administrator</option>
+            <option>Supervisor RRHH</option>
+            <option>Jefe de área</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Observación -->
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Observación</label>
+        <textarea rows="2" placeholder="Detalle adicional (opcional)..." class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none"></textarea>
+      </div>
+
+      <div class="flex gap-3 pt-2 border-t border-slate-100">
+        <button type="button" onclick="cerrarModal('modal-nueva-novedad')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">add</span> Cargar novedad
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Rechazar novedad -->
+<div id="modal-rechazar" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="cerrarModal('modal-rechazar')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+      <h3 class="text-base font-extrabold font-headline text-on-background">Rechazar novedad</h3>
+      <button onclick="cerrarModal('modal-rechazar')" class="text-slate-400 hover:text-slate-700 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form onsubmit="confirmarRechazo(event)" class="px-8 py-6 space-y-4">
+      <div>
+        <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Motivo de rechazo *</label>
+        <textarea required id="motivo-rechazo" rows="3" placeholder="Indicá el motivo del rechazo..." class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-error/30 focus:border-error resize-none"></textarea>
+      </div>
+      <div class="flex gap-3">
+        <button type="button" onclick="cerrarModal('modal-rechazar')" class="flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+        <button type="submit" class="flex-1 py-2.5 bg-error text-white font-bold text-sm rounded-lg hover:opacity-90 transition-opacity">Confirmar rechazo</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold">
+  <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;" id="toast-icon">check_circle</span>
+  <span id="toast-msg">Acción completada</span>
+</div>
 
 <script>
 (function() {
@@ -234,6 +470,187 @@ tailwind.config = {
     }
   });
 })();
+
+function abrirModal(id) { document.getElementById(id).classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); document.body.style.overflow = ''; }
+function mostrarToast(msg, ok) {
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').textContent = ok === false ? 'cancel' : 'check_circle';
+  t.classList.remove('hidden');
+  setTimeout(function() { t.classList.add('hidden'); }, 3000);
+}
+
+function abrirNovedad() {
+  var hoy = new Date().toISOString().split('T')[0];
+  document.getElementById('nov-fecha-creacion').value = hoy;
+  abrirModal('modal-nueva-novedad');
+}
+
+function toggleCantidadNov() {
+  var tipo = document.getElementById('nov-tipo-select').value;
+  var horas   = ['horas_extra_50','horas_extra_100'];
+  var minutos = ['tardanza'];
+  var dias    = ['justificacion','ausencia','licencia_enfermedad','licencia_examen','vacaciones','permiso_especial','suspension'];
+  document.getElementById('nov-campo-horas').classList.toggle('hidden', !horas.includes(tipo));
+  document.getElementById('nov-campo-minutos').classList.toggle('hidden', !minutos.includes(tipo));
+  document.getElementById('nov-campo-dias').classList.toggle('hidden', !dias.includes(tipo));
+}
+
+function guardarNovedad(e) {
+  e.preventDefault();
+  cerrarModal('modal-nueva-novedad');
+  e.target.reset();
+  document.getElementById('nov-campo-horas').classList.add('hidden');
+  document.getElementById('nov-campo-minutos').classList.add('hidden');
+  document.getElementById('nov-campo-dias').classList.add('hidden');
+  mostrarToast('Novedad cargada. Estado: Pendiente.');
+}
+
+// ── Paginación ──────────────────────────────────────────────
+var novPagActual = 1;
+var novPorPagina = 8;
+
+function getFilasNovFiltradas() {
+  var busq  = (document.getElementById('search-nov').value || '').toLowerCase().trim();
+  var tipo  = (document.getElementById('filtro-tipo-nov').value || '').toLowerCase();
+  var estado = (document.getElementById('filtro-estado-nov').value || '').toLowerCase();
+  return Array.from(document.querySelectorAll('#tabla-nov tr:not(#fila-sin-resultados-nov)')).filter(function(f) {
+    var id     = f.cells[0].textContent.trim().toLowerCase();
+    var emp    = f.cells[1].textContent.trim().toLowerCase();
+    var tipoCel = (f.querySelector('.nov-tipo') || {}).textContent.trim().toLowerCase();
+    var estCel  = (f.querySelector('.nov-estado') || {}).textContent.trim().toLowerCase();
+    return (!busq   || id.includes(busq) || emp.includes(busq))
+        && (!tipo   || tipoCel.includes(tipo))
+        && (!estado || estCel.includes(estado));
+  });
+}
+
+function renderPaginaNov(visibles) {
+  var total = visibles.length;
+  var totalPags = Math.max(1, Math.ceil(total / novPorPagina));
+  if (novPagActual > totalPags) novPagActual = totalPags;
+  var desde = (novPagActual - 1) * novPorPagina;
+  Array.from(document.querySelectorAll('#tabla-nov tr:not(#fila-sin-resultados-nov)')).forEach(function(f) { f.style.display = 'none'; });
+  visibles.forEach(function(f, i) { f.style.display = (i >= desde && i < desde + novPorPagina) ? '' : 'none'; });
+  var sinRes = document.getElementById('fila-sin-resultados-nov');
+  sinRes.style.display = total === 0 ? '' : 'none';
+  sinRes.classList.remove('hidden');
+  document.getElementById('nov-thead').style.display = total === 0 ? 'none' : '';
+  document.getElementById('contador-nov').textContent = 'Mostrando ' + total + ' novedad' + (total !== 1 ? 'es' : '');
+  document.getElementById('nov-pagina').textContent = novPagActual + ' / ' + totalPags;
+  document.getElementById('nov-prev').disabled = novPagActual <= 1;
+  document.getElementById('nov-next').disabled = novPagActual >= totalPags;
+}
+
+function filtrarNov(limpiar) {
+  if (limpiar) {
+    document.getElementById('search-nov').value = '';
+    document.getElementById('filtro-tipo-nov').value = '';
+    document.getElementById('filtro-estado-nov').value = '';
+  }
+  novPagActual = 1;
+  renderPaginaNov(getFilasNovFiltradas());
+}
+
+function paginarNov(dir) {
+  novPagActual += dir;
+  renderPaginaNov(getFilasNovFiltradas());
+}
+
+// ── Detalle ──────────────────────────────────────────────────
+var novActual = {};
+
+function seleccionarNov(fila, id, nombre, legajo, tipo, fecha, cantidad, origen, estado, obs, fechaCreacion, creador) {
+  document.querySelectorAll('#tabla-nov tr:not(#fila-sin-resultados-nov)').forEach(function(r) {
+    r.classList.remove('bg-primary-container/20');
+    var td = r.querySelector('td:first-child');
+    if (td) td.classList.remove('border-l-4', 'border-primary');
+  });
+  fila.classList.add('bg-primary-container/20');
+  var td = fila.querySelector('td:first-child');
+  if (td) td.classList.add('border-l-4', 'border-primary');
+
+  novActual = { id, nombre, legajo, tipo, fecha, cantidad, origen, estado, obs, fila };
+
+  document.getElementById('det-nov-vacio').classList.add('hidden');
+  document.getElementById('det-nov-contenido').classList.remove('hidden');
+
+  document.getElementById('det-nov-id').textContent = id;
+  document.getElementById('det-nov-nombre').textContent = nombre;
+  document.getElementById('det-nov-legajo').textContent = legajo;
+  document.getElementById('det-nov-fecha').textContent = fecha;
+  document.getElementById('det-nov-cantidad').textContent = cantidad;
+  document.getElementById('det-nov-origen').textContent = origen;
+  document.getElementById('det-nov-obs').textContent = obs;
+  document.getElementById('det-nov-fecha-creacion').textContent = fechaCreacion || '—';
+  document.getElementById('det-nov-creador').textContent = creador || '—';
+
+  // Tipo badge
+  var tipoBadgeMap = {
+    'horas_extra_50': 'bg-tertiary-container/40 text-on-tertiary-container',
+    'horas_extra_100': 'bg-primary-container/40 text-on-primary-container',
+    'justificacion': 'bg-secondary-container/40 text-on-secondary-container',
+    'ausencia': 'bg-error-container/20 text-error',
+    'tardanza': 'bg-tertiary-container/40 text-on-tertiary-container'
+  };
+  var tb = document.getElementById('det-nov-tipo-badge');
+  tb.textContent = tipo;
+  tb.className = 'px-2 py-0.5 text-[10px] font-bold rounded-full uppercase ' + (tipoBadgeMap[tipo] || 'bg-surface-container text-on-surface-variant');
+
+  // Estado
+  var estadoHtml = {
+    'pendiente': '<span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>Pendiente</span>',
+    'aprobado':  '<span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>Aprobado</span>',
+    'rechazado': '<span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-error"><span class="w-1.5 h-1.5 rounded-full bg-error"></span>Rechazado</span>'
+  };
+  document.getElementById('det-nov-estado').innerHTML = estadoHtml[estado] || estado;
+
+  // Mostrar acciones solo si está pendiente
+  var acciones = document.getElementById('det-nov-acciones');
+  if (estado === 'pendiente') {
+    acciones.classList.remove('hidden');
+    acciones.classList.add('flex');
+  } else {
+    acciones.classList.add('hidden');
+    acciones.classList.remove('flex');
+  }
+}
+
+function aprobarNovDet() {
+  if (!novActual.fila) return;
+  var estadoCel = novActual.fila.querySelector('.nov-estado');
+  if (estadoCel) estadoCel.outerHTML = '<span class="nov-estado inline-flex items-center gap-1.5 text-[10px] font-bold text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>Aprobado</span>';
+  document.getElementById('det-nov-estado').innerHTML = '<span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>Aprobado</span>';
+  document.getElementById('det-nov-acciones').classList.add('hidden');
+  document.getElementById('det-nov-acciones').classList.remove('flex');
+  novActual.estado = 'aprobado';
+  mostrarToast('Novedad aprobada correctamente.');
+}
+
+var filaRechazando = null;
+
+function rechazarNovDet() {
+  filaRechazando = novActual;
+  document.getElementById('motivo-rechazo').value = '';
+  abrirModal('modal-rechazar');
+}
+
+function confirmarRechazo(e) {
+  e.preventDefault();
+  if (filaRechazando && filaRechazando.fila) {
+    var estadoCel = filaRechazando.fila.querySelector('.nov-estado');
+    if (estadoCel) estadoCel.outerHTML = '<span class="nov-estado inline-flex items-center gap-1.5 text-[10px] font-bold text-error"><span class="w-1.5 h-1.5 rounded-full bg-error"></span>Rechazado</span>';
+    document.getElementById('det-nov-estado').innerHTML = '<span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-error"><span class="w-1.5 h-1.5 rounded-full bg-error"></span>Rechazado</span>';
+    document.getElementById('det-nov-acciones').classList.add('hidden');
+    document.getElementById('det-nov-acciones').classList.remove('flex');
+    filaRechazando = null;
+  }
+  cerrarModal('modal-rechazar');
+  mostrarToast('Novedad rechazada.', false);
+}
+
+renderPaginaNov(getFilasNovFiltradas());
 </script>
 </body>
 </html>

@@ -67,9 +67,6 @@ tailwind.config = {
     <a href="horarios.html" data-nav="horarios.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold tracking-tight text-sm transition-all duration-200 cursor-pointer active:scale-95">
       <span class="material-symbols-outlined">calendar_today</span><span>Horarios</span>
     </a>
-    <a href="horarios.html#ciclos" data-nav="ciclos" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold tracking-tight text-sm transition-all duration-200 cursor-pointer active:scale-95">
-      <span class="material-symbols-outlined">autorenew</span><span>Ciclos rotativos</span>
-    </a>
     <a href="fichadas.html" data-nav="fichadas.html" class="nav-link flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-200 font-bold tracking-tight text-sm transition-all duration-200 cursor-pointer active:scale-95">
       <span class="material-symbols-outlined">fingerprint</span><span>Fichadas</span>
     </a>
@@ -84,7 +81,6 @@ tailwind.config = {
     </a>
   </nav>
   <div class="mt-auto px-4 pt-6 border-t border-slate-200/50">
-    <button class="w-full mb-4 bg-gradient-to-br from-primary to-primary-dim text-white font-bold py-2.5 px-4 rounded-lg text-sm active:scale-95 transition-all">Run Payroll</button>
     <div class="space-y-1">
       <a href="#" class="flex items-center gap-3 px-3 py-2 text-slate-600 font-bold tracking-tight text-sm hover:bg-slate-200 transition-colors">
         <span class="material-symbols-outlined">help</span><span>Support</span>
@@ -98,272 +94,358 @@ tailwind.config = {
 
 <!-- TopNavBar -->
 <header class="fixed top-0 right-0 left-64 h-16 z-40 bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/50 flex items-center justify-between px-8 w-[calc(100%-16rem)]">
-  <div class="flex items-center gap-6">
-    <h1 class="text-xl font-bold text-slate-800 font-headline">LABOR PULSE</h1>
-    <div class="relative">
-      <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-        <span class="material-symbols-outlined text-sm">search</span>
-      </span>
-      <input class="pl-10 pr-4 py-1.5 bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-md text-xs font-headline tracking-widest w-64" placeholder="BUSCAR EMPLEADO..." type="text"/>
+  <h1 class="text-xl font-bold text-slate-800 font-headline">DASHBOARD</h1>
+  <div class="flex items-center gap-3 pl-6 border-l border-slate-200/50">
+    <div class="text-right">
+      <p class="text-[10px] font-headline font-bold text-slate-900 leading-none">ADMINISTRATOR</p>
+      <p class="text-[9px] text-slate-500 font-headline uppercase tracking-widest mt-1">Super User</p>
     </div>
-  </div>
-  <div class="flex items-center gap-6">
-    <div class="flex gap-4">
-      <button class="text-slate-500 hover:text-blue-900 transition-all"><span class="material-symbols-outlined">notifications</span></button>
-      <button class="text-slate-500 hover:text-blue-900 transition-all"><span class="material-symbols-outlined">history</span></button>
-    </div>
-    <div class="flex items-center gap-3 pl-6 border-l border-slate-200/50">
-      <div class="text-right">
-        <p class="text-[10px] font-headline font-bold text-slate-900 leading-none">ADMINISTRATOR</p>
-        <p class="text-[9px] text-slate-500 font-headline uppercase tracking-widest mt-1">Super User</p>
-      </div>
-      <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary text-xs font-bold font-headline">AD</div>
-    </div>
+    <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary text-xs font-bold font-headline">AD</div>
   </div>
 </header>
 
 <!-- Main Content -->
 <main class="ml-64 pt-20 px-8 pb-12 min-h-screen">
-  <!-- Hero Metrics -->
-  <div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
-    <div class="bg-surface-container-highest p-6 rounded-lg relative overflow-hidden group">
-      <p class="text-xs font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-2">Total tracked</p>
-      <h3 class="text-3xl font-headline font-black text-primary">1,240<span class="text-sm font-medium ml-1">hrs</span></h3>
-      <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-primary/5 group-hover:scale-110 transition-transform">schedule</span>
+
+  <!-- Page Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-extrabold tracking-tight text-on-background font-headline">Dashboard</h2>
+      <p class="text-on-surface-variant text-sm mt-1" id="dash-fecha">Resumen operativo del día de hoy.</p>
     </div>
-    <div class="bg-surface-container-highest p-6 rounded-lg relative overflow-hidden group">
-      <p class="text-xs font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-2">Active Shifts</p>
-      <h3 class="text-3xl font-headline font-black text-on-secondary-container">42</h3>
-      <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-on-secondary-container/5 group-hover:scale-110 transition-transform">groups</span>
-    </div>
-    <div class="bg-surface-container-highest p-6 rounded-lg relative overflow-hidden group">
-      <p class="text-xs font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-2">Overtime Breach</p>
-      <h3 class="text-3xl font-headline font-black text-error">12</h3>
-      <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-error/5 group-hover:scale-110 transition-transform">warning</span>
-    </div>
-    <div class="bg-surface-container-highest p-6 rounded-lg relative overflow-hidden group">
-      <p class="text-xs font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-2">Cycle Status</p>
-      <h3 class="text-3xl font-headline font-black text-tertiary">92%</h3>
-      <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-tertiary/5 group-hover:scale-110 transition-transform">donut_large</span>
+    <div class="flex items-center gap-3">
+      <a href="fichadas.html" class="flex items-center gap-2 px-4 py-2 bg-surface-container-low text-on-surface-variant rounded-md font-semibold text-sm hover:bg-surface-container-high transition-colors border border-slate-200/50">
+        <span class="material-symbols-outlined text-sm">fingerprint</span> Ver fichadas
+      </a>
+      <a href="novedades.html" class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md font-semibold text-sm shadow-sm hover:bg-primary/90 transition-colors">
+        <span class="material-symbols-outlined text-sm">notification_important</span> Ver novedades
+      </a>
     </div>
   </div>
 
-  <div class="flex flex-col lg:flex-row gap-8 mb-8">
-    <!-- Filters -->
-    <section class="lg:w-[30%] space-y-6">
-      <div class="bg-surface-container-low p-6 rounded-xl">
-        <h2 class="text-xs font-headline font-extrabold tracking-[0.2em] mb-6 flex items-center gap-2">
-          <span class="material-symbols-outlined text-sm">filter_alt</span> FILTROS DE VISTA
-        </h2>
-        <div class="space-y-5">
-          <div class="space-y-1">
-            <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Fecha de control</label>
-            <input class="w-full bg-surface-container-lowest border-none border-b-2 border-primary focus:ring-0 text-sm font-medium py-2" type="date" value="2025-06-12"/>
-          </div>
-          <div class="space-y-1">
-            <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Turno</label>
-            <select class="w-full bg-surface-container-lowest border-none border-b-2 border-primary focus:ring-0 text-sm font-medium py-2">
-              <option>Todos</option><option>Mañana</option><option>Tarde</option><option>Noche</option>
-            </select>
-          </div>
-          <div class="space-y-1">
-            <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Tipo Horario</label>
-            <select class="w-full bg-surface-container-lowest border-none border-b-2 border-primary focus:ring-0 text-sm font-medium py-2">
-              <option>Todos</option><option>Administrativo</option><option>Planta</option>
-            </select>
-          </div>
-          <div class="space-y-1">
-            <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Estado</label>
-            <select class="w-full bg-surface-container-lowest border-none border-b-2 border-primary focus:ring-0 text-sm font-medium py-2">
-              <option>Todos</option><option>Activos</option><option>Baja</option>
-            </select>
-          </div>
-          <button class="w-full mt-4 py-3 bg-slate-900 text-white text-xs font-bold tracking-widest uppercase rounded hover:bg-black transition-colors">
-            Aplicar Filtros
-          </button>
-        </div>
-      </div>
-      <div class="bg-surface-container-highest aspect-[4/3] rounded-xl flex flex-col items-center justify-center p-8 text-center">
-        <span class="material-symbols-outlined text-4xl text-outline mb-4">location_on</span>
-        <p class="text-[10px] font-headline font-bold text-outline-variant uppercase tracking-widest">Planta Central</p>
-        <p class="text-sm font-headline text-on-surface mt-2">Ubicación Geo-Referenciada de Fichadas Activas</p>
-        <div class="mt-4 w-full h-24 bg-gradient-to-br from-surface-container-high to-surface-dim rounded border border-outline-variant/10 flex items-center justify-center">
-          <span class="material-symbols-outlined text-outline-variant text-3xl">map</span>
-        </div>
-      </div>
-    </section>
+  <!-- Hero Metrics -->
+  <div class="mb-6 grid grid-cols-4 gap-4">
+    <div class="bg-surface-container-highest p-5 rounded-lg relative overflow-hidden group">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Empleados activos</p>
+      <h3 class="text-2xl font-headline font-black text-on-secondary-container">42</h3>
+      <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-on-secondary-container/5 group-hover:scale-110 transition-transform">groups</span>
+    </div>
+    <div class="bg-surface-container-highest p-5 rounded-lg relative overflow-hidden group">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Horas del mes</p>
+      <h3 class="text-2xl font-headline font-black text-primary">1,240<span class="text-sm font-medium ml-1">hs</span></h3>
+      <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-primary/5 group-hover:scale-110 transition-transform">more_time</span>
+    </div>
+    <div class="bg-surface-container-highest p-5 rounded-lg relative overflow-hidden group">
+      <p class="text-[10px] font-headline font-bold text-on-surface-variant tracking-widest uppercase mb-1">Novedades pendientes</p>
+      <h3 class="text-2xl font-headline font-black text-tertiary">9</h3>
+      <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-tertiary/5 group-hover:scale-110 transition-transform">pending_actions</span>
+    </div>
+    <a href="cierre.html" class="bg-on-background p-5 rounded-lg relative overflow-hidden group block hover:bg-slate-800 transition-colors">
+      <p class="text-[10px] font-headline font-bold text-slate-400 tracking-widest uppercase mb-1">Cierre actual</p>
+      <h3 class="text-2xl font-headline font-black text-white flex items-center gap-2">Junio <span class="text-[10px] opacity-50 font-normal">BORRADOR</span></h3>
+      <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-white/5 group-hover:scale-110 transition-transform">payments</span>
+    </a>
+  </div>
 
-    <!-- Daily Summary -->
-    <section class="lg:w-[70%]">
-      <div class="mb-6">
-        <h2 class="text-xs font-headline font-extrabold tracking-[0.2em] mb-4 flex items-center gap-2">
-          <span class="material-symbols-outlined text-sm">analytics</span> RESUMEN DIARIO - 12 JUN 2025
-        </h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-slate-200/50 rounded-xl overflow-hidden border border-slate-200/50">
-          <div class="bg-surface-container-lowest p-6 hover:bg-slate-50 transition-colors">
-            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">Presentes</p>
-            <div class="flex items-baseline gap-2">
-              <span class="text-3xl font-headline font-black text-on-secondary-container">34</span>
-              <span class="text-[10px] font-bold text-on-secondary-fixed-variant">/ 37</span>
+  <!-- Main grid -->
+  <div class="grid grid-cols-12 gap-6 mb-6">
+
+    <!-- Resumen diario + Alertas (col 8) -->
+    <div class="col-span-12 lg:col-span-8 space-y-5">
+
+      <!-- Resumen diario -->
+      <div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+          <h2 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">analytics</span> RESUMEN DEL DÍA
+          </h2>
+          <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest" id="dash-fecha-corta">12 JUN 2025</span>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-slate-100">
+          <div class="bg-surface-container-lowest p-5 hover:bg-slate-50 transition-colors">
+            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1.5">Presentes</p>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-2xl font-headline font-black text-on-secondary-container">34</span>
+              <span class="text-[10px] font-bold text-on-surface-variant">/ 37</span>
             </div>
           </div>
-          <div class="bg-surface-container-lowest p-6 hover:bg-slate-50 transition-colors">
-            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">Ausentes</p>
-            <div class="flex items-baseline gap-2">
-              <span class="text-3xl font-headline font-black text-error">3</span>
+          <div class="bg-surface-container-lowest p-5 hover:bg-slate-50 transition-colors">
+            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1.5">Ausentes</p>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-2xl font-headline font-black text-error">3</span>
               <span class="material-symbols-outlined text-error text-sm">person_off</span>
             </div>
           </div>
-          <div class="bg-surface-container-lowest p-6 hover:bg-slate-50 transition-colors">
-            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">Tardanzas</p>
-            <div class="flex items-baseline gap-2">
-              <span class="text-3xl font-headline font-black text-tertiary">7</span>
-              <span class="material-symbols-outlined text-tertiary text-sm">history</span>
+          <div class="bg-surface-container-lowest p-5 hover:bg-slate-50 transition-colors">
+            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1.5">Tardanzas</p>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-2xl font-headline font-black text-tertiary">7</span>
+              <span class="material-symbols-outlined text-tertiary text-sm">schedule</span>
             </div>
           </div>
-          <div class="bg-surface-container-lowest p-6 hover:bg-slate-50 transition-colors">
-            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">Doble Fichada</p>
-            <div class="flex items-baseline gap-2">
-              <span class="text-3xl font-headline font-black text-primary">2</span>
+          <div class="bg-surface-container-lowest p-5 hover:bg-slate-50 transition-colors">
+            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1.5">Doble fichada</p>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-2xl font-headline font-black text-primary">2</span>
               <span class="material-symbols-outlined text-primary text-sm">error_outline</span>
             </div>
           </div>
-          <div class="bg-surface-container-lowest p-6 hover:bg-slate-50 transition-colors">
-            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">HE 50% Hoy</p>
-            <span class="text-3xl font-headline font-black text-on-background">4h 30m</span>
+          <div class="bg-surface-container-lowest p-5 hover:bg-slate-50 transition-colors">
+            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1.5">HE 50% hoy</p>
+            <span class="text-2xl font-headline font-black text-on-background">4h 30m</span>
           </div>
-          <div class="bg-surface-container-lowest p-6 hover:bg-slate-50 transition-colors">
-            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">HE 100% Hoy</p>
-            <span class="text-3xl font-headline font-black text-on-background">1h 00m</span>
+          <div class="bg-surface-container-lowest p-5 hover:bg-slate-50 transition-colors">
+            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1.5">HE 100% hoy</p>
+            <span class="text-2xl font-headline font-black text-on-background">1h 00m</span>
           </div>
-          <div class="bg-surface-container-lowest p-6 hover:bg-slate-50 transition-colors">
-            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">Pendientes</p>
-            <div class="flex items-baseline gap-2">
-              <span class="text-3xl font-headline font-black text-primary">9</span>
-              <span class="text-[10px] font-bold text-primary">NOVEDADES</span>
+          <div class="bg-surface-container-lowest p-5 hover:bg-slate-50 transition-colors">
+            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1.5">Sin fichar aún</p>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-2xl font-headline font-black text-on-surface-variant">12</span>
+              <span class="material-symbols-outlined text-on-surface-variant text-sm">hourglass_empty</span>
             </div>
           </div>
-          <a href="cierre.html" class="bg-slate-900 p-6 text-white group cursor-pointer hover:bg-slate-800 transition-colors">
-            <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Cierre Actual</p>
-            <div class="flex items-baseline justify-between">
-              <span class="text-lg font-headline font-bold">Junio <span class="text-[10px] opacity-60">BORR.</span></span>
-              <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">chevron_right</span>
+          <div class="bg-surface-container-lowest p-5 hover:bg-slate-50 transition-colors">
+            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1.5">Con licencia</p>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-2xl font-headline font-black text-on-secondary-container">4</span>
+              <span class="material-symbols-outlined text-on-secondary-container text-sm">beach_access</span>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alertas del día -->
+      <div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
+        <div class="px-5 py-4 border-b border-slate-100">
+          <h2 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm text-error">campaign</span> ALERTAS DEL DÍA
+          </h2>
+        </div>
+        <div class="divide-y divide-slate-100">
+          <a href="empleado-juan-perez.html" class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50 transition-all border-l-4 border-error">
+            <span class="material-symbols-outlined text-error text-lg" style="font-variation-settings:'FILL' 1">warning</span>
+            <div class="flex-1"><span class="font-bold text-sm">Juan Perez</span><span class="text-xs text-on-surface-variant ml-2">Leg. 0042</span></div>
+            <span class="text-xs font-semibold text-error px-3 py-1 bg-error/5 rounded-full border border-error/20">Tardanza 6 min</span>
+          </a>
+          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50 transition-all border-l-4 border-primary">
+            <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings:'FILL' 1">sync_problem</span>
+            <div class="flex-1"><span class="font-bold text-sm">Ana Gomez</span><span class="text-xs text-on-surface-variant ml-2">Leg. 0018</span></div>
+            <span class="text-xs font-semibold text-primary px-3 py-1 bg-primary/5 rounded-full border border-primary/20">Doble fichada de entrada</span>
+          </div>
+          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50 transition-all border-l-4 border-error">
+            <span class="material-symbols-outlined text-error text-lg" style="font-variation-settings:'FILL' 1">person_alert</span>
+            <div class="flex-1"><span class="font-bold text-sm">Luis Diaz</span><span class="text-xs text-on-surface-variant ml-2">Leg. 0031</span></div>
+            <span class="text-xs font-semibold text-error px-3 py-1 bg-error/5 rounded-full border border-error/20">Posible ausencia</span>
+          </div>
+          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50 transition-all border-l-4 border-tertiary">
+            <span class="material-symbols-outlined text-tertiary text-lg" style="font-variation-settings:'FILL' 1">coffee</span>
+            <div class="flex-1"><span class="font-bold text-sm">Carla Ruiz</span><span class="text-xs text-on-surface-variant ml-2">Leg. 0050</span></div>
+            <span class="text-xs font-semibold text-tertiary px-3 py-1 bg-tertiary/5 rounded-full border border-tertiary/20">Descanso excedido</span>
+          </div>
+          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50 transition-all border-l-4 border-tertiary">
+            <span class="material-symbols-outlined text-tertiary text-lg" style="font-variation-settings:'FILL' 1">exit_to_app</span>
+            <div class="flex-1"><span class="font-bold text-sm">Martin Sosa</span><span class="text-xs text-on-surface-variant ml-2">Leg. 0027</span></div>
+            <span class="text-xs font-semibold text-tertiary px-3 py-1 bg-tertiary/5 rounded-full border border-tertiary/20">Salida anticipada</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel lateral (col 4) -->
+    <div class="col-span-12 lg:col-span-4 space-y-5">
+
+      <!-- Estado del período -->
+      <div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
+        <div class="px-5 py-4 border-b border-slate-100">
+          <h2 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">calendar_month</span> ESTADO DEL PERÍODO
+          </h2>
+        </div>
+        <div class="p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-on-surface-variant">Período</span>
+            <span class="text-sm font-bold">Junio 2025</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-on-surface-variant">Días hábiles transcurridos</span>
+            <span class="text-sm font-bold">9 / 21</span>
+          </div>
+          <div class="w-full bg-surface-container-high rounded-full h-2">
+            <div class="bg-primary h-2 rounded-full" style="width: 43%"></div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-on-surface-variant">HE 50% acumuladas</span>
+            <span class="text-sm font-bold text-primary">42h 15m</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-on-surface-variant">HE 100% acumuladas</span>
+            <span class="text-sm font-bold text-primary">8h 00m</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-on-surface-variant">Ausencias sin justificar</span>
+            <span class="text-sm font-bold text-error">3</span>
+          </div>
+          <div class="pt-2 border-t border-slate-100">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+              <span class="text-xs font-bold text-yellow-700">Cierre en borrador — sin cerrar</span>
+            </div>
+          </div>
+        </div>
+        <div class="px-5 pb-5">
+          <a href="cierre.html" class="block w-full py-2.5 text-center bg-on-background text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity">
+            Ir al cierre mensual
           </a>
         </div>
       </div>
 
-      <!-- Alerts -->
-      <div class="bg-surface-container-low rounded-xl p-6">
-        <h2 class="text-xs font-headline font-extrabold tracking-[0.2em] mb-4 flex items-center gap-2">
-          <span class="material-symbols-outlined text-sm text-error">campaign</span> ALERTAS DEL DIA
-        </h2>
-        <div class="space-y-2">
-          <a href="empleado-juan-perez.html" class="flex items-center gap-4 bg-surface-container-lowest p-3 rounded hover:bg-slate-50 transition-all border-l-4 border-error">
-            <span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
-            <div class="flex-1"><span class="font-bold text-sm">Juan Perez</span><span class="text-xs text-on-surface-variant ml-2">(Leg. 0042)</span></div>
-            <span class="text-xs font-medium text-error px-3 py-1 bg-error-container/10 rounded-full">Tardanza 6 min</span>
-          </a>
-          <div class="flex items-center gap-4 bg-surface-container-lowest p-3 rounded hover:bg-slate-50 transition-all border-l-4 border-primary">
-            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">sync_problem</span>
-            <div class="flex-1"><span class="font-bold text-sm">Ana Gomez</span><span class="text-xs text-on-surface-variant ml-2">(Leg. 0018)</span></div>
-            <span class="text-xs font-medium text-primary px-3 py-1 bg-primary-container/10 rounded-full">Doble fichada de entrada</span>
+      <!-- Actividad reciente -->
+      <div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+          <h2 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">history</span> ÚLTIMA ACTIVIDAD
+          </h2>
+          <span class="flex items-center gap-1.5 text-[10px] font-bold text-green-600">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> En vivo
+          </span>
+        </div>
+        <div class="divide-y divide-slate-100">
+          <div class="flex items-center gap-3 px-5 py-3">
+            <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-bold shrink-0">JP</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-semibold truncate">Juan Perez</p>
+              <p class="text-[10px] text-on-surface-variant">Entrada · 09:15</p>
+            </div>
+            <span class="text-[10px] font-bold text-tertiary shrink-0">Tardanza</span>
           </div>
-          <div class="flex items-center gap-4 bg-surface-container-lowest p-3 rounded hover:bg-slate-50 transition-all border-l-4 border-error">
-            <span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">person_alert</span>
-            <div class="flex-1"><span class="font-bold text-sm">Luis Diaz</span><span class="text-xs text-on-surface-variant ml-2">(Leg. 0031)</span></div>
-            <span class="text-xs font-medium text-error px-3 py-1 bg-error-container/10 rounded-full">Posible ausencia</span>
+          <div class="flex items-center gap-3 px-5 py-3">
+            <div class="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-white text-[10px] font-bold shrink-0">CR</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-semibold truncate">Carla Ruiz</p>
+              <p class="text-[10px] text-on-surface-variant">Entrada · 08:58</p>
+            </div>
+            <span class="text-[10px] font-bold text-green-600 shrink-0">Normal</span>
           </div>
-          <div class="flex items-center gap-4 bg-surface-container-lowest p-3 rounded hover:bg-slate-50 transition-all border-l-4 border-tertiary">
-            <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">coffee</span>
-            <div class="flex-1"><span class="font-bold text-sm">Carla Ruiz</span><span class="text-xs text-on-surface-variant ml-2">(Leg. 0050)</span></div>
-            <span class="text-xs font-medium text-tertiary px-3 py-1 bg-tertiary-container/20 rounded-full">Descanso excedido</span>
+          <div class="flex items-center gap-3 px-5 py-3">
+            <div class="w-7 h-7 rounded-full bg-tertiary flex items-center justify-center text-white text-[10px] font-bold shrink-0">AG</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-semibold truncate">Ana Gomez</p>
+              <p class="text-[10px] text-on-surface-variant">Entrada · 08:45</p>
+            </div>
+            <span class="text-[10px] font-bold text-primary shrink-0">Doble</span>
           </div>
-          <div class="flex items-center gap-4 bg-surface-container-lowest p-3 rounded hover:bg-slate-50 transition-all border-l-4 border-tertiary">
-            <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">exit_to_app</span>
-            <div class="flex-1"><span class="font-bold text-sm">Martin Sosa</span><span class="text-xs text-on-surface-variant ml-2">(Leg. 0027)</span></div>
-            <span class="text-xs font-medium text-tertiary px-3 py-1 bg-tertiary-container/20 rounded-full">Salida anticipada</span>
+          <div class="flex items-center gap-3 px-5 py-3">
+            <div class="w-7 h-7 rounded-full bg-on-surface-variant flex items-center justify-center text-white text-[10px] font-bold shrink-0">MS</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-semibold truncate">Martin Sosa</p>
+              <p class="text-[10px] text-on-surface-variant">Salida · 08:40</p>
+            </div>
+            <span class="text-[10px] font-bold text-tertiary shrink-0">Anticipada</span>
+          </div>
+          <div class="flex items-center gap-3 px-5 py-3">
+            <div class="w-7 h-7 rounded-full bg-error flex items-center justify-center text-white text-[10px] font-bold shrink-0">LD</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-semibold truncate">Luis Diaz</p>
+              <p class="text-[10px] text-on-surface-variant">Sin registrar · Ausente</p>
+            </div>
+            <span class="text-[10px] font-bold text-error shrink-0">Ausente</span>
           </div>
         </div>
+        <div class="px-5 pb-4 pt-2">
+          <a href="fichadas.html" class="block w-full py-2 text-center text-xs font-bold text-primary hover:underline">Ver todas las fichadas</a>
+        </div>
       </div>
-    </section>
+
+    </div>
   </div>
 
   <!-- Novedades Pendientes -->
-  <section class="mb-8 bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
-    <div class="p-6 flex items-center justify-between border-b border-slate-100">
+  <section class="mb-6 bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-200/50">
+    <div class="px-5 py-4 flex items-center justify-between border-b border-slate-100">
       <h2 class="text-xs font-headline font-extrabold tracking-[0.2em] flex items-center gap-2">
         <span class="material-symbols-outlined text-sm">playlist_add_check</span> NOVEDADES PENDIENTES
       </h2>
       <a href="novedades.html" class="text-[10px] font-bold text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
-        Ver historial completo <span class="material-symbols-outlined text-xs">arrow_forward</span>
+        Ver todas <span class="material-symbols-outlined text-xs">arrow_forward</span>
       </a>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
           <tr class="bg-surface-container-low">
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Legajo</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Empleado</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Tipo</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Fecha</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Cantidad</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Estado</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Origen</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Acción</th>
+            <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Legajo</th>
+            <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Empleado</th>
+            <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Tipo</th>
+            <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Fecha</th>
+            <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Cantidad</th>
+            <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Estado</th>
+            <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Origen</th>
+            <th class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider"></th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
           <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-sm font-medium">0042</td>
-            <td class="px-6 py-4 text-sm font-bold"><a href="empleado-juan-perez.html" class="hover:text-primary hover:underline">Juan Perez</a></td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-tertiary-container/30 text-on-tertiary-container text-[10px] font-bold rounded-full uppercase tracking-tighter">horas_extra_50</span></td>
-            <td class="px-6 py-4 text-sm">12/06/2025</td>
-            <td class="px-6 py-4 text-sm font-bold">105 min</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1 text-[10px] font-bold text-on-surface-variant"><span class="w-2 h-2 rounded-full bg-outline-variant"></span> PENDIENTE</span></td>
-            <td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">automatica</td>
-            <td class="px-6 py-4"><a href="empleado-juan-perez.html" class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</a></td>
+            <td class="px-5 py-3.5 text-sm font-medium">0042</td>
+            <td class="px-5 py-3.5 text-sm font-bold"><a href="empleado-juan-perez.html" class="hover:text-primary hover:underline">Juan Perez</a></td>
+            <td class="px-5 py-3.5"><span class="px-2 py-0.5 bg-tertiary-container/40 text-on-tertiary-container text-[10px] font-bold rounded-full">Horas extra 50%</span></td>
+            <td class="px-5 py-3.5 text-sm">12/06/2025</td>
+            <td class="px-5 py-3.5 text-sm font-bold">1h 45m</td>
+            <td class="px-5 py-3.5"><span class="flex items-center gap-1.5 text-[10px] font-bold text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Pendiente</span></td>
+            <td class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant">Automática</td>
+            <td class="px-5 py-3.5"><a href="empleado-juan-perez.html" class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded hover:bg-primary/5 transition-colors">Ver</a></td>
           </tr>
           <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-sm font-medium">0018</td>
-            <td class="px-6 py-4 text-sm font-bold">Ana Gomez</td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold rounded-full uppercase tracking-tighter">justificacion</span></td>
-            <td class="px-6 py-4 text-sm">12/06/2025</td>
-            <td class="px-6 py-4 text-sm font-bold">1 dia</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1 text-[10px] font-bold text-on-surface-variant"><span class="w-2 h-2 rounded-full bg-outline-variant"></span> PENDIENTE</span></td>
-            <td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">manual</td>
-            <td class="px-6 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button></td>
+            <td class="px-5 py-3.5 text-sm font-medium">0018</td>
+            <td class="px-5 py-3.5 text-sm font-bold">Ana Gomez</td>
+            <td class="px-5 py-3.5"><span class="px-2 py-0.5 bg-secondary-container/40 text-on-secondary-container text-[10px] font-bold rounded-full">Justificación</span></td>
+            <td class="px-5 py-3.5 text-sm">12/06/2025</td>
+            <td class="px-5 py-3.5 text-sm font-bold">1 día</td>
+            <td class="px-5 py-3.5"><span class="flex items-center gap-1.5 text-[10px] font-bold text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Pendiente</span></td>
+            <td class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant">Manual</td>
+            <td class="px-5 py-3.5"><a href="novedades.html" class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded hover:bg-primary/5 transition-colors">Ver</a></td>
           </tr>
           <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-sm font-medium">0031</td>
-            <td class="px-6 py-4 text-sm font-bold">Luis Diaz</td>
-            <td class="px-6 py-4"><span class="px-2 py-1 bg-error-container/10 text-error text-[10px] font-bold rounded-full uppercase tracking-tighter">ausencia</span></td>
-            <td class="px-6 py-4 text-sm">12/06/2025</td>
-            <td class="px-6 py-4 text-sm font-bold">1 dia</td>
-            <td class="px-6 py-4"><span class="flex items-center gap-1 text-[10px] font-bold text-on-surface-variant"><span class="w-2 h-2 rounded-full bg-outline-variant"></span> PENDIENTE</span></td>
-            <td class="px-6 py-4 text-[10px] font-bold uppercase text-on-surface-variant">automatica</td>
-            <td class="px-6 py-4"><button class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded">Ver</button></td>
+            <td class="px-5 py-3.5 text-sm font-medium">0031</td>
+            <td class="px-5 py-3.5 text-sm font-bold">Luis Diaz</td>
+            <td class="px-5 py-3.5"><span class="px-2 py-0.5 bg-error/10 text-error text-[10px] font-bold rounded-full">Ausencia</span></td>
+            <td class="px-5 py-3.5 text-sm">12/06/2025</td>
+            <td class="px-5 py-3.5 text-sm font-bold">1 día</td>
+            <td class="px-5 py-3.5"><span class="flex items-center gap-1.5 text-[10px] font-bold text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Pendiente</span></td>
+            <td class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant">Automática</td>
+            <td class="px-5 py-3.5"><a href="novedades.html" class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded hover:bg-primary/5 transition-colors">Ver</a></td>
+          </tr>
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-5 py-3.5 text-sm font-medium">0050</td>
+            <td class="px-5 py-3.5 text-sm font-bold">Carla Ruiz</td>
+            <td class="px-5 py-3.5"><span class="px-2 py-0.5 bg-tertiary-container/40 text-on-tertiary-container text-[10px] font-bold rounded-full">Tardanza</span></td>
+            <td class="px-5 py-3.5 text-sm">12/06/2025</td>
+            <td class="px-5 py-3.5 text-sm font-bold">22 min</td>
+            <td class="px-5 py-3.5"><span class="flex items-center gap-1.5 text-[10px] font-bold text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Pendiente</span></td>
+            <td class="px-5 py-3.5 text-[10px] font-bold text-on-surface-variant">Automática</td>
+            <td class="px-5 py-3.5"><a href="novedades.html" class="text-primary font-black text-[10px] uppercase tracking-widest hover:text-blue-900 border border-primary/20 px-3 py-1 rounded hover:bg-primary/5 transition-colors">Ver</a></td>
           </tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <!-- Footer Actions -->
-  <footer class="mt-8 flex flex-wrap gap-4 items-center justify-start p-6 bg-surface-container-low rounded-xl border border-slate-200/50">
-    <a href="fichadas.html" class="flex items-center gap-2 px-6 py-3 bg-primary text-white text-[11px] font-bold tracking-widest uppercase rounded shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 transition-all">
-      <span class="material-symbols-outlined text-sm">history</span> Ver fichadas del dia
+  <!-- Quick Actions -->
+  <div class="flex flex-wrap gap-3 items-center">
+    <a href="fichadas.html" class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-xs font-bold tracking-widest uppercase rounded-lg hover:bg-primary/90 transition-colors shadow-sm">
+      <span class="material-symbols-outlined text-sm">history</span> Fichadas del día
     </a>
-    <a href="novedades.html" class="flex items-center gap-2 px-6 py-3 bg-secondary text-white text-[11px] font-bold tracking-widest uppercase rounded shadow-lg hover:shadow-secondary/20 hover:-translate-y-0.5 transition-all">
-      <span class="material-symbols-outlined text-sm">edit_notifications</span> Ver novedades
+    <a href="novedades.html" class="flex items-center gap-2 px-5 py-2.5 bg-on-secondary-container text-white text-xs font-bold tracking-widest uppercase rounded-lg hover:opacity-90 transition-opacity shadow-sm">
+      <span class="material-symbols-outlined text-sm">edit_notifications</span> Gestionar novedades
     </a>
-    <a href="cierre.html" class="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white text-[11px] font-bold tracking-widest uppercase rounded shadow-lg hover:-translate-y-0.5 transition-all">
-      <span class="material-symbols-outlined text-sm">point_of_sale</span> Ir a cierre mensual
+    <a href="cierre.html" class="flex items-center gap-2 px-5 py-2.5 bg-on-background text-white text-xs font-bold tracking-widest uppercase rounded-lg hover:opacity-90 transition-opacity shadow-sm">
+      <span class="material-symbols-outlined text-sm">point_of_sale</span> Cierre mensual
     </a>
-    <a href="exportaciones.html" class="flex items-center gap-2 px-6 py-3 bg-surface-container-lowest text-primary border border-primary/20 text-[11px] font-bold tracking-widest uppercase rounded hover:bg-primary/5 transition-all ml-auto">
-      <span class="material-symbols-outlined text-sm">download</span> Exportar resumen rapido
+    <a href="exportaciones.html" class="flex items-center gap-2 px-5 py-2.5 bg-surface-container-lowest text-primary border border-primary/20 text-xs font-bold tracking-widest uppercase rounded-lg hover:bg-primary/5 transition-colors ml-auto">
+      <span class="material-symbols-outlined text-sm">download</span> Exportar resumen
     </a>
-  </footer>
+  </div>
+
 </main>
 
 <script>
@@ -376,6 +458,16 @@ tailwind.config = {
       el.classList.remove('text-slate-600', 'hover:bg-slate-200');
     }
   });
+
+  var dias   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  var meses  = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var mesesCortos = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+  var hoy = new Date();
+  var d = hoy.getDate(), m = hoy.getMonth(), y = hoy.getFullYear();
+  var df = document.getElementById('dash-fecha');
+  var dfc = document.getElementById('dash-fecha-corta');
+  if (df) df.textContent = dias[hoy.getDay()] + ', ' + d + ' de ' + meses[m] + ' de ' + y;
+  if (dfc) dfc.textContent = d + ' ' + mesesCortos[m] + ' ' + y;
 })();
 </script>
 </body>
