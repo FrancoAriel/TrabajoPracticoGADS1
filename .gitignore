@@ -1,1 +1,4 @@
 stitch/
+node_modules/
+dist/
+.vite/
