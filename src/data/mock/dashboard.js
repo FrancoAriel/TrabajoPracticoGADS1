@@ -16,11 +16,11 @@ export const mockDashboard = {
     { key: 'license', label: 'Con licencia', value: '4', icon: 'beach_access', valueClassName: 'text-on-secondary-container', iconClassName: 'text-on-secondary-container' },
   ],
   alerts: [
-    { id: 'alert_1', employeeId: 'emp_42', employeeName: 'Juan Perez', employeeLegajo: '0042', status: 'Tardanza 6 min', icon: 'warning', border: 'border-error', accent: 'text-error', badge: 'bg-error/5 border-error/20 text-error', filled: true },
-    { id: 'alert_2', employeeId: 'emp_18', employeeName: 'Ana Gomez', employeeLegajo: '0018', status: 'Doble fichada de entrada', icon: 'sync_problem', border: 'border-primary', accent: 'text-primary', badge: 'bg-primary/5 border-primary/20 text-primary', filled: true },
-    { id: 'alert_3', employeeId: 'emp_31', employeeName: 'Luis Diaz', employeeLegajo: '0031', status: 'Posible ausencia', icon: 'person_alert', border: 'border-error', accent: 'text-error', badge: 'bg-error/5 border-error/20 text-error', filled: true },
-    { id: 'alert_4', employeeId: 'emp_50', employeeName: 'Carla Ruiz', employeeLegajo: '0050', status: 'Descanso excedido', icon: 'coffee', border: 'border-tertiary', accent: 'text-tertiary', badge: 'bg-tertiary/5 border-tertiary/20 text-tertiary', filled: true },
-    { id: 'alert_5', employeeId: 'emp_27', employeeName: 'Martin Sosa', employeeLegajo: '0027', status: 'Salida anticipada', icon: 'exit_to_app', border: 'border-tertiary', accent: 'text-tertiary', badge: 'bg-tertiary/5 border-tertiary/20 text-tertiary', filled: true },
+    { id: 'alert_1', name: 'Juan Perez',  legajo: 'Leg. 0042', status: 'Tardanza 6 min',          icon: 'warning',      border: 'border-error',    accent: 'text-error',    badge: 'bg-error/5 border-error/20 text-error',       filled: true, route: '/empleado/juan-perez' },
+    { id: 'alert_2', name: 'Ana Gomez',   legajo: 'Leg. 0018', status: 'Doble fichada de entrada', icon: 'sync_problem', border: 'border-primary',  accent: 'text-primary',  badge: 'bg-primary/5 border-primary/20 text-primary', filled: true },
+    { id: 'alert_3', name: 'Luis Diaz',   legajo: 'Leg. 0031', status: 'Posible ausencia',         icon: 'person_alert', border: 'border-error',    accent: 'text-error',    badge: 'bg-error/5 border-error/20 text-error',       filled: true },
+    { id: 'alert_4', name: 'Carla Ruiz',  legajo: 'Leg. 0050', status: 'Descanso excedido',        icon: 'coffee',       border: 'border-tertiary', accent: 'text-tertiary', badge: 'bg-tertiary/5 border-tertiary/20 text-tertiary', filled: true },
+    { id: 'alert_5', name: 'Martin Sosa', legajo: 'Leg. 0027', status: 'Salida anticipada',        icon: 'exit_to_app',  border: 'border-tertiary', accent: 'text-tertiary', badge: 'bg-tertiary/5 border-tertiary/20 text-tertiary', filled: true },
   ],
   periodStatus: {
     period: 'Junio 2025', businessDaysElapsed: '9 / 21', progressPercent: 43, he50: '42h 15m', he100: '8h 00m', unjustifiedAbsences: '3', closureStatusLabel: 'Cierre en borrador - sin cerrar',
@@ -33,9 +33,9 @@ export const mockDashboard = {
     { initials: 'LD', name: 'Luis Diaz', detail: 'Sin registrar · Ausente', status: 'Ausente', avatar: 'bg-error', statusClassName: 'text-error' },
   ],
   pendingNewsTable: [
-    { id: 'pn_1', employeeId: 'emp_42', legajo: '0042', employee: 'Juan Perez', type: 'Horas extra 50%', typeClassName: 'bg-tertiary-container/40 text-on-tertiary-container', date: '12/06/2025', quantity: '1h 45m', origin: 'Automatica' },
-    { id: 'pn_2', employeeId: 'emp_18', legajo: '0018', employee: 'Ana Gomez', type: 'Justificacion', typeClassName: 'bg-secondary-container/40 text-on-secondary-container', date: '12/06/2025', quantity: '1 dia', origin: 'Manual' },
-    { id: 'pn_3', employeeId: 'emp_31', legajo: '0031', employee: 'Luis Diaz', type: 'Ausencia', typeClassName: 'bg-error/10 text-error', date: '12/06/2025', quantity: '1 dia', origin: 'Automatica' },
-    { id: 'pn_4', employeeId: 'emp_50', legajo: '0050', employee: 'Carla Ruiz', type: 'Tardanza', typeClassName: 'bg-tertiary-container/40 text-on-tertiary-container', date: '12/06/2025', quantity: '22 min', origin: 'Automatica' },
+    { id: 'pn_1', legajo: '0042', employee: 'Juan Perez', employeeRoute: '/empleado/juan-perez', type: 'Horas extra 50%', typeClassName: 'bg-tertiary-container/40 text-on-tertiary-container', date: '12/06/2025', quantity: '1h 45m', origin: 'Automatica', route: '/empleado/juan-perez' },
+    { id: 'pn_2', legajo: '0018', employee: 'Ana Gomez',  type: 'Justificación',  typeClassName: 'bg-secondary-container/40 text-on-secondary-container', date: '12/06/2025', quantity: '1 día',   origin: 'Manual',     route: '/novedades' },
+    { id: 'pn_3', legajo: '0031', employee: 'Luis Diaz',  type: 'Ausencia',       typeClassName: 'bg-error/10 text-error',                                date: '12/06/2025', quantity: '1 día',   origin: 'Automática', route: '/novedades' },
+    { id: 'pn_4', legajo: '0050', employee: 'Carla Ruiz', type: 'Tardanza',       typeClassName: 'bg-tertiary-container/40 text-on-tertiary-container',   date: '12/06/2025', quantity: '22 min',  origin: 'Automática', route: '/novedades' },
   ],
 }

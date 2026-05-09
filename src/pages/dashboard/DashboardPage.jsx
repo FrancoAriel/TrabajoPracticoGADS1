@@ -86,7 +86,10 @@ function HeroMetricCard({ metric }) {
   return (
     <div className="group relative overflow-hidden rounded-lg bg-surface-container-highest p-5">
       <p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">{metric.label}</p>
-      <h3 className={`font-headline text-2xl font-black ${metric.valueClassName}`}>{metric.value}</h3>
+      <h3 className={`font-headline text-2xl font-black ${metric.valueClassName}`}>
+        {metric.value}
+        {metric.unit && <span className="ml-1 text-sm font-medium">{metric.unit}</span>}
+      </h3>
       <span className={`material-symbols-outlined absolute -bottom-2 -right-2 text-6xl transition-transform group-hover:scale-110 ${metric.iconClassName}`}>
         {metric.icon}
       </span>
