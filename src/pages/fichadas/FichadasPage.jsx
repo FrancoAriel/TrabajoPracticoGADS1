@@ -1,0 +1,442 @@
+import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import AppShell from '../../components/layout/AppShell'
+import Modal from '../../components/ui/Modal'
+import { routes } from '../../lib/routes'
+
+const baseItems = [
+  { legajo: '0042', empleado: 'Juan Perez', initials: 'JP', avatarClass: 'bg-blue-100 text-primary', fecha: '12/06/2025 09:11', tipo: 'Entrada', origen: 'Biométrico', origenIcon: 'fingerprint', correccion: false, estado: 'OK', estadoClass: 'bg-on-secondary-container/10 text-on-secondary-container', dotClass: 'bg-on-secondary-container' },
+  { legajo: '0018', empleado: 'Ana Gomez', initials: 'AG', avatarClass: 'bg-purple-100 text-tertiary', fecha: '12/06/2025 09:03', tipo: 'Entrada', origen: 'Biométrico', origenIcon: 'fingerprint', correccion: false, estado: 'OK', estadoClass: 'bg-on-secondary-container/10 text-on-secondary-container', dotClass: 'bg-on-secondary-container' },
+  { legajo: '0050', empleado: 'Carla Ruiz', initials: 'CR', avatarClass: 'bg-purple-100 text-tertiary', fecha: '12/06/2025 08:55', tipo: 'Entrada', origen: 'Biométrico', origenIcon: 'fingerprint', correccion: false, estado: 'OK', estadoClass: 'bg-on-secondary-container/10 text-on-secondary-container', dotClass: 'bg-on-secondary-container' },
+  { legajo: '0027', empleado: 'Martin Sosa', initials: 'MS', avatarClass: 'bg-slate-200 text-slate-600', fecha: '12/06/2025 06:02', tipo: 'Entrada', origen: 'App móvil', origenIcon: 'smartphone', correccion: false, estado: 'OK', estadoClass: 'bg-on-secondary-container/10 text-on-secondary-container', dotClass: 'bg-on-secondary-container' },
+  { legajo: '0158', empleado: 'Maria Alvez', initials: 'MA', avatarClass: 'bg-slate-200 text-slate-600', fecha: '12/06/2025 09:18', tipo: 'Entrada', origen: 'Biométrico', origenIcon: 'fingerprint', correccion: true, estado: 'Revisar', estadoClass: 'bg-tertiary-container text-on-tertiary-container', dotClass: 'bg-tertiary' },
+  { legajo: '0892', empleado: 'Roberto Gomez', initials: 'RG', avatarClass: 'bg-blue-100 text-primary', fecha: '12/06/2025 18:02', tipo: 'Salida', origen: 'Biométrico', origenIcon: 'fingerprint', correccion: false, estado: 'OK', estadoClass: 'bg-on-secondary-container/10 text-on-secondary-container', dotClass: 'bg-on-secondary-container' },
+  { legajo: '0042', empleado: 'Juan Perez', initials: 'JP', avatarClass: 'bg-blue-100 text-primary', fecha: '12/06/2025 19:45', tipo: 'Salida', origen: 'Biométrico', origenIcon: 'fingerprint', correccion: false, estado: 'OK', estadoClass: 'bg-on-secondary-container/10 text-on-secondary-container', dotClass: 'bg-on-secondary-container' },
+  { legajo: '0031', empleado: 'Luis Diaz', initials: 'LD', avatarClass: 'bg-red-100 text-error', fecha: '12/06/2025 09:31', tipo: 'Entrada', origen: 'Manual', origenIcon: 'edit_note', correccion: false, estado: 'Revisar', estadoClass: 'bg-tertiary-container text-on-tertiary-container', dotClass: 'bg-tertiary' },
+]
+
+const employeeOptions = ['0042 — Juan Perez', '0018 — Ana Gomez', '0027 — Martin Sosa', '0031 — Luis Diaz', '0050 — Carla Ruiz', '0158 — Maria Alvez', '0892 — Roberto Gomez']
+
+const mockHorario = {
+  '0042': { horario: 'Mañana 09:00–18:00', jornada: '9h (completa)' },
+  '0018': { horario: 'Mañana 09:00–18:00', jornada: '9h (completa)' },
+  '0050': { horario: 'Temprano 08:00–17:00', jornada: '9h (completa)' },
+  '0027': { horario: 'Rotativo A 06:00–14:00', jornada: '8h (completa)' },
+  '0158': { horario: 'Mañana 09:00–18:00', jornada: '9h (completa)' },
+  '0892': { horario: 'Tarde 14:00–22:00', jornada: '8h (completa)' },
+  '0031': { horario: 'Mañana 09:00–13:00', jornada: '4h (parcial)' },
+}
+
+function FilterSelect({ value, onChange, children, minWidth = 'min-w-[8rem]' }) {
+  return (
+    <div className="relative flex items-center">
+      <select value={value} onChange={onChange} className={`${minWidth} appearance-none rounded-md border-none bg-surface-container-low py-1.5 pl-3 pr-8 text-xs font-medium text-on-surface-variant`}>
+        {children}
+      </select>
+      <span className="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-base leading-none text-on-surface-variant">expand_more</span>
+    </div>
+  )
+}
+
+function Field({ label, children }) {
+  return (
+    <div>
+      <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">{label}</label>
+      {children}
+    </div>
+  )
+}
+
+function TextInput(props) {
+  return <input {...props} className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
+}
+
+function SelectInput({ children, ...props }) {
+  return <select {...props} className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30">{children}</select>
+}
+
+export default function FichadasPage() {
+  const [search, setSearch] = useState('')
+  const [filterDate, setFilterDate] = useState('')
+  const [filterType, setFilterType] = useState('')
+  const [filterOrigin, setFilterOrigin] = useState('')
+  const [filterStatus, setFilterStatus] = useState('')
+  const [clock, setClock] = useState('')
+  const [selected, setSelected] = useState(null)
+  const [openManual, setOpenManual] = useState(false)
+  const [openCorrection, setOpenCorrection] = useState(false)
+  const [toast, setToast] = useState('')
+
+  const showToast = (msg) => {
+    setToast(msg)
+    setTimeout(() => setToast(''), 3000)
+  }
+
+  useEffect(() => {
+    document.title = 'Fichadas - Executive Architect'
+    const pad = (n) => String(n).padStart(2, '0')
+    const update = () => {
+      const now = new Date()
+      setClock(`Última act. ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`)
+    }
+    update()
+    const id = window.setInterval(update, 1000)
+    return () => window.clearInterval(id)
+  }, [])
+
+  const items = useMemo(() => baseItems.filter((item) => {
+    const q = search.toLowerCase()
+    return (
+      (!q || item.legajo.includes(q) || item.empleado.toLowerCase().includes(q)) &&
+      (!filterType || item.tipo === filterType) &&
+      (!filterOrigin || item.origen === filterOrigin) &&
+      (!filterStatus || item.estado === filterStatus)
+    )
+  }), [search, filterType, filterOrigin, filterStatus])
+
+  const clearFilters = () => { setFilterType(''); setFilterOrigin(''); setFilterStatus(''); setFilterDate('') }
+
+  const infoFor = selected ? (mockHorario[selected.legajo] || { horario: '—', jornada: '—' }) : null
+
+  return (
+    <AppShell
+      topbarTitle="FICHADAS"
+      topbarContent={
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><span className="material-symbols-outlined text-sm">search</span></span>
+            <input value={search} onChange={(e) => setSearch(e.target.value)} className="w-56 rounded-md border-none bg-surface-container-low py-1.5 pl-10 pr-4 text-xs focus:ring-1 focus:ring-primary" placeholder="BUSCAR POR NOMBRE O LEGAJO..." type="text" />
+          </div>
+          <button type="button" className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-primary/90">
+            <span className="material-symbols-outlined text-sm">search</span> Buscar
+          </button>
+        </div>
+      }
+    >
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h2 className="font-headline text-2xl font-extrabold tracking-tight text-on-background">Gestión de Fichadas</h2>
+          <p className="mt-1 text-sm text-on-surface-variant">Registros de asistencia del personal.</p>
+        </div>
+        <div className="flex gap-3">
+          <button type="button" onClick={() => showToast('Interpretación reprocesada correctamente.')} className="flex items-center gap-2 rounded-md bg-surface-container-high px-4 py-2 text-sm font-semibold text-on-secondary-container transition-colors hover:bg-surface-container-highest">
+            <span className="material-symbols-outlined text-sm">auto_mode</span> Reprocesar
+          </button>
+          <button type="button" onClick={() => setOpenManual(true)} className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dim">
+            <span className="material-symbols-outlined text-sm">add_circle</span> Nueva fichada manual
+          </button>
+        </div>
+      </div>
+
+      <div className="mb-8 grid grid-cols-4 gap-4">
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Total del día</p><p className="font-headline text-2xl font-black text-on-secondary-container">12</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Entradas</p><p className="font-headline text-2xl font-black text-primary">8</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Salidas</p><p className="font-headline text-2xl font-black text-tertiary">4</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Por revisar</p><p className="font-headline text-2xl font-black text-error">2</p></div>
+      </div>
+
+      <div className="overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest">
+        <div className="flex items-center justify-between border-b border-slate-100 p-6">
+          <div className="flex items-center gap-3">
+            <h3 className="flex items-center gap-2 font-headline text-xs font-extrabold tracking-[0.2em]">
+              <span className="material-symbols-outlined text-sm">fingerprint</span> FICHADAS DEL DÍA — 12/06/2025
+            </h3>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-green-700">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+              </span>
+              En vivo
+            </span>
+            <span className="font-mono text-[10px] text-on-surface-variant">{clock}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} className="rounded-md border-none bg-surface-container-low py-1.5 pl-3 pr-3 text-xs font-medium text-on-surface-variant" />
+            <FilterSelect value={filterType} onChange={(e) => setFilterType(e.target.value)} minWidth="min-w-[7rem]">
+              <option value="">Todos los tipos</option>
+              <option>Entrada</option>
+              <option>Salida</option>
+            </FilterSelect>
+            <FilterSelect value={filterOrigin} onChange={(e) => setFilterOrigin(e.target.value)}>
+              <option value="">Todos los orígenes</option>
+              <option>Biométrico</option>
+              <option>App móvil</option>
+              <option>Manual</option>
+            </FilterSelect>
+            <FilterSelect value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+              <option value="">Todos los estados</option>
+              <option>OK</option>
+              <option>Revisar</option>
+            </FilterSelect>
+            <button type="button" onClick={clearFilters} className="flex items-center gap-1 rounded-md border border-outline-variant/30 px-3 py-1.5 text-xs font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">
+              <span className="material-symbols-outlined text-sm">filter_alt_off</span> Limpiar
+            </button>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left">
+            {items.length > 0 && (
+              <thead>
+                <tr className="bg-surface-container-low">
+                  {[
+                    { label: 'Legajo' }, { label: 'Empleado' }, { label: 'Fecha / Hora' },
+                    { label: 'Tipo', center: true }, { label: 'Origen' },
+                    { label: 'Corrección', center: true }, { label: 'Estado' }, { label: 'Acción' },
+                  ].map(({ label, center }) => (
+                    <th key={label} className={`px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant${center ? ' text-center' : ''}`}>{label}</th>
+                  ))}
+                </tr>
+              </thead>
+            )}
+            <tbody className="divide-y divide-slate-100">
+              {items.length ? items.map((item, i) => (
+                <tr key={i} onClick={() => setSelected(item)} className="cursor-pointer transition-colors hover:bg-slate-50">
+                  <td className="px-4 py-3 font-mono text-sm font-bold text-primary">{item.legajo}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold ${item.avatarClass}`}>{item.initials}</div>
+                      <span className="text-sm font-semibold">{item.empleado}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-on-surface-variant">{item.fecha}</td>
+                  <td className="px-4 py-3 text-center">
+                    {item.tipo === 'Entrada'
+                      ? <span className="inline-flex items-center gap-1 rounded bg-green-50 px-2 py-1 text-[10px] font-black uppercase text-green-700"><span className="material-symbols-outlined text-xs">login</span> Entrada</span>
+                      : <span className="inline-flex items-center gap-1 rounded bg-red-50 px-2 py-1 text-[10px] font-black uppercase text-red-700"><span className="material-symbols-outlined text-xs">logout</span> Salida</span>
+                    }
+                  </td>
+                  <td className="px-4 py-3 text-xs font-medium">
+                    <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">{item.origenIcon}</span> {item.origen}</span>
+                  </td>
+                  <td className="px-4 py-3 text-center text-xs font-bold">
+                    {item.correccion ? <span className="font-bold text-primary">Sí</span> : <span className="text-on-surface-variant">—</span>}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-[10px] font-bold ${item.estadoClass}`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${item.dotClass}`} /> {item.estado}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <button type="button" className="rounded border border-primary/20 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-primary hover:text-blue-900">Ver</button>
+                  </td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan={8} className="px-6 py-12 text-center text-sm text-on-surface-variant">
+                    <span className="material-symbols-outlined mb-2 block text-3xl opacity-30">search_off</span>
+                    No se encontraron fichadas con los filtros aplicados.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="flex items-center justify-between border-t border-slate-100 p-4">
+          <p className="text-xs text-on-surface-variant">{items.length === 0 ? 'Sin resultados' : `Mostrando ${items.length} de ${baseItems.length} fichadas`}</p>
+          <div className="flex items-center gap-2">
+            <Link to={routes.exportaciones} className="mr-2 flex items-center gap-1.5 text-xs font-bold text-primary hover:underline">
+              <span className="material-symbols-outlined text-sm">download</span> Exportar
+            </Link>
+            <button disabled className="rounded-md border border-outline-variant/30 p-1.5 text-on-surface-variant opacity-30">
+              <span className="material-symbols-outlined text-sm">chevron_left</span>
+            </button>
+            <span className="px-2 text-xs font-bold text-on-surface-variant">1 / 1</span>
+            <button disabled className="rounded-md border border-outline-variant/30 p-1.5 text-on-surface-variant opacity-30">
+              <span className="material-symbols-outlined text-sm">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <Modal open={!!selected} title={selected ? `Fichada — Legajo ${selected.legajo}` : ''} subtitle={selected ? `${selected.empleado} · ${selected.fecha}` : ''} onClose={() => setSelected(null)} size="max-w-xl">
+        {selected ? (
+          <div className="space-y-5 px-8 py-6">
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { label: 'Empleado', value: `${selected.empleado} (${selected.legajo})` },
+                { label: 'Fecha / Hora', value: selected.fecha },
+                { label: 'Estado', value: selected.estado },
+                { label: 'Tipo', value: selected.tipo },
+                { label: 'Origen', value: selected.origen },
+                { label: 'Corrección', value: selected.correccion ? 'Sí' : 'No' },
+              ].map(({ label, value }) => (
+                <div key={label}>
+                  <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">{label}</p>
+                  <p className="text-sm font-semibold">{value}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-xl bg-surface-container-low p-4">
+              <p className="mb-3 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-on-surface-variant">
+                <span className="material-symbols-outlined text-sm text-primary">analytics</span> Interpretación del motor
+              </p>
+              <div className="mb-3 flex items-center gap-4 border-b border-outline-variant/20 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-sm text-on-surface-variant">schedule</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Horario:</span>
+                  <span className="text-xs font-semibold text-on-background">{infoFor?.horario}</span>
+                </div>
+                <span className="text-outline-variant">·</span>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-sm text-on-surface-variant">timelapse</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Jornada:</span>
+                  <span className="text-xs font-semibold text-on-background">{infoFor?.jornada}</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="rounded-lg border-b-2 border-error bg-white p-3">
+                  <p className="text-[10px] font-bold uppercase text-on-surface-variant">Tardanza</p>
+                  <p className="text-base font-black text-error">{selected.tipo === 'Entrada' ? '6 min' : '—'}</p>
+                </div>
+                <div className="rounded-lg border-b-2 border-primary bg-white p-3">
+                  <p className="text-[10px] font-bold uppercase text-on-surface-variant">Horas extra</p>
+                  <p className="text-base font-black text-primary">{selected.tipo === 'Salida' ? '105 min' : '—'}</p>
+                </div>
+                <div className="rounded-lg border-b-2 border-on-secondary-container bg-white p-3">
+                  <p className="text-[10px] font-bold uppercase text-on-surface-variant">Efectivo</p>
+                  <p className="text-base font-black text-on-secondary-container">{selected.tipo === 'Salida' ? '9h 45m' : '—'}</p>
+                </div>
+              </div>
+            </div>
+
+            {selected.correccion && (
+              <div>
+                <p className="mb-3 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-on-surface-variant">
+                  <span className="material-symbols-outlined text-sm text-tertiary">history</span> Trazabilidad de corrección
+                </p>
+                <div>
+                  <div className="flex gap-4">
+                    <div className="flex flex-col items-center">
+                      <div className="mt-1.5 h-3 w-3 shrink-0 rounded-full bg-outline-variant" />
+                      <div className="my-1 w-px flex-1 bg-outline-variant/40" />
+                    </div>
+                    <div className="flex-1 pb-4">
+                      <p className="mb-1.5 text-[10px] font-black uppercase tracking-wider text-on-surface-variant">Registro original</p>
+                      <div className="rounded-xl bg-surface-container-low px-4 py-3">
+                        <p className="text-sm font-semibold">{selected.tipo} · {selected.origen}</p>
+                        <p className="mt-1 font-mono text-[11px] text-on-surface-variant">{selected.fecha}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="flex flex-col items-center">
+                      <div className="mt-1.5 h-3 w-3 shrink-0 rounded-full bg-tertiary" />
+                    </div>
+                    <div className="flex-1 pb-1">
+                      <p className="mb-1.5 text-[10px] font-black uppercase tracking-wider text-tertiary">Corrección aplicada</p>
+                      <div className="rounded-xl border border-tertiary/25 bg-tertiary-container/25 px-4 py-3">
+                        <p className="text-sm font-semibold">{selected.tipo} · Manual (corregida)</p>
+                        <p className="mt-1 font-mono text-[11px] text-on-surface-variant">13/06/2025 10:05</p>
+                        <div className="mt-2.5 flex items-center gap-3 border-t border-tertiary/20 pt-2.5 text-xs text-on-surface-variant">
+                          <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">person</span><span className="font-semibold text-on-background">admin</span></span>
+                          <span>·</span>
+                          <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">info</span>Error del dispositivo</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-2 border-t border-slate-100 pt-2">
+              <button type="button" onClick={() => { setSelected(null); setOpenCorrection(true) }} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">
+                <span className="material-symbols-outlined text-sm">edit_note</span> Corregir
+              </button>
+              <button type="button" className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">
+                <span className="material-symbols-outlined text-sm">manage_history</span> Ver historial
+              </button>
+              <Link to={routes.empleadoJuanPerez} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary-dim">
+                <span className="material-symbols-outlined text-sm">person</span> Ver empleado
+              </Link>
+            </div>
+          </div>
+        ) : null}
+      </Modal>
+
+      <Modal open={openManual} title="Nueva Fichada Manual" subtitle="Registrá una fichada en nombre del empleado." onClose={() => setOpenManual(false)} size="max-w-lg">
+        <form className="space-y-4 px-8 py-6" onSubmit={(e) => { e.preventDefault(); setOpenManual(false) }}>
+          <Field label="Empleado *">
+            <SelectInput required>
+              <option value="">Seleccionar empleado...</option>
+              {employeeOptions.map((o) => <option key={o}>{o}</option>)}
+            </SelectInput>
+          </Field>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Fecha *"><TextInput required type="date" /></Field>
+            <Field label="Hora *"><TextInput required type="time" /></Field>
+          </div>
+          <Field label="Tipo *">
+            <div className="flex gap-3">
+              <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-outline-variant/40 p-3 hover:bg-surface-container-low has-[:checked]:border-primary has-[:checked]:bg-primary-container/20">
+                <input type="radio" name="tipo-fich" value="entrada" className="accent-primary" required />
+                <span className="material-symbols-outlined text-sm text-green-600">login</span>
+                <span className="text-sm font-semibold">Entrada</span>
+              </label>
+              <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-outline-variant/40 p-3 hover:bg-surface-container-low has-[:checked]:border-error has-[:checked]:bg-error-container/10">
+                <input type="radio" name="tipo-fich" value="salida" className="accent-error" />
+                <span className="material-symbols-outlined text-sm text-red-600">logout</span>
+                <span className="text-sm font-semibold">Salida</span>
+              </label>
+            </div>
+          </Field>
+          <Field label="Motivo *">
+            <textarea required rows={2} placeholder="Describí el motivo del registro manual..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
+          </Field>
+          <div className="flex items-start gap-2 rounded-lg border border-tertiary/20 bg-tertiary-container/20 p-3">
+            <span className="material-symbols-outlined mt-0.5 text-sm text-tertiary">info</span>
+            <p className="text-[11px] text-on-tertiary-container">Quedará marcada como <strong>Manual</strong> con tu usuario y el motivo ingresado.</p>
+          </div>
+          <div className="flex gap-3 border-t border-slate-100 pt-2">
+            <button type="button" onClick={() => setOpenManual(false)} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">Cancelar</button>
+            <button type="submit" className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary-dim">
+              <span className="material-symbols-outlined text-sm">add_circle</span> Registrar
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal open={openCorrection} title="Registrar Corrección" subtitle="La fichada original no se modifica. Se registra una corrección con trazabilidad." onClose={() => setOpenCorrection(false)} size="max-w-lg">
+        <form className="space-y-4 px-8 py-6" onSubmit={(e) => { e.preventDefault(); setOpenCorrection(false) }}>
+          <Field label="Empleado *">
+            <SelectInput required>
+              <option value="">Seleccionar empleado...</option>
+              {employeeOptions.map((o) => <option key={o}>{o}</option>)}
+            </SelectInput>
+          </Field>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Nueva fecha *"><TextInput required type="date" /></Field>
+            <Field label="Nueva hora *"><TextInput required type="time" /></Field>
+          </div>
+          <Field label="Motivo *">
+            <SelectInput required>
+              <option value="">Seleccionar motivo...</option>
+              <option>Error del dispositivo</option>
+              <option>El empleado olvidó fichar</option>
+              <option>Hora incorrecta registrada</option>
+              <option>Otro</option>
+            </SelectInput>
+          </Field>
+          <Field label="Observación *">
+            <textarea required rows={2} placeholder="Detalle adicional..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
+          </Field>
+          <div className="flex gap-3 border-t border-slate-100 pt-2">
+            <button type="button" onClick={() => setOpenCorrection(false)} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">Cancelar</button>
+            <button type="submit" className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary-dim">
+              <span className="material-symbols-outlined text-sm">edit_note</span> Registrar corrección
+            </button>
+          </div>
+        </form>
+      </Modal>
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-3 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-2xl">
+          <span className="material-symbols-outlined text-green-400" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+          {toast}
+        </div>
+      )}
+    </AppShell>
+  )
+}
