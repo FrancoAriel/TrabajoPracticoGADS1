@@ -5,7 +5,9 @@ import PageHeader from '../../components/layout/PageHeader'
 import Modal from '../../components/ui/Modal'
 import SectionCard from '../../components/ui/SectionCard'
 import StatCard from '../../components/ui/StatCard'
-import { createEmployee, listEmployees } from '../../services/employeeService'
+import { isApiMode } from '../../config/env'
+import { createEmployee, createEmployeeAssignment, listEmployees } from '../../services/employeeService'
+import { getLaborCatalogs } from '../../services/scheduleService'
 
 const capitalize = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : ''
 
@@ -59,6 +61,7 @@ function calculateCuil(dni, sexo) {
 }
 
 export default function EmpleadosPage() {
+  const api = isApiMode()
   const [employees, setEmployees] = useState([])
   const [stats, setStats] = useState({ totalActivos: 0, jornadaCompleta: 0, jornadaParcial: 0, bajasEsteMes: 0 })
   const [search, setSearch] = useState('')
@@ -69,25 +72,62 @@ export default function EmpleadosPage() {
   const [form, setForm] = useState({
     nombre: '', apellido: '', dni: '', sexo: '', fechaIngreso: '',
     categoria: '', convenio: '', jornada: '',
-    parcialHoras: '4', horario: '', fichada: 'Biométrico',
+    parcialHoras: '4', horario: '', asignacionApi: '', fichada: 'Biométrico',
   })
+  /** Catálogo real: horarios y ciclos activos (solo modo API). */
+  const [catalogHorarios, setCatalogHorarios] = useState([])
+  const [catalogCiclos, setCatalogCiclos] = useState([])
+  const [catalogLoading, setCatalogLoading] = useState(false)
   const pageSize = 7
+
+  useEffect(() => {
+    if (!open || !api) return
+    let c = false
+    setCatalogLoading(true)
+    getLaborCatalogs()
+      .then((cat) => {
+        if (!c) {
+          setCatalogHorarios(cat?.horarios ?? [])
+          setCatalogCiclos(cat?.ciclos ?? [])
+        }
+      })
+      .catch(() => {
+        if (!c) {
+          setCatalogHorarios([])
+          setCatalogCiclos([])
+        }
+      })
+      .finally(() => {
+        if (!c) setCatalogLoading(false)
+      })
+    return () => { c = true }
+  }, [open, api])
 
   useEffect(() => {
     document.title = 'Gestión de Empleados'
     let cancelled = false
-    listEmployees().then((data) => {
-      if (!cancelled) {
-        setEmployees(data.items)
-        setStats({
-          totalActivos:    data.stats.active          ?? data.stats.totalActivos  ?? 0,
-          jornadaCompleta: data.stats.jornadaCompleta ?? 0,
-          jornadaParcial:  data.stats.jornadaParcial  ?? data.stats.partial       ?? 0,
-          bajasEsteMes:    data.stats.bajasEsteMes    ?? 0,
-        })
-        setLoading(false)
-      }
-    })
+    listEmployees()
+      .then((data) => {
+        if (!cancelled) {
+          setEmployees(data?.items ?? [])
+          const st = data?.stats ?? {}
+          setStats({
+            totalActivos:    st.active          ?? st.totalActivos  ?? 0,
+            jornadaCompleta: st.jornadaCompleta ?? 0,
+            jornadaParcial:  st.jornadaParcial  ?? st.partial       ?? 0,
+            bajasEsteMes:    st.bajasEsteMes    ?? 0,
+          })
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setEmployees([])
+          setStats({ totalActivos: 0, jornadaCompleta: 0, jornadaParcial: 0, bajasEsteMes: 0 })
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
     return () => { cancelled = true }
   }, [])
 
@@ -121,30 +161,76 @@ export default function EmpleadosPage() {
     }
     try {
       const payload = {
-        ...form,
+        nombre: form.nombre,
+        apellido: form.apellido,
+        dni: form.dni,
         cuil,
+        fechaIngreso: form.fechaIngreso,
+        categoria: form.categoria,
+        convenio: form.convenio,
         jornada: form.jornada,
         parcialHoras: form.jornada === 'Parcial' ? Number(form.parcialHoras) : undefined,
+        fichada: form.fichada,
       }
+      if (!api) payload.horario = form.horario
       const created = await createEmployee(payload)
-      setEmployees((current) => [...current, {
-        id:       created.id,
-        legajo:   created.legajo,
-        name:     `${form.nombre} ${form.apellido}`,
-        dni:      form.dni,
-        category: form.categoria,
-        convenio: form.convenio,
-        jornada:  form.jornada,
-        jornadaHoras:
-          form.jornada === 'Parcial'
-            ? `${String(Number(form.parcialHoras)).replace(/\.0$/, '')}hs`
-            : null,
-        fichada:  form.fichada || null,
-        schedule: form.horario || null,
-        status:   'Activo',
-      }])
+      const legajoNuevo = created.id ?? created.legajo
+
+      if (api && form.asignacionApi && form.fechaIngreso) {
+        const [kind, idStr] = form.asignacionApi.split(':')
+        const targetId = Number(idStr)
+        if ((kind === 'horario' || kind === 'ciclo') && Number.isFinite(targetId)) {
+          await createEmployeeAssignment(legajoNuevo, {
+            type: kind === 'ciclo' ? 'ciclo' : 'horario',
+            targetId,
+            fechaDesde: form.fechaIngreso,
+          })
+        }
+      }
+
+      if (api) {
+        const data = await listEmployees({ page: 1, pageSize: 500 })
+        setEmployees(data?.items ?? [])
+        const st = data?.stats ?? {}
+        setStats({
+          totalActivos:    st.active          ?? st.totalActivos  ?? 0,
+          jornadaCompleta: st.jornadaCompleta ?? 0,
+          jornadaParcial:  st.jornadaParcial  ?? st.partial       ?? 0,
+          bajasEsteMes:    st.bajasEsteMes    ?? 0,
+        })
+      } else {
+        setEmployees((current) => [...current, {
+          id:       created.id,
+          legajo:   created.legajo,
+          name:     `${form.nombre} ${form.apellido}`,
+          dni:      form.dni,
+          category: form.categoria,
+          convenio: form.convenio,
+          jornada:  form.jornada,
+          jornadaHoras:
+            form.jornada === 'Parcial'
+              ? `${String(Number(form.parcialHoras)).replace(/\.0$/, '')}hs`
+              : null,
+          fichada:  form.fichada || null,
+          schedule: form.horario || null,
+          status:   'Activo',
+        }])
+      }
       setOpen(false)
-      setForm({ nombre: '', apellido: '', dni: '', sexo: '', fechaIngreso: '', categoria: '', convenio: '', jornada: '', parcialHoras: '4', horario: '', fichada: 'Biométrico' })
+      setForm({
+        nombre: '',
+        apellido: '',
+        dni: '',
+        sexo: '',
+        fechaIngreso: '',
+        categoria: '',
+        convenio: '',
+        jornada: '',
+        parcialHoras: '4',
+        horario: '',
+        asignacionApi: '',
+        fichada: 'Biométrico',
+      })
     } catch (err) {
       alert(`Error al guardar: ${err.message}`)
     }
@@ -464,14 +550,51 @@ export default function EmpleadosPage() {
           <div className="grid grid-cols-2 gap-5">
             <div>
               <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Horario / Ciclo asignado</label>
-              <select value={form.horario} onChange={(e) => setForm((f) => ({ ...f, horario: e.target.value }))} className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30">
-                <option value="">Sin asignar</option>
-                <option>H-001 Planta Mañana</option>
-                <option>H-002 Soporte Nocturno</option>
-                <option>H-003 Oficina central</option>
-                <option>C-001 4x2 Producción</option>
-                <option>C-002 Rotación planta A</option>
+              <select
+                value={api ? form.asignacionApi : form.horario}
+                onChange={(e) =>
+                  setForm((f) =>
+                    api ? { ...f, asignacionApi: e.target.value } : { ...f, horario: e.target.value },
+                  )}
+                disabled={api && catalogLoading}
+                className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-60"
+              >
+                <option value="">{api ? 'Sin asignar' : 'Sin asignar'}</option>
+                {api ? (
+                  <>
+                    {(catalogHorarios ?? []).length > 0 ? (
+                      <optgroup label="Horarios">
+                        {catalogHorarios.map((h) => (
+                          <option key={`h-${h.id}`} value={`horario:${h.id}`}>
+                            H-{String(h.id).padStart(3, '0')} · {h.nombre}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ) : null}
+                    {(catalogCiclos ?? []).length > 0 ? (
+                      <optgroup label="Ciclos rotativos">
+                        {catalogCiclos.map((c) => (
+                          <option key={`c-${c.id}`} value={`ciclo:${c.id}`}>
+                            C-{String(c.id).padStart(3, '0')} · {c.nombre}
+                            {c.duracionDias != null ? ` (${c.duracionDias} días)` : ''}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ) : null}
+                  </>
+                ) : (
+                  <>
+                    <option>H-001 Planta Mañana</option>
+                    <option>H-002 Soporte Nocturno</option>
+                    <option>H-003 Oficina central</option>
+                    <option>C-001 4x2 Producción</option>
+                    <option>C-002 Rotación planta A</option>
+                  </>
+                )}
               </select>
+              {api && !catalogLoading && catalogHorarios.length === 0 && catalogCiclos.length === 0 ? (
+                <p className="mt-1 text-[10px] text-on-surface-variant">No hay horarios o ciclos activos en el catálogo.</p>
+              ) : null}
             </div>
             <div>
               <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Modalidad de fichada</label>

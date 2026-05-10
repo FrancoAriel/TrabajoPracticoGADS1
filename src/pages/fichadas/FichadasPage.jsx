@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AppShell from '../../components/layout/AppShell'
 import Modal from '../../components/ui/Modal'
@@ -13,14 +13,14 @@ import {
 
 /** Mocks (solo VITE_DATA_SOURCE=mock). */
 const baseItems = [
-  { id: null, employeeId: 42, legajo: '0042', empleado: 'Juan Perez', initials: 'JP', avatarClass: 'bg-blue-100 text-primary', fecha: '12/06/2025 09:11', tipo: 'Entrada', origen: 'Biométrico', origenIcon: 'fingerprint', correction: false, estado: 'OK', estadoClass: 'bg-on-secondary-container/10 text-on-secondary-container', dotClass: 'bg-on-secondary-container' },
-  { id: null, employeeId: 18, legajo: '0018', empleado: 'Ana Gomez', initials: 'AG', avatarClass: 'bg-purple-100 text-tertiary', fecha: '12/06/2025 09:03', tipo: 'Entrada', origen: 'Biométrico', origenIcon: 'fingerprint', correction: false, estado: 'OK', estadoClass: 'bg-on-secondary-container/10 text-on-secondary-container', dotClass: 'bg-on-secondary-container' },
-  { id: null, employeeId: 50, legajo: '0050', empleado: 'Carla Ruiz', initials: 'CR', avatarClass: 'bg-purple-100 text-tertiary', fecha: '12/06/2025 08:55', tipo: 'Entrada', origen: 'Biométrico', origenIcon: 'fingerprint', correction: false, estado: 'OK', estadoClass: 'bg-on-secondary-container/10 text-on-secondary-container', dotClass: 'bg-on-secondary-container' },
-  { id: null, employeeId: 27, legajo: '0027', empleado: 'Martin Sosa', initials: 'MS', avatarClass: 'bg-slate-200 text-slate-600', fecha: '12/06/2025 06:02', tipo: 'Entrada', origen: 'App móvil', origenIcon: 'smartphone', correction: false, estado: 'OK', estadoClass: 'bg-on-secondary-container/10 text-on-secondary-container', dotClass: 'bg-on-secondary-container' },
-  { id: null, employeeId: 158, legajo: '0158', empleado: 'Maria Alvez', initials: 'MA', avatarClass: 'bg-slate-200 text-slate-600', fecha: '12/06/2025 09:18', tipo: 'Entrada', origen: 'Biométrico', origenIcon: 'fingerprint', correction: true, estado: 'Revisar', estadoClass: 'bg-tertiary-container text-on-tertiary-container', dotClass: 'bg-tertiary' },
-  { id: null, employeeId: 892, legajo: '0892', empleado: 'Roberto Gomez', initials: 'RG', avatarClass: 'bg-blue-100 text-primary', fecha: '12/06/2025 18:02', tipo: 'Salida', origen: 'Biométrico', origenIcon: 'fingerprint', correction: false, estado: 'OK', estadoClass: 'bg-on-secondary-container/10 text-on-secondary-container', dotClass: 'bg-on-secondary-container' },
-  { id: null, employeeId: 42, legajo: '0042', empleado: 'Juan Perez', initials: 'JP', avatarClass: 'bg-blue-100 text-primary', fecha: '12/06/2025 19:45', tipo: 'Salida', origen: 'Biométrico', origenIcon: 'fingerprint', correction: false, estado: 'OK', estadoClass: 'bg-on-secondary-container/10 text-on-secondary-container', dotClass: 'bg-on-secondary-container' },
-  { id: null, employeeId: 31, legajo: '0031', empleado: 'Luis Diaz', initials: 'LD', avatarClass: 'bg-red-100 text-error', fecha: '12/06/2025 09:31', tipo: 'Entrada', origen: 'Manual', origenIcon: 'edit_note', correction: false, estado: 'Revisar', estadoClass: 'bg-tertiary-container text-on-tertiary-container', dotClass: 'bg-tertiary' },
+  { id: null, employeeId: 42, legajo: '0042', empleado: 'Juan Perez', initials: 'JP', avatarClass: 'bg-blue-100 text-primary', fecha: '12/06/2025 09:11', tipo: 'Entrada', origen: 'Biométrico', origenIcon: 'fingerprint', correction: false },
+  { id: null, employeeId: 18, legajo: '0018', empleado: 'Ana Gomez', initials: 'AG', avatarClass: 'bg-purple-100 text-tertiary', fecha: '12/06/2025 09:03', tipo: 'Entrada', origen: 'Biométrico', origenIcon: 'fingerprint', correction: false },
+  { id: null, employeeId: 50, legajo: '0050', empleado: 'Carla Ruiz', initials: 'CR', avatarClass: 'bg-purple-100 text-tertiary', fecha: '12/06/2025 08:55', tipo: 'Entrada', origen: 'Biométrico', origenIcon: 'fingerprint', correction: false },
+  { id: null, employeeId: 27, legajo: '0027', empleado: 'Martin Sosa', initials: 'MS', avatarClass: 'bg-slate-200 text-slate-600', fecha: '12/06/2025 06:02', tipo: 'Entrada', origen: 'App móvil', origenIcon: 'smartphone', correction: false },
+  { id: null, employeeId: 158, legajo: '0158', empleado: 'Maria Alvez', initials: 'MA', avatarClass: 'bg-slate-200 text-slate-600', fecha: '12/06/2025 09:18', tipo: 'Entrada', origen: 'Biométrico', origenIcon: 'fingerprint', correction: true },
+  { id: null, employeeId: 892, legajo: '0892', empleado: 'Roberto Gomez', initials: 'RG', avatarClass: 'bg-blue-100 text-primary', fecha: '12/06/2025 18:02', tipo: 'Salida', origen: 'Biométrico', origenIcon: 'fingerprint', correction: false },
+  { id: null, employeeId: 42, legajo: '0042', empleado: 'Juan Perez', initials: 'JP', avatarClass: 'bg-blue-100 text-primary', fecha: '12/06/2025 19:45', tipo: 'Salida', origen: 'Biométrico', origenIcon: 'fingerprint', correction: false },
+  { id: null, employeeId: 31, legajo: '0031', empleado: 'Luis Diaz', initials: 'LD', avatarClass: 'bg-red-100 text-error', fecha: '12/06/2025 09:31', tipo: 'Entrada', origen: 'Manual', origenIcon: 'edit_note', correction: false },
 ]
 
 const employeeOptionsMock = ['0042 — Juan Perez', '0018 — Ana Gomez', '0027 — Martin Sosa', '0031 — Luis Diaz', '0050 — Carla Ruiz', '0158 — Maria Alvez', '0892 — Roberto Gomez']
@@ -86,10 +86,43 @@ function formatHeaderDate(dateStr) {
   return `${String(da).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`
 }
 
+function tsToParts(ts) {
+  if (!ts) return { fecha: '', hora: '' }
+  const d = new Date(ts)
+  if (Number.isNaN(d.getTime()))
+    return { fecha: typeof ts === 'string' ? ts.slice(0, 10) : '', hora: '09:00' }
+  const pad = (n) => String(n).padStart(2, '0')
+  return {
+    fecha: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
+    hora: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+  }
+}
+
+function pickOriginalPunchShape(api) {
+  return api.originalPunch ?? api.fichadaOriginal ?? api.originalFichada ?? api.original ?? null
+}
+
+/** Id de la fichada corregida (varios aliases según backend / adaptador). */
+function pickOriginalPunchId(api) {
+  const o = pickOriginalPunchShape(api)
+  return api.originalPunchId ?? api.originalId ?? api.idFichadaOriginal ?? api.originalFichadaId
+    ?? api.id_fichada_original ?? api.idFichadaCorregida ?? o?.id ?? o?.originalId ?? null
+}
+
+function pickOriginalTimestamp(api, orig) {
+  return api.originalTimestamp ?? api.originalFechaHora ?? api.original_fecha_hora
+    ?? orig?.timestamp ?? orig?.fecha_hora ?? orig?.fechaHora ?? null
+}
+
 function mapApiPunch(api) {
   const name = api.employeeName || 'Sin datos'
   const [origLabel, origIcon] = originDbToUi(api.origin)
-  const revisar = api.correction || api.origin === 'Manual'
+  const orig = pickOriginalPunchShape(api)
+  const originalId = pickOriginalPunchId(api)
+  const rawOrigTs = pickOriginalTimestamp(api, orig)
+  const origTipo = api.originalType ?? orig?.tipo ?? orig?.type
+  const origOrigenRaw = api.originalOrigin ?? orig?.origen ?? orig?.origin
+  const [origOrigenUi] = origOrigenRaw != null ? originDbToUi(origOrigenRaw) : ['', '']
   return {
     id: api.id,
     employeeId: api.employeeId,
@@ -101,12 +134,125 @@ function mapApiPunch(api) {
     tipo: api.type,
     origen: origLabel,
     origenIcon: origIcon,
-    correction: !!api.correction,
-    estado: revisar ? 'Revisar' : 'OK',
-    estadoClass: revisar ? 'bg-tertiary-container text-on-tertiary-container' : 'bg-on-secondary-container/10 text-on-secondary-container',
-    dotClass: revisar ? 'bg-tertiary' : 'bg-on-secondary-container',
+    correction: !!(api.correction ?? api.es_correccion ?? api.esCorreccion),
+    originalId,
+    originalFecha: rawOrigTs ? formatTimestamp(rawOrigTs) : null,
+    originalTipo: origTipo || null,
+    originalOrigen: origOrigenUi || null,
     _ts: api.timestamp,
   }
+}
+
+/** `Entrada/Salida` - origen biométrico, manual, etc. */
+function formatTipoOrigenLine(tipo, origen) {
+  const t = (tipo ?? '').trim() || '—'
+  const o = (origen ?? '').trim() || '—'
+  return `${t} - ${o}`
+}
+
+/** Textos para “Trazabilidad de corrección” (layout docs/fichadas.html). */
+function traceabilityTexts(row, apiMode) {
+  if (!row?.correction) return null
+
+  let origLine1
+  let origLine2
+  if (apiMode) {
+    const hasEmbedded = !!(row.originalFecha || row.originalTipo || row.originalOrigen)
+    if (hasEmbedded) {
+      origLine1 = formatTipoOrigenLine(row.originalTipo, row.originalOrigen)
+      origLine2 = row.originalFecha || '—'
+    }
+    else {
+      origLine1 = formatTipoOrigenLine(null, null)
+      origLine2 = '—'
+    }
+  }
+  else {
+    origLine1 = formatTipoOrigenLine(row.tipo, row.origen)
+    origLine2 = row.fecha
+  }
+
+  const nuevoLine1 = `${row.tipo} - Manual (corregida)`
+  const nuevoLine2 = apiMode ? row.fecha : '13/06/2025 10:05'
+  const operador = 'admin'
+  const motivo = 'Error del dispositivo'
+
+  let origMotivo = row.originalOrigen ?? null
+  if (!origMotivo && typeof origLine1 === 'string' && origLine1.includes(' - ')) {
+    const parts = origLine1.split(' - ')
+    parts.shift()
+    origMotivo = parts.join(' - ').trim() || null
+  }
+  if (!origMotivo || origMotivo === '—') origMotivo = 'Marcación automática'
+  const origOperador = 'Sistema'
+
+  return {
+    origLine1,
+    origLine2,
+    nuevoLine1,
+    nuevoLine2,
+    operador,
+    motivo,
+    origOperador,
+    origMotivo,
+  }
+}
+
+/** Pie compartido (person · info) entre registro original y corrección aplicada. */
+function TrazabilidadPie({ operador, motivo, borderClass }) {
+  return (
+    <div className={`mt-2.5 flex items-center gap-3 border-t pt-2.5 text-xs text-on-surface-variant ${borderClass}`}>
+      <span className="flex items-center gap-1">
+        <span className="material-symbols-outlined text-sm">person</span>
+        <span className="font-semibold text-on-background">{operador}</span>
+      </span>
+      <span>·</span>
+      <span className="flex items-center gap-1">
+        <span className="material-symbols-outlined text-sm">info</span>
+        <span>{motivo}</span>
+      </span>
+    </div>
+  )
+}
+function TrazabilidadCorreccion({ row, apiMode }) {
+  const traz = traceabilityTexts(row, apiMode)
+  if (!traz) return null
+  return (
+    <div>
+      <p className="mb-3 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-on-surface-variant">
+        <span className="material-symbols-outlined text-sm text-tertiary">history</span> Trazabilidad de corrección
+      </p>
+      <div className="space-y-0">
+        <div className="flex gap-4">
+          <div className="flex flex-col items-center">
+            <div className="mt-1.5 h-3 w-3 shrink-0 rounded-full bg-outline-variant" />
+            <div className="my-1 flex-1 w-px bg-outline-variant/40" />
+          </div>
+          <div className="flex-1 pb-4">
+            <p className="mb-1.5 text-[10px] font-black uppercase tracking-wider text-on-surface-variant">Registro original</p>
+            <div className="rounded-xl border border-outline-variant/40 bg-surface-container-low px-4 py-3">
+              <p className="text-sm font-semibold text-on-background">{traz.origLine1}</p>
+              <p className="mt-1 font-mono text-[11px] text-on-surface-variant">{traz.origLine2}</p>
+              <TrazabilidadPie operador={traz.origOperador} motivo={traz.origMotivo} borderClass="border-outline-variant/40" />
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-4">
+          <div className="flex flex-col items-center">
+            <div className="mt-1.5 h-3 w-3 shrink-0 rounded-full bg-tertiary" />
+          </div>
+          <div className="flex-1 pb-1">
+            <p className="mb-1.5 text-[10px] font-black uppercase tracking-wider text-tertiary">Corrección aplicada</p>
+            <div className="rounded-xl border border-tertiary/25 bg-tertiary-container/25 px-4 py-3">
+              <p className="text-sm font-semibold text-on-background">{traz.nuevoLine1}</p>
+              <p className="mt-1 font-mono text-[11px] text-on-surface-variant">{traz.nuevoLine2}</p>
+              <TrazabilidadPie operador={traz.operador} motivo={traz.motivo} borderClass="border-tertiary/20" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 function FilterSelect({ value, onChange, children, minWidth = 'min-w-[8rem]' }) {
@@ -139,6 +285,33 @@ function SelectInput({ children, ...props }) {
   )
 }
 
+/** Tras POST fichada manual: resultado de tardanza/ausencia automática. */
+function extraMsgFromAttendanceEvaluation(ev) {
+  if (!ev) return ''
+  if (ev.kind === 'created' && ev.details?.tipo === 'Tardanza') {
+    return ` Se generó novedad de tardanza (${ev.details.minutos} min). Revisá Novedades.`
+  }
+  if (ev.kind === 'created' && ev.details?.tipo === 'Ausencia') {
+    return ' Se generó novedad de ausencia. Revisá Novedades.'
+  }
+  if (ev.kind === 'ok') {
+    return ' Sin tardanza (a tiempo o horario flexible).'
+  }
+  if (ev.kind === 'skipped') {
+    const r = ev.details?.reason
+    if (r === 'dia_no_laborable') return ' Día no laborable: no aplica control de ingreso.'
+    if (r === 'sin_asignacion_horario') return ' Sin horario asignado: no se evaluó.'
+    if (r === 'tardanza_ya_registrada') return ' Ya había tardanza registrada ese día.'
+    if (r === 'ausencia_automatica_ya_registrada') return ' Ya había ausencia automática ese día.'
+    if (r === 'ausencia_manual_u_otra_ya_cubre') return ''
+    return ''
+  }
+  if (ev.kind === 'error') {
+    return ` Error al evaluar: ${ev.details?.message || 'desconocido'}`
+  }
+  return ''
+}
+
 export default function FichadasPage() {
   const api = isApiMode()
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
@@ -148,7 +321,6 @@ export default function FichadasPage() {
   const [filterDate, setFilterDate] = useState(() => (api ? today : ''))
   const [filterType, setFilterType] = useState('')
   const [filterOrigin, setFilterOrigin] = useState('')
-  const [filterStatus, setFilterStatus] = useState('')
   const [clock, setClock] = useState('')
   const [selected, setSelected] = useState(null)
   const [openManual, setOpenManual] = useState(false)
@@ -161,6 +333,9 @@ export default function FichadasPage() {
   const [page, setPage] = useState(1)
   const [employees, setEmployees] = useState([])
   const [correctionTargetId, setCorrectionTargetId] = useState(null)
+  const [correctionSourceRow, setCorrectionSourceRow] = useState(null)
+  const initialLoadPendingRef = useRef(api)
+  const [initialLoading, setInitialLoading] = useState(api)
   const [manualForm, setManualForm] = useState({
     legajo: '', fecha: today, hora: '09:00', tipo: 'Entrada',
   })
@@ -237,6 +412,10 @@ export default function FichadasPage() {
       setPunchStats(null)
     } finally {
       setLoading(false)
+      if (initialLoadPendingRef.current) {
+        initialLoadPendingRef.current = false
+        setInitialLoading(false)
+      }
     }
   }, [api, debouncedSearch, filterDate, filterOrigin, filterType, page, showToast, today])
 
@@ -247,26 +426,25 @@ export default function FichadasPage() {
 
   const sourceRows = api ? rows : mockFiltered
 
-  const items = useMemo(() =>
-    sourceRows.filter((item) =>
-      (!filterStatus || item.estado === filterStatus)),
-  [sourceRows, filterStatus])
+  const items = sourceRows
 
   const mockStatsComputed = useMemo(() => ({
     totalDelDía: mockFiltered.length,
     entradas: mockFiltered.filter((i) => i.tipo === 'Entrada').length,
     salidas: mockFiltered.filter((i) => i.tipo === 'Salida').length,
-    porRevisar: mockFiltered.filter((i) => i.estado === 'Revisar').length,
   }), [mockFiltered])
 
   const statsForCards = api
-    ? (punchStats ?? { totalDelDía: 0, entradas: 0, salidas: 0, porRevisar: 0 })
+    ? {
+        totalDelDía: punchStats?.totalDelDía ?? 0,
+        entradas: punchStats?.entradas ?? 0,
+        salidas: punchStats?.salidas ?? 0,
+      }
     : mockStatsComputed
 
   const clearFilters = () => {
     setFilterType('')
     setFilterOrigin('')
-    setFilterStatus('')
     if (api) setFilterDate(today)
     else setFilterDate('')
   }
@@ -274,15 +452,6 @@ export default function FichadasPage() {
   const infoFor = selected
     ? (mockHorario[selected.legajo] || { horario: '—', jornada: '—' })
     : null
-
-  const openCorrectionFromToolbar = () => {
-    if (api)
-      showToast('Para corregir, abrí una fichada desde el listado y tocá «Corregir».')
-    else {
-      setCorrectionTargetId(null)
-      setOpenCorrection(true)
-    }
-  }
 
   const submitManual = async (e) => {
     e.preventDefault()
@@ -295,8 +464,9 @@ export default function FichadasPage() {
       return
     }
     try {
-      await createManualPunch({ legajo: legajoNum, fechaHora, tipo: manualForm.tipo })
-      showToast('Fichada manual registrada.')
+      const res = await createManualPunch({ legajo: legajoNum, fechaHora, tipo: manualForm.tipo })
+      const extra = extraMsgFromAttendanceEvaluation(res?.attendanceEvaluation)
+      showToast(`Fichada manual registrada.${extra}`.trim())
       setOpenManual(false)
       refreshPunches()
     } catch (err) {
@@ -309,6 +479,7 @@ export default function FichadasPage() {
     if (!api) {
       setOpenCorrection(false)
       setCorrectionTargetId(null)
+      setCorrectionSourceRow(null)
       showToast('Corrección registrada (modo demo).')
       return
     }
@@ -323,6 +494,7 @@ export default function FichadasPage() {
       showToast('Corrección registrada.')
       setOpenCorrection(false)
       setCorrectionTargetId(null)
+      setCorrectionSourceRow(null)
       refreshPunches()
     } catch (err) {
       showToast(`No se pudo registrar: ${err.message}`)
@@ -337,26 +509,39 @@ export default function FichadasPage() {
   const empleadoLink = (sel) =>
     `/empleados/${sel.employeeId != null ? sel.employeeId : Number(sel.legajo.replace(/\D/g, ''))}`
 
+  const topbarSearch = (
+    <div className="flex items-center gap-2">
+      <div className="relative">
+        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><span className="material-symbols-outlined text-sm">search</span></span>
+        <input
+          value={search}
+          onChange={(ev) => setSearch(ev.target.value)}
+          className="w-56 rounded-md border-none bg-surface-container-low py-1.5 pl-10 pr-4 text-xs focus:ring-1 focus:ring-primary"
+          placeholder="BUSCAR POR NOMBRE O LEGAJO..."
+          type="text"
+        />
+      </div>
+      <button type="button" className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-primary/90">
+        <span className="material-symbols-outlined text-sm">search</span> Buscar
+      </button>
+    </div>
+  )
+
+  if (initialLoading) {
+    return (
+      <AppShell topbarTitle="FICHADAS" topbarContent={topbarSearch}>
+        <div className="flex flex-col items-center justify-center gap-3 py-32 text-on-surface-variant">
+          <span className="material-symbols-outlined animate-spin text-4xl opacity-40">progress_activity</span>
+          <p className="text-sm font-semibold">Cargando fichadas...</p>
+        </div>
+      </AppShell>
+    )
+  }
+
   return (
     <AppShell
       topbarTitle="FICHADAS"
-      topbarContent={
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><span className="material-symbols-outlined text-sm">search</span></span>
-            <input
-              value={search}
-              onChange={(ev) => setSearch(ev.target.value)}
-              className="w-56 rounded-md border-none bg-surface-container-low py-1.5 pl-10 pr-4 text-xs focus:ring-1 focus:ring-primary"
-              placeholder="BUSCAR POR NOMBRE O LEGAJO..."
-              type="text"
-            />
-          </div>
-          <button type="button" className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-primary/90">
-            <span className="material-symbols-outlined text-sm">search</span> Buscar
-          </button>
-        </div>
-      }
+      topbarContent={topbarSearch}
     >
       <div className="mb-8 flex items-center justify-between">
         <div>
@@ -371,24 +556,20 @@ export default function FichadasPage() {
           >
             <span className="material-symbols-outlined text-sm">auto_mode</span> Reprocesar
           </button>
-          <button type="button" onClick={openCorrectionFromToolbar} className="flex items-center gap-2 rounded-md bg-surface-container-high px-4 py-2 text-sm font-semibold text-on-secondary-container transition-colors hover:bg-surface-container-highest">
-            <span className="material-symbols-outlined text-sm">edit_note</span> Registrar corrección
-          </button>
           <button type="button" onClick={() => setOpenManual(true)} className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dim">
             <span className="material-symbols-outlined text-sm">add_circle</span> Nueva fichada manual
           </button>
         </div>
       </div>
 
-      <div className="mb-8 grid grid-cols-4 gap-4">
+      <div className="mb-8 grid grid-cols-3 gap-4">
         <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Total del día</p><p className="font-headline text-2xl font-black text-on-secondary-container">{statsForCards.totalDelDía}</p></div>
-        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Entradas</p><p className="font-headline text-2xl font-black text-primary">{statsForCards.entradas}</p></div>
-        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Salidas</p><p className="font-headline text-2xl font-black text-tertiary">{statsForCards.salidas}</p></div>
-        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Por revisar</p><p className="font-headline text-2xl font-black text-error">{statsForCards.porRevisar}</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Entradas</p><p className="font-headline text-2xl font-black text-green-600">{statsForCards.entradas}</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Salidas</p><p className="font-headline text-2xl font-black text-red-600">{statsForCards.salidas}</p></div>
       </div>
 
       <div className="relative overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest">
-        {loading && (
+        {loading && !initialLoading && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
             <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
           </div>
@@ -428,11 +609,6 @@ export default function FichadasPage() {
               <option>QR</option>
               <option>PIN / Teclado</option>
             </FilterSelect>
-            <FilterSelect value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-              <option value="">Todos los estados</option>
-              <option>OK</option>
-              <option>Revisar</option>
-            </FilterSelect>
             <button type="button" onClick={clearFilters} className="flex items-center gap-1 rounded-md border border-outline-variant/30 px-3 py-1.5 text-xs font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">
               <span className="material-symbols-outlined text-sm">filter_alt_off</span> Limpiar
             </button>
@@ -447,7 +623,7 @@ export default function FichadasPage() {
                   {[
                     { label: 'Legajo' }, { label: 'Empleado' }, { label: 'Fecha / Hora' },
                     { label: 'Tipo', center: true }, { label: 'Origen' },
-                    { label: 'Corrección', center: true }, { label: 'Estado' }, { label: 'Acción' },
+                    { label: 'Corrección', center: true }, { label: 'Acción' },
                   ].map(({ label, center }) => (
                     <th key={label} className={`px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant${center ? ' text-center' : ''}`}>{label}</th>
                   ))}
@@ -474,12 +650,9 @@ export default function FichadasPage() {
                     <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">{item.origenIcon}</span> {item.origen}</span>
                   </td>
                   <td className="px-4 py-3 text-center text-xs font-bold">
-                    {item.correction ? <span className="font-bold text-primary">Sí</span> : <span className="text-on-surface-variant">—</span>}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-[10px] font-bold ${item.estadoClass}`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${item.dotClass}`} /> {item.estado}
-                    </span>
+                    {item.correction
+                      ? <span className="font-bold text-primary">Sí</span>
+                      : <span className="text-on-surface-variant">—</span>}
                   </td>
                   <td className="px-4 py-3">
                     <button type="button" onClick={(e) => { e.stopPropagation(); setSelected(item) }} className="rounded border border-primary/20 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-primary hover:text-blue-900">
@@ -489,7 +662,7 @@ export default function FichadasPage() {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center text-sm text-on-surface-variant">
+                  <td colSpan={7} className="px-6 py-12 text-center text-sm text-on-surface-variant">
                     <span className="material-symbols-outlined mb-2 block text-3xl opacity-30">search_off</span>
                     No se encontraron fichadas con los filtros aplicados.
                   </td>
@@ -533,7 +706,6 @@ export default function FichadasPage() {
               {[
                 { label: 'Empleado', value: `${selected.empleado} (${selected.legajo})` },
                 { label: 'Fecha / Hora', value: selected.fecha },
-                { label: 'Estado', value: selected.estado },
                 { label: 'Tipo', value: selected.tipo },
                 { label: 'Origen', value: selected.origen },
                 { label: 'Corrección', value: selected.correction ? 'Sí' : 'No' },
@@ -553,7 +725,7 @@ export default function FichadasPage() {
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-sm text-on-surface-variant">schedule</span>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Horario:</span>
-                  <span className="text-xs font-semibold text-on-background">{api ? '— (no disponible vía API)' : infoFor?.horario}</span>
+                  <span className="text-xs font-semibold text-on-background">{api ? '—' : infoFor?.horario}</span>
                 </div>
                 <span className="text-outline-variant">·</span>
                 <div className="flex items-center gap-2">
@@ -578,11 +750,7 @@ export default function FichadasPage() {
               </div>
             </div>
 
-            {!api && selected.correction && (
-              <div className="text-xs italic text-on-surface-variant">
-                Vista detalle de trazabilidad de corrección: solo modo demo HTML.
-              </div>
-            )}
+            <TrazabilidadCorreccion row={selected} apiMode={api} />
 
             <div className="flex gap-2 border-t border-slate-100 pt-2">
               <button
@@ -591,6 +759,13 @@ export default function FichadasPage() {
                   const id = selected.id
                   if (api && !id) showToast('No se puede corregir este registro (sin ID).')
                   else {
+                    setCorrectionSourceRow({ ...selected })
+                    const { fecha: fd, hora: th } = tsToParts(selected._ts)
+                    setCorrForm({
+                      fecha: fd || filterDate || today,
+                      hora: th || '09:00',
+                      tipo: selected.tipo || 'Entrada',
+                    })
                     setCorrectionTargetId(id ?? null)
                     setSelected(null)
                     setOpenCorrection(true)
@@ -600,9 +775,6 @@ export default function FichadasPage() {
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low disabled:opacity-40"
               >
                 <span className="material-symbols-outlined text-sm">edit_note</span> Corregir
-              </button>
-              <button type="button" className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">
-                <span className="material-symbols-outlined text-sm">manage_history</span> Ver historial
               </button>
               <Link
                 to={empleadoLink(selected)}
@@ -622,7 +794,7 @@ export default function FichadasPage() {
               <SelectInput required value={manualForm.legajo} onChange={(e) => setManualForm((f) => ({ ...f, legajo: e.target.value }))}>
                 <option value="">Seleccionar empleado...</option>
                 {employees.map((e) => (
-                  <option key={e.id} value={String(e.id)}>{e.legajo} — {e.name}</option>
+                  <option key={e.id} value={String(e.legajo)}>{e.legajo} — {e.name}</option>
                 ))}
               </SelectInput>
             ) : (
@@ -663,7 +835,7 @@ export default function FichadasPage() {
         </form>
       </Modal>
 
-      <Modal open={openCorrection} title="Registrar Corrección" subtitle="La fichada original no se modifica." onClose={() => { setOpenCorrection(false); setCorrectionTargetId(null) }} size="max-w-lg">
+      <Modal open={openCorrection} title="Registrar Corrección" subtitle="La fichada original no se modifica. Se registra una corrección con trazabilidad." onClose={() => { setOpenCorrection(false); setCorrectionTargetId(null); setCorrectionSourceRow(null) }} size="max-w-lg">
         <form className="space-y-4 px-8 py-6" onSubmit={submitCorrection}>
           {!api && (
             <Field label="Empleado *">
@@ -673,9 +845,21 @@ export default function FichadasPage() {
               </SelectInput>
             </Field>
           )}
-          {api && (
-            <div className="rounded-lg bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
-              Corrección sobre fichada <span className="font-mono font-bold text-primary">#{correctionTargetId}</span>.
+          {(correctionSourceRow || correctionTargetId != null) && (
+            <div className="space-y-2 rounded-lg border border-outline-variant/30 bg-surface-container-low px-4 py-3 text-sm">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Marcación que se corrige</p>
+              {correctionSourceRow && (
+                <>
+                  <p className="font-semibold text-on-background">{correctionSourceRow.empleado} <span className="font-mono text-primary">({correctionSourceRow.legajo})</span></p>
+                  <p className="text-on-surface-variant">{correctionSourceRow.fecha}</p>
+                  <p className="text-xs text-on-surface-variant">{correctionSourceRow.tipo} · {correctionSourceRow.origen}</p>
+                </>
+              )}
+              <p className="border-t border-outline-variant/30 pt-2 font-mono text-xs text-on-surface-variant">
+                ID en base de datos:
+                {' '}
+                <span className="font-bold text-primary">{correctionTargetId != null ? `#${correctionTargetId}` : '—'}</span>
+              </p>
             </div>
           )}
           <div className="grid grid-cols-2 gap-4">
@@ -706,7 +890,7 @@ export default function FichadasPage() {
             <textarea required rows={2} placeholder="Detalle adicional..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
           </Field>
           <div className="flex gap-3 border-t border-slate-100 pt-2">
-            <button type="button" onClick={() => { setOpenCorrection(false); setCorrectionTargetId(null) }} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">Cancelar</button>
+            <button type="button" onClick={() => { setOpenCorrection(false); setCorrectionTargetId(null); setCorrectionSourceRow(null) }} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">Cancelar</button>
             <button type="submit" className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary-dim">
               <span className="material-symbols-outlined text-sm">edit_note</span> Registrar corrección
             </button>

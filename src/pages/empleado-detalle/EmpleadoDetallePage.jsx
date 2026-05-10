@@ -8,6 +8,8 @@ import { createEmployeeAssignment, createEmployeeManualPunch, createEmployeeNews
 const INPUT = 'w-full rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30'
 const LABEL = 'mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant'
 
+const ESTADOS_LABORALES = ['Activo', 'Inactivo', 'Suspendido']
+
 function Field({ label, value }) {
   return (
     <div>
@@ -31,8 +33,16 @@ function statusDot(status) {
   const s = status?.toLowerCase()
   if (s === 'activo')     return 'bg-green-500'
   if (s === 'inactivo')   return 'bg-red-500'
-  if (s === 'suspendido') return 'bg-yellow-400'
+  if (s === 'suspendido') return 'bg-amber-400'
   return 'bg-slate-400'
+}
+
+function statusTextStrong(status) {
+  const s = status?.toLowerCase()
+  if (s === 'activo')     return 'text-green-700'
+  if (s === 'inactivo')   return 'text-red-600'
+  if (s === 'suspendido') return 'text-amber-700'
+  return 'text-on-surface'
 }
 
 function newsStatusColor(status) {
@@ -75,6 +85,7 @@ export default function EmpleadoDetallePage() {
   const [editForm, setEditForm] = useState({
     nombre: '', apellido: '', dni: '', sexo: 'M',
     fechaIngreso: '', categoria: '', convenio: '', jornada: 'Completa', parcialHoras: '', fichada: 'Biométrico',
+    estado: 'Activo',
   })
   const editCuil = useMemo(() => calcCuil(editForm.dni, editForm.sexo), [editForm.dni, editForm.sexo])
 
@@ -85,6 +96,9 @@ export default function EmpleadoDetallePage() {
 
   const [editToast, setEditToast] = useState(null)
   const editToastTimerRef = useRef(null)
+
+  const [statusSelect, setStatusSelect] = useState('Activo')
+  const [estadoSaving, setEstadoSaving] = useState(false)
 
   const showEditToast = (message, ok) => {
     if (editToastTimerRef.current) clearTimeout(editToastTimerRef.current)
@@ -117,6 +131,7 @@ export default function EmpleadoDetallePage() {
       jornada:      employee.jornada ?? 'Completa',
       parcialHoras: employee.jornada === 'Parcial' ? (parcialStr || '4') : '',
       fichada:      employee.modalidadFichada || 'Biométrico',
+      estado:       employee.status ?? 'Activo',
     })
     document.title = `${employee.name} - Labor Pulse`
   }
@@ -140,6 +155,11 @@ export default function EmpleadoDetallePage() {
   const sched        = detail?.scheduleConfig
   const recentPunches = detail?.recentPunches || []
   const recentNews   = detail?.recentNews || []
+
+  useEffect(() => {
+    const s = detail?.employee?.status
+    if (s) setStatusSelect(s)
+  }, [detail?.employee?.status])
 
   const horarioOCicloActivo =
     sched?.cycle
@@ -173,6 +193,22 @@ export default function EmpleadoDetallePage() {
       showEditToast('Empleado actualizado correctamente.', true)
     } catch (err) {
       showEditToast(err?.message || 'No se pudieron guardar los cambios.', false)
+    }
+  }
+
+  const handleEstadoSave = async () => {
+    if (!id || statusSelect === emp?.status) return
+    setEstadoSaving(true)
+    try {
+      await updateEmployee(id, { estado: statusSelect })
+      const updated = await getEmployeeDetail(id)
+      setDetail(updated)
+      applyEmployeeToEditForm(updated?.employee)
+      showEditToast('Estado laboral actualizado.', true)
+    } catch (err) {
+      showEditToast(err?.message || 'No se pudo actualizar el estado.', false)
+    } finally {
+      setEstadoSaving(false)
     }
   }
 
@@ -280,11 +316,69 @@ export default function EmpleadoDetallePage() {
                 </span>
               </p>
             </div>
-            <button type="button" onClick={() => setOpenEdit(true)}
-              className="flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-on-primary shadow-lg shadow-primary/20 transition-transform hover:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg, #455f88 0%, #39537c 100%)' }}>
-              <span className="material-symbols-outlined text-lg">edit</span> Editar empleado
-            </button>
+            <div className="flex w-full shrink-0 flex-wrap items-stretch justify-start gap-3 sm:w-auto sm:justify-end">
+              <div
+                className="flex min-w-[min(100%,18rem)] flex-1 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_2px_8px_-2px_rgba(15,23,42,0.08),0_1px_2px_rgba(15,23,42,0.04)] sm:max-w-md sm:flex-initial dark:border-outline-variant/30 dark:bg-surface-container-low"
+                role="group"
+                aria-label="Estado laboral del empleado"
+              >
+                <div className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(145deg,#5a739c_0%,#3d5780_100%)] text-white shadow-inner shadow-black/10">
+                    <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: '"FILL" 1' }}>work_history</span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-on-surface-variant/80">
+                      Estado laboral
+                    </p>
+                    <div className="mt-1.5 flex items-center gap-2">
+                      <span
+                        className={`h-2.5 w-2.5 shrink-0 rounded-full ring-2 ring-white dark:ring-surface-container-low ${statusDot(statusSelect)}`}
+                        aria-hidden
+                      />
+                      <div className="relative min-w-0 flex-1">
+                        <select
+                          value={statusSelect}
+                          onChange={(e) => setStatusSelect(e.target.value)}
+                          disabled={estadoSaving}
+                          className={`w-full appearance-none truncate rounded-xl border border-outline-variant/30 bg-surface-container-high/70 py-2 pl-3 pr-9 text-[13px] font-bold tracking-tight shadow-[inset_0_1px_2px_rgba(15,23,42,0.04)] outline-none transition-[box-shadow,border-color] hover:border-outline-variant/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50 ${statusTextStrong(statusSelect)}`}
+                        >
+                          {ESTADOS_LABORALES.map((s) => (
+                            <option key={s} value={s}>{s}</option>
+                          ))}
+                        </select>
+                        <span className="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant/50">
+                          expand_more
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  disabled={estadoSaving || statusSelect === emp.status}
+                  onClick={handleEstadoSave}
+                  title={statusSelect === emp.status ? 'Sin cambios' : 'Guardar estado laboral'}
+                  className="flex shrink-0 items-center gap-2 border-l border-slate-200/90 bg-gradient-to-br from-primary/8 to-transparent px-4 py-3 text-xs font-bold uppercase tracking-wide text-primary transition-colors hover:from-primary/14 disabled:cursor-not-allowed disabled:opacity-[0.35] dark:border-outline-variant/30"
+                >
+                  <span
+                    className={`material-symbols-outlined text-[20px] ${estadoSaving ? 'animate-spin' : ''}`}
+                    style={{ fontVariationSettings: '"FILL" 1' }}
+                  >
+                    {estadoSaving ? 'progress_activity' : 'check_circle'}
+                  </span>
+                  <span className="hidden min-[420px]:inline">{estadoSaving ? 'Guardando' : 'Aplicar'}</span>
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpenEdit(true)}
+                className="flex min-h-[3.5rem] min-w-[12rem] flex-1 items-center justify-center gap-2 self-stretch rounded-2xl px-5 text-sm font-semibold text-on-primary shadow-[0_4px_14px_-4px_rgba(57,83,124,0.55)] transition-[transform,box-shadow] hover:scale-[0.99] hover:shadow-[0_6px_20px_-4px_rgba(57,83,124,0.45)] sm:flex-initial sm:py-4"
+                style={{ background: 'linear-gradient(135deg, #455f88 0%, #39537c 100%)' }}
+              >
+                <span className="material-symbols-outlined text-xl">edit</span>
+                Editar empleado
+              </button>
+            </div>
           </div>
           <div className="grid grid-cols-4 gap-x-8 gap-y-5 border-t border-slate-100 pt-6">
             <Field label="DNI"               value={emp.dni} />
@@ -472,6 +566,13 @@ export default function EmpleadoDetallePage() {
               </div>
             </div>
           )}
+          <div><label className={LABEL}>Estado laboral *</label>
+            <select required value={editForm.estado} onChange={ef('estado')} className={INPUT}>
+              {ESTADOS_LABORALES.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
           <div><label className={LABEL}>Modalidad de fichada *</label>
             <select required value={editForm.fichada} onChange={ef('fichada')} className={INPUT}>
               <option>Biométrico</option>

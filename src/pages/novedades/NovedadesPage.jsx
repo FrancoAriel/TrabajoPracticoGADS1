@@ -1,6 +1,8 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useCallback } from 'react'
 import AppShell from '../../components/layout/AppShell'
 import Modal from '../../components/ui/Modal'
+import { isApiMode } from '../../config/env'
+import { listNews, approveNews, rejectNews } from '../../services/newsService'
 
 const TYPE_BADGE = {
   horas_extra_50: 'bg-tertiary-container/40 text-on-tertiary-container',
@@ -32,8 +34,24 @@ function StatusPill({ status }) {
   return <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-error"><span className="h-1.5 w-1.5 rounded-full bg-error" />Rechazado</span>
 }
 
+const TYPE_LABEL = {
+  horas_extra_50: 'Horas extra 50%',
+  horas_extra_100: 'Horas extra 100%',
+  justificacion: 'Justificación',
+  ausencia: 'Ausencia',
+  tardanza: 'Tardanza',
+  suspension: 'Suspensión',
+  licencia_enfermedad: 'Licencia enfermedad',
+  licencia_examen: 'Licencia examen',
+  vacaciones: 'Vacaciones',
+  permiso_especial: 'Permiso especial',
+  salida_anticipada: 'Salida anticipada',
+  horas_faltantes: 'Horas faltantes',
+}
+
 function TypeBadge({ type }) {
-  return <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${TYPE_BADGE[type] || 'bg-surface-container text-on-surface-variant'}`}>{type}</span>
+  const label = TYPE_LABEL[type] || type
+  return <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${TYPE_BADGE[type] || 'bg-surface-container text-on-surface-variant'}`}>{label}</span>
 }
 
 function FilterSelect({ value, onChange, children, minWidth = 'min-w-[8rem]' }) {
@@ -68,11 +86,90 @@ const HORAS_TYPES = ['horas_extra_50', 'horas_extra_100']
 const MINUTOS_TYPES = ['tardanza']
 const DIAS_TYPES = ['justificacion', 'ausencia', 'licencia_enfermedad', 'licencia_examen', 'vacaciones', 'permiso_especial', 'suspension']
 
+function formatApiDate(isoDate) {
+  if (!isoDate) return '—'
+  const [y, m, d] = String(isoDate).split('-')
+  if (!y || !m || !d) return isoDate
+  return `${d}/${m}/${y}`
+}
+
+function formatApiDateTime(iso) {
+  if (!iso) return '—'
+  try {
+    const d = new Date(iso)
+    return `${d.toLocaleDateString('es-AR')} ${d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`
+  } catch {
+    return String(iso)
+  }
+}
+
+function formatNewsQuantity(c, u) {
+  if (c == null || c === '') return '—'
+  const n = Number(c)
+  if (u === 'Minutos') return `${Number.isFinite(n) ? Math.round(n) : c} min`
+  if (u === 'Horas') return `${c} hs`
+  if (u === 'Dias') return `${c} día(s)`
+  return String(c)
+}
+
+function mapApiTipoToFilterKey(tipo) {
+  const map = {
+    Tardanza: 'tardanza',
+    Ausencia: 'ausencia',
+    Horas_extra_50: 'horas_extra_50',
+    Horas_extra_100: 'horas_extra_100',
+    Justificacion: 'justificacion',
+    Salida_anticipada: 'salida_anticipada',
+    Horas_faltantes: 'horas_faltantes',
+    Licencia: 'licencia',
+    Vacaciones: 'vacaciones',
+    Suspension: 'suspension',
+    Permiso_especial: 'permiso_especial',
+  }
+  if (!tipo) return ''
+  return map[tipo] || String(tipo).toLowerCase()
+}
+
+function mapEstadoToPill(estado) {
+  if (estado === 'Aprobada') return 'Aprobado'
+  if (estado === 'Rechazada') return 'Rechazado'
+  if (estado === 'Pendiente') return 'Pendiente'
+  return estado
+}
+
+function mapOriginToUi(o) {
+  if (o === 'Automatica') return 'Automática'
+  if (o === 'Manual') return 'Manual'
+  return o || '—'
+}
+
+function mapNewsItemFromApi(n) {
+  const uiType = mapApiTipoToFilterKey(n.type)
+  return {
+    id: n.id,
+    rawId: n.id,
+    employee: n.employee ?? '—',
+    legajo: String(n.employeeId ?? '').padStart(4, '0'),
+    type: uiType,
+    date: formatApiDate(n.date),
+    status: mapEstadoToPill(n.status),
+    quantity: formatNewsQuantity(n.quantity, n.unit),
+    origin: mapOriginToUi(n.origin),
+    obs: n.note ?? '—',
+    createdAt: formatApiDateTime(n.createdAt),
+    createdBy: n.origin === 'Automatica' ? 'Sistema' : 'Usuario',
+  }
+}
+
 export default function NovedadesPage() {
+  const api = isApiMode()
   const [search, setSearch] = useState('')
   const [filterType, setFilterType] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
   const [items, setItems] = useState(initialItems)
+  const [kpiStats, setKpiStats] = useState({ pending: 9, approved: 4, rejected: 1, total: 28 })
+  const [loading, setLoading] = useState(false)
+  const [dataReady, setDataReady] = useState(() => !api)
   const [selectedId, setSelectedId] = useState(null)
   const [openCreate, setOpenCreate] = useState(false)
   const [openReject, setOpenReject] = useState(false)
@@ -81,36 +178,88 @@ export default function NovedadesPage() {
 
   useEffect(() => { document.title = 'Novedades - Executive Architect' }, [])
 
+  const loadNews = useCallback(() => {
+    if (!api) return
+    setLoading(true)
+    listNews({ pageSize: 500 })
+      .then((data) => {
+        const rows = (data.items ?? []).map(mapNewsItemFromApi)
+        setItems(rows)
+        const st = data.stats ?? {}
+        setKpiStats({
+          pending:  st.pending ?? 0,
+          approved: st.approved ?? 0,
+          rejected: st.rejected ?? 0,
+          total:    (st.pending ?? 0) + (st.approved ?? 0) + (st.rejected ?? 0),
+        })
+      })
+      .catch(() => {
+        setItems([])
+        setKpiStats({ pending: 0, approved: 0, rejected: 0, total: 0 })
+      })
+      .finally(() => {
+        setLoading(false)
+        setDataReady(true)
+      })
+  }, [api])
+
+  useEffect(() => {
+    loadNews()
+  }, [loadNews])
+
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3000) }
 
   const filtered = useMemo(() => items.filter((item) => {
     const q = search.toLowerCase()
+    const idStr = String(item.id).toLowerCase()
     return (
-      (!q || item.id.toLowerCase().includes(q) || item.employee.toLowerCase().includes(q) || item.legajo.includes(q)) &&
+      (!q || idStr.includes(q) || item.employee.toLowerCase().includes(q) || item.legajo.includes(q)) &&
       (!filterType || item.type === filterType) &&
       (!filterStatus || item.status.toLowerCase() === filterStatus)
     )
   }), [items, search, filterType, filterStatus])
 
-  const selected = filtered.find((i) => i.id === selectedId) ?? null
+  const selected = items.find((i) => i.id === selectedId) ?? null
 
   const clearFilters = () => { setFilterType(''); setFilterStatus('') }
 
-  const approve = () => {
+  const approve = async () => {
+    if (!selected) return
+    if (api) {
+      try {
+        await approveNews(selected.rawId ?? selected.id)
+        showToast('Novedad aprobada correctamente.')
+        loadNews()
+        setSelectedId(null)
+      } catch (e) {
+        showToast(`Error: ${e.message}`)
+      }
+      return
+    }
     setItems((prev) => prev.map((i) => i.id === selected.id ? { ...i, status: 'Aprobado' } : i))
     showToast('Novedad aprobada correctamente.')
   }
 
-  const reject = () => {
+  const reject = async () => {
+    if (!selected) return
+    if (api) {
+      try {
+        await rejectNews(selected.rawId ?? selected.id, '')
+        showToast('Novedad rechazada.')
+        setOpenReject(false)
+        loadNews()
+        setSelectedId(null)
+      } catch (e) {
+        showToast(`Error: ${e.message}`)
+      }
+      return
+    }
     setItems((prev) => prev.map((i) => i.id === selected.id ? { ...i, status: 'Rechazado' } : i))
     setOpenReject(false)
     showToast('Novedad rechazada.')
   }
 
-  return (
-    <AppShell
-      topbarTitle="NOVEDADES"
-      topbarContent={
+  const topbarContent = (
         <div className="flex items-center gap-2">
           <div className="relative">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><span className="material-symbols-outlined text-sm">search</span></span>
@@ -120,8 +269,21 @@ export default function NovedadesPage() {
             <span className="material-symbols-outlined text-sm">search</span> Buscar
           </button>
         </div>
-      }
-    >
+      )
+
+  if (api && !dataReady) {
+    return (
+      <AppShell topbarTitle="NOVEDADES" topbarContent={topbarContent}>
+        <div className="flex flex-col items-center justify-center gap-3 py-32 text-on-surface-variant">
+          <span className="material-symbols-outlined animate-spin text-4xl opacity-40">progress_activity</span>
+          <p className="text-sm font-semibold">Cargando novedades...</p>
+        </div>
+      </AppShell>
+    )
+  }
+
+  return (
+    <AppShell topbarTitle="NOVEDADES" topbarContent={topbarContent}>
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h2 className="font-headline text-2xl font-extrabold tracking-tight text-on-background">Gestión de Novedades</h2>
@@ -133,14 +295,19 @@ export default function NovedadesPage() {
       </div>
 
       <div className="mb-8 grid grid-cols-4 gap-4">
-        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Pendientes</p><p className="font-headline text-2xl font-black text-tertiary">9</p></div>
-        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Aprobadas del mes</p><p className="font-headline text-2xl font-black text-on-secondary-container">4</p></div>
-        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Rechazadas del mes</p><p className="font-headline text-2xl font-black text-error">1</p></div>
-        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Total del mes</p><p className="font-headline text-2xl font-black text-primary">28</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Pendientes</p><p className="font-headline text-2xl font-black text-tertiary">{kpiStats.pending}</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Aprobadas</p><p className="font-headline text-2xl font-black text-on-secondary-container">{kpiStats.approved}</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Rechazadas</p><p className="font-headline text-2xl font-black text-error">{kpiStats.rejected}</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Total (en vista)</p><p className="font-headline text-2xl font-black text-primary">{kpiStats.total}</p></div>
       </div>
 
       <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-12 overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest lg:col-span-7">
+        <div className="relative col-span-12 overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest lg:col-span-7">
+          {loading && api && dataReady ? (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
+              <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
+            </div>
+          ) : null}
           <div className="flex items-center justify-between gap-3 border-b border-slate-100 p-5">
             <h3 className="flex shrink-0 items-center gap-2 font-headline text-xs font-extrabold tracking-[0.2em]">
               <span className="material-symbols-outlined text-sm">playlist_add_check</span> NOVEDADES DEL PERÍODO
@@ -180,7 +347,7 @@ export default function NovedadesPage() {
               <tbody className="divide-y divide-slate-100">
                 {filtered.length ? filtered.map((item) => (
                   <tr key={item.id} onClick={() => setSelectedId(item.id)} className={`cursor-pointer transition-colors hover:bg-slate-50 ${selected?.id === item.id ? 'bg-primary-container/20' : ''}`}>
-                    <td className={`px-5 py-3.5 font-mono text-xs font-bold text-primary${selected?.id === item.id ? ' border-l-4 border-primary' : ''}`}>{item.id}</td>
+                    <td className={`px-5 py-3.5 font-mono text-xs font-bold text-primary${selected?.id === item.id ? ' border-l-4 border-primary' : ''}`}>{typeof item.id === 'number' ? `#${item.id}` : item.id}</td>
                     <td className="px-5 py-3.5"><span className="text-sm font-semibold">{item.employee}</span><span className="ml-1.5 text-xs text-on-surface-variant">{item.legajo}</span></td>
                     <td className="px-5 py-3.5"><TypeBadge type={item.type} /></td>
                     <td className="px-5 py-3.5 text-sm text-on-surface-variant">{item.date}</td>
@@ -221,7 +388,7 @@ export default function NovedadesPage() {
                 <h3 className="flex items-center gap-2 font-headline text-xs font-extrabold tracking-[0.2em]">
                   <span className="material-symbols-outlined text-sm">info</span> DETALLE DE NOVEDAD
                 </h3>
-                <span className="font-mono text-xs font-bold text-on-surface-variant">{selected.id}</span>
+                <span className="font-mono text-xs font-bold text-on-surface-variant">{typeof selected.id === 'number' ? `#${selected.id}` : selected.id}</span>
               </div>
               <div className="space-y-3 p-5">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">

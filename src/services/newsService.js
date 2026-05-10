@@ -4,12 +4,19 @@ import { apiClient } from '../lib/apiClient'
 
 let newsState = [...mockNews]
 
-export async function listNews() {
+export async function listNews(params = {}) {
   if (!isApiMode()) {
     return { stats: mockNewsStats, items: newsState }
   }
 
-  const response = await apiClient.get('/news')
+  const sp = new URLSearchParams()
+  if (params.pageSize) sp.set('pageSize', String(params.pageSize))
+  if (params.page) sp.set('page', String(params.page))
+  if (params.status) sp.set('status', params.status)
+  if (params.type) sp.set('type', params.type)
+  if (params.search) sp.set('search', params.search)
+  const qs = sp.toString()
+  const response = await apiClient.get(`/news${qs ? `?${qs}` : ''}`)
   return response.data
 }
 

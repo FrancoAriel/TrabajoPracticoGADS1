@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import { routes } from '../../lib/routes'
+import { isApiMode } from '../../config/env'
 import { getDashboard } from '../../services/dashboardService'
 
 const fallbackHeroMetrics = [
@@ -60,6 +61,11 @@ const fallbackRecentActivity = [
   { initials: 'LD', name: 'Luis Diaz', detail: 'Sin registrar · Ausente', status: 'Ausente', avatar: 'bg-error', statusClassName: 'text-error' },
 ]
 
+/** Iconos/estilos por label cuando el API solo devuelve { label, value } */
+const heroMetricDefaultsByLabel = Object.fromEntries(
+  fallbackHeroMetrics.map((m) => [m.label, m]),
+)
+
 const fallbackPendingNews = [
   { legajo: '0042', employee: 'Juan Perez', employeeRoute: routes.empleadoJuanPerez, type: 'Horas extra 50%', typeClassName: 'bg-tertiary-container/40 text-on-tertiary-container', date: '12/06/2025', quantity: '1h 45m', origin: 'Automatica', route: routes.empleadoJuanPerez },
   { legajo: '0018', employee: 'Ana Gomez', type: 'Justificacion', typeClassName: 'bg-secondary-container/40 text-on-secondary-container', date: '12/06/2025', quantity: '1 dia', origin: 'Manual', route: routes.novedades },
@@ -82,6 +88,38 @@ function getDashboardDates() {
   }
 }
 
+/** Días hábiles lun–vie entre dos fechas (inclusive), en calendario local */
+function countWeekdaysInclusive(startDay, endDay) {
+  let n = 0
+  const cur = new Date(startDay.getFullYear(), startDay.getMonth(), startDay.getDate())
+  const end = new Date(endDay.getFullYear(), endDay.getMonth(), endDay.getDate())
+  while (cur <= end) {
+    const wd = cur.getDay()
+    if (wd !== 0 && wd !== 6) n += 1
+    cur.setDate(cur.getDate() + 1)
+  }
+  return n
+}
+
+/** Período = mes calendario actual; progreso sobre días hábiles del mes */
+function getMonthPeriodStats(reference = new Date()) {
+  const y = reference.getFullYear()
+  const m = reference.getMonth()
+  const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+  const monthStart = new Date(y, m, 1)
+  const monthEnd = new Date(y, m + 1, 0)
+  const totalBd = countWeekdaysInclusive(monthStart, monthEnd)
+  const elapsedBd = countWeekdaysInclusive(monthStart, reference)
+  const periodLabel = `${meses[m]} ${y}`
+  const progressPercent = totalBd > 0 ? Math.min(100, Math.round((elapsedBd / totalBd) * 100)) : 0
+
+  return {
+    periodLabel,
+    businessDaysElapsedText: `${elapsedBd} / ${totalBd}`,
+    progressPercent,
+  }
+}
+
 function HeroMetricCard({ metric }) {
   return (
     <div className="group relative overflow-hidden rounded-lg bg-surface-container-highest p-5">
@@ -99,28 +137,111 @@ function HeroMetricCard({ metric }) {
 
 export default function DashboardPage() {
   const dashboardDates = useMemo(() => getDashboardDates(), [])
+  const monthPeriod = useMemo(() => getMonthPeriodStats(new Date()), [])
   const [dashboard, setDashboard] = useState(null)
+  const [loading, setLoading] = useState(() => isApiMode())
 
   useEffect(() => {
     document.title = 'Labor Pulse - Dashboard'
     let cancelled = false
 
-    getDashboard().then((data) => {
-      if (!cancelled) setDashboard(data)
-    })
+    getDashboard()
+      .then((data) => {
+        if (!cancelled) setDashboard(data ?? null)
+      })
+      .catch(() => {
+        if (!cancelled) setDashboard(null)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
 
     return () => {
       cancelled = true
     }
   }, [])
 
-  const heroMetrics = dashboard?.heroMetrics || fallbackHeroMetrics
-  const dailySummary = dashboard?.dailySummary || fallbackDailySummary
-  const alerts = dashboard?.alerts || fallbackAlerts
-  const recentActivity = dashboard?.recentActivity || fallbackRecentActivity
-  const pendingNews = dashboard?.pendingNewsTable || fallbackPendingNews
-  const periodStatus = dashboard?.periodStatus
-  const currentClosure = dashboard?.currentClosure
+  const heroMetrics = useMemo(() => {
+    const raw = dashboard?.heroMetrics
+    const baseList = raw?.length ? raw : fallbackHeroMetrics
+    const mapped = baseList.map((m) => {
+      const fb = heroMetricDefaultsByLabel[m.label] ?? {}
+      const value = m.value != null && typeof m.value !== 'object' ? m.value : fb.value
+      return {
+        ...fb,
+        ...m,
+        label: m.label,
+        value,
+        icon: m.icon ?? fb.icon,
+        valueClassName: m.valueClassName ?? fb.valueClassName,
+        iconClassName: m.iconClassName ?? fb.iconClassName,
+        unit: m.unit ?? fb.unit,
+      }
+    })
+    if (dashboard?.pendingNewsSource === 'api' && dashboard.pendingNewsCount != null) {
+      return mapped.map((m) =>
+        m.label === 'Novedades pendientes' || m.key === 'pendingNews'
+          ? { ...m, value: String(dashboard.pendingNewsCount) }
+          : m,
+      )
+    }
+    return mapped
+  }, [dashboard])
+
+  const dailySummary =
+    dashboard?.dailySummarySource === 'api'
+      ? (Array.isArray(dashboard.dailySummary) && dashboard.dailySummary.length > 0
+          ? dashboard.dailySummary
+          : fallbackDailySummary)
+      : dashboard?.dailySummary && dashboard.dailySummary.length > 0
+        ? dashboard.dailySummary
+        : fallbackDailySummary
+  const alerts =
+    dashboard?.alertsSource === 'api'
+      ? (Array.isArray(dashboard.alerts) ? dashboard.alerts : [])
+      : dashboard?.alerts && dashboard.alerts.length > 0
+        ? dashboard.alerts
+        : fallbackAlerts
+  const recentActivity =
+    dashboard?.recentActivitySource === 'api'
+      ? (Array.isArray(dashboard.recentActivity) ? dashboard.recentActivity : [])
+      : dashboard?.recentActivity && dashboard.recentActivity.length > 0
+        ? dashboard.recentActivity
+        : fallbackRecentActivity
+  const pendingNews =
+    dashboard?.pendingNewsSource === 'api'
+      ? (Array.isArray(dashboard.pendingNewsTable) ? dashboard.pendingNewsTable : [])
+      : dashboard?.pendingNewsTable?.length > 0
+        ? dashboard.pendingNewsTable
+        : fallbackPendingNews
+  const periodStatus = useMemo(
+    () => ({
+      ...(dashboard?.periodStatus || {}),
+      period: monthPeriod.periodLabel,
+      businessDaysElapsed: monthPeriod.businessDaysElapsedText,
+      progressPercent: monthPeriod.progressPercent,
+    }),
+    [dashboard?.periodStatus, monthPeriod],
+  )
+
+  const currentClosure = useMemo(
+    () => ({
+      ...(dashboard?.currentClosure || {}),
+      periodLabel: monthPeriod.periodLabel,
+    }),
+    [dashboard?.currentClosure, monthPeriod],
+  )
+
+  if (loading && isApiMode()) {
+    return (
+      <AppShell topbarTitle="DASHBOARD">
+        <div className="flex flex-col items-center justify-center gap-3 py-32 text-on-surface-variant">
+          <span className="material-symbols-outlined animate-spin text-4xl opacity-40">progress_activity</span>
+          <p className="text-sm font-semibold">Cargando dashboard...</p>
+        </div>
+      </AppShell>
+    )
+  }
 
   return (
     <AppShell topbarTitle="DASHBOARD">
@@ -155,7 +276,8 @@ export default function DashboardPage() {
         <Link to={routes.cierre} className="group relative block overflow-hidden rounded-lg bg-on-background p-5 transition-colors hover:bg-slate-800">
           <p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-slate-400">Cierre actual</p>
           <h3 className="flex items-center gap-2 font-headline text-2xl font-black text-white">
-            {currentClosure?.periodLabel || 'Junio'} <span className="text-[10px] font-normal opacity-50">{currentClosure?.status || 'BORRADOR'}</span>
+            {currentClosure?.periodLabel || monthPeriod.periodLabel}{' '}
+            <span className="text-[10px] font-normal opacity-50">{currentClosure?.status || 'BORRADOR'}</span>
           </h3>
           <span className="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-white/5 transition-transform group-hover:scale-110">
             payments
@@ -195,6 +317,9 @@ export default function DashboardPage() {
               </h2>
             </div>
             <div className="divide-y divide-slate-100">
+              {alerts.length === 0 && dashboard?.alertsSource === 'api' ? (
+                <p className="px-5 py-8 text-center text-sm text-on-surface-variant">No hay novedades registradas para hoy.</p>
+              ) : null}
               {alerts.map((alert) => {
                 const content = (
                   <>
@@ -210,17 +335,18 @@ export default function DashboardPage() {
                 )
 
                 const className = `flex items-center gap-4 border-l-4 px-5 py-3.5 transition-all hover:bg-slate-50 ${alert.border}`
+                const rowKey = alert.id ?? `${alert.name}-${alert.legajo}-${alert.status}`
 
                 if (alert.route) {
                   return (
-                    <Link key={alert.name} to={alert.route} className={className}>
+                    <Link key={rowKey} to={alert.route} className={className}>
                       {content}
                     </Link>
                   )
                 }
 
                 return (
-                  <div key={alert.name} className={className}>
+                  <div key={rowKey} className={className}>
                     {content}
                   </div>
                 )
@@ -240,26 +366,29 @@ export default function DashboardPage() {
             <div className="space-y-4 p-5">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-on-surface-variant">Periodo</span>
-                <span className="text-sm font-bold">{periodStatus?.period || 'Junio 2025'}</span>
+                <span className="text-sm font-bold">{periodStatus?.period || monthPeriod.periodLabel}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-on-surface-variant">Dias habiles transcurridos</span>
-                <span className="text-sm font-bold">{periodStatus?.businessDaysElapsed || '9 / 21'}</span>
+                <span className="text-sm font-bold">{periodStatus?.businessDaysElapsed || monthPeriod.businessDaysElapsedText}</span>
               </div>
               <div className="h-2 w-full rounded-full bg-surface-container-high">
-                <div className="h-2 rounded-full bg-primary" style={{ width: `${periodStatus?.progressPercent || 43}%` }} />
+                <div
+                  className="h-2 rounded-full bg-primary"
+                  style={{ width: `${periodStatus?.progressPercent ?? monthPeriod.progressPercent}%` }}
+                />
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-on-surface-variant">HE 50% acumuladas</span>
-                <span className="text-sm font-bold text-primary">{periodStatus?.he50 || '42h 15m'}</span>
+                <span className="text-sm font-bold text-primary">{periodStatus?.he50 || '00h 00m'}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-on-surface-variant">HE 100% acumuladas</span>
-                <span className="text-sm font-bold text-primary">{periodStatus?.he100 || '8h 00m'}</span>
+                <span className="text-sm font-bold text-primary">{periodStatus?.he100 || '00h 00m'}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-on-surface-variant">Ausencias sin justificar</span>
-                <span className="text-sm font-bold text-error">{periodStatus?.unjustifiedAbsences || '3'}</span>
+                <span className="text-sm font-bold text-error">{periodStatus?.unjustifiedAbsences || '0'}</span>
               </div>
               <div className="border-t border-slate-100 pt-2">
                 <div className="flex items-center gap-2">
@@ -287,8 +416,11 @@ export default function DashboardPage() {
               </span>
             </div>
             <div className="divide-y divide-slate-100">
+              {recentActivity.length === 0 && dashboard?.recentActivitySource === 'api' ? (
+                <p className="px-5 py-8 text-center text-sm text-on-surface-variant">Sin fichadas registradas hoy.</p>
+              ) : null}
               {recentActivity.map((item) => (
-                <div key={item.name} className="flex items-center gap-3 px-5 py-3">
+                <div key={item.key ?? `${item.name}-${item.detail}`} className="flex items-center gap-3 px-5 py-3">
                   <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ${item.avatar}`}>
                     {item.initials}
                   </div>
@@ -334,8 +466,15 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
+              {pendingNews.length === 0 && dashboard?.pendingNewsSource === 'api' ? (
+                <tr>
+                  <td colSpan={8} className="px-5 py-10 text-center text-sm text-on-surface-variant">
+                    No hay novedades pendientes.
+                  </td>
+                </tr>
+              ) : null}
               {pendingNews.map((item) => (
-                <tr key={`${item.legajo}-${item.type}`} className="transition-colors hover:bg-slate-50">
+                <tr key={item.id ?? `${item.legajo}-${item.type}-${item.date}`} className="transition-colors hover:bg-slate-50">
                   <td className="px-5 py-3.5 text-sm font-medium">{item.legajo}</td>
                   <td className="px-5 py-3.5 text-sm font-bold">
                     {item.employeeRoute ? (

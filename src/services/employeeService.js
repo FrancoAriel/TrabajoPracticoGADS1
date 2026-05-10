@@ -4,6 +4,9 @@ import { apiClient } from '../lib/apiClient'
 
 let employeesState = [...mockEmployees]
 
+/** Copia editable del detalle mock para que PATCH / refetch reflejen cambios locales */
+let mockEmployeeDetailMutable = structuredClone(mockEmployeeDetail)
+
 export async function listEmployees(params = {}) {
   if (!isApiMode()) {
     return { items: employeesState, stats: mockEmployeeStats }
@@ -41,7 +44,8 @@ export async function createEmployee(payload) {
 
 export async function getEmployeeDetail(employeeId) {
   if (!isApiMode()) {
-    return { ...mockEmployeeDetail, employee: { ...mockEmployeeDetail.employee, id: employeeId } }
+    const base = mockEmployeeDetailMutable ?? mockEmployeeDetail
+    return { ...base, employee: { ...base.employee, id: employeeId } }
   }
 
   const response = await apiClient.get(`/employees/${employeeId}`)
@@ -50,6 +54,28 @@ export async function getEmployeeDetail(employeeId) {
 
 export async function updateEmployee(employeeId, payload) {
   if (!isApiMode()) {
+    const prev = mockEmployeeDetailMutable ?? mockEmployeeDetail
+    const e = { ...prev.employee }
+    const p = payload
+    const nextEstado = p.estado ?? p.status
+    if (nextEstado !== undefined) e.status = nextEstado
+    if (p.nombre != null || p.apellido != null) {
+      const n = p.nombre ?? e.name?.split(' ')?.[0] ?? ''
+      const a = p.apellido ?? e.name?.split(' ')?.slice(1)?.join(' ') ?? ''
+      e.name = `${n} ${a}`.trim() || e.name
+    }
+    if (p.dni !== undefined) e.dni = p.dni
+    if (p.cuil !== undefined) e.cuil = p.cuil
+    if (p.fechaIngreso !== undefined) e.fechaIngreso = p.fechaIngreso
+    if (p.categoria !== undefined) e.category = p.categoria
+    if (p.convenio !== undefined) e.convenio = p.convenio
+    if (p.jornada !== undefined) e.jornada = p.jornada
+    if (p.parcialHoras !== undefined) {
+      const v = p.parcialHoras
+      e.parcialHoras = v === '' || v == null ? null : Number(v)
+    }
+    if (p.fichada !== undefined) e.modalidadFichada = p.fichada
+    mockEmployeeDetailMutable = { ...prev, employee: e }
     return { id: employeeId, ...payload }
   }
 
