@@ -20,6 +20,7 @@ export default function App() {
           <Route path={routes.dashboard} element={<DashboardPage />} />
           <Route path={routes.login} element={<LoginPage />} />
           <Route path={routes.empleados} element={<EmpleadosPage />} />
+          <Route path={routes.empleadoDetalle} element={<EmpleadoJuanPerezPage />} />
           <Route path={routes.empleadoJuanPerez} element={<EmpleadoJuanPerezPage />} />
           <Route path={routes.fichadas} element={<FichadasPage />} />
           <Route path={routes.horarios} element={<HorariosPage />} />

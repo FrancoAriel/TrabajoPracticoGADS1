@@ -19,12 +19,12 @@ export async function saveSchedule(payload) {
 
 export async function saveCycle(payload) {
   if (!isApiMode()) return { success: true, ...payload }
-  const response = await apiClient.post('/cycles', payload)
+  const response = await apiClient.post('/schedules/cycles', payload)
   return response.data
 }
 
 export async function saveAssignment(payload) {
   if (!isApiMode()) return { success: true, ...payload }
-  const response = await apiClient.post('/assignments', payload)
+  const response = await apiClient.post('/schedules/assignments', payload)
   return response.data
 }

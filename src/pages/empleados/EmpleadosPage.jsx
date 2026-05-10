@@ -5,8 +5,36 @@ import PageHeader from '../../components/layout/PageHeader'
 import Modal from '../../components/ui/Modal'
 import SectionCard from '../../components/ui/SectionCard'
 import StatCard from '../../components/ui/StatCard'
-import { routes } from '../../lib/routes'
 import { createEmployee, listEmployees } from '../../services/employeeService'
+
+const capitalize = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : ''
+
+/** Columna tabla: mismo criterio que ficha Parcial (6hs). */
+function textoJornadaLista(employee) {
+  const j = employee.jornada
+  if (j !== 'Parcial') return capitalize(j || '')
+  if (employee.jornadaHoras) {
+    const inner = employee.jornadaHoras.replace(/hs$/i, '').trim()
+    return `Parcial (${inner}hs)`
+  }
+  return 'Parcial'
+}
+
+function getStatusDotClass(status) {
+  const s = status?.toLowerCase()
+  if (s === 'activo')    return 'bg-green-500'
+  if (s === 'inactivo')  return 'bg-red-500'
+  if (s === 'suspendido') return 'bg-yellow-400'
+  return 'bg-slate-400'
+}
+
+function getStatusTextClass(status) {
+  const s = status?.toLowerCase()
+  if (s === 'activo')    return 'text-green-700'
+  if (s === 'inactivo')  return 'text-red-600'
+  if (s === 'suspendido') return 'text-yellow-700'
+  return 'text-slate-500'
+}
 
 function getInitials(name) {
   return name
@@ -24,16 +52,6 @@ function getCategoryBadgeClass(category) {
   return 'bg-primary-container/30 text-on-primary-container'
 }
 
-const initialEmployees = [
-  { legajo: '0042', name: 'Juan Perez',    dni: '30.111.222', category: 'Administrativo', convenio: 'Comercio (130/75)',    jornada: 'Completa', schedule: 'H-003 Oficina central',     status: 'Activo', detail: true, avatarBg: 'bg-blue-100',   avatarText: 'text-primary' },
-  { legajo: '0018', name: 'Ana Gomez',     dni: '28.445.601', category: 'Administrativo', convenio: 'Comercio (130/75)',    jornada: 'Parcial',  jornadaHoras: '6hs', schedule: 'H-003 Oficina central', status: 'Activo', avatarBg: 'bg-purple-100', avatarText: 'text-tertiary' },
-  { legajo: '0027', name: 'Martin Sosa',   dni: '33.987.412', category: 'Operario',       convenio: 'Metalúrgico (260/75)', jornada: 'Completa', schedule: 'C-002 Rotación planta A',  status: 'Activo', avatarBg: 'bg-slate-200',  avatarText: 'text-slate-600' },
-  { legajo: '0031', name: 'Luis Diaz',     dni: '31.200.033', category: 'Operario',       convenio: 'Metalúrgico (260/75)', jornada: 'Completa', schedule: 'H-001 Planta Mañana',     status: 'Activo', avatarBg: 'bg-red-100',    avatarText: 'text-error' },
-  { legajo: '0050', name: 'Carla Ruiz',    dni: '35.120.099', category: 'Administrativo', convenio: 'Comercio (130/75)',    jornada: 'Parcial',  jornadaHoras: '4hs', schedule: 'H-003 Oficina central', status: 'Activo', avatarBg: 'bg-purple-100', avatarText: 'text-tertiary' },
-  { legajo: '0158', name: 'Maria Alvez',   dni: '29.774.421', category: 'Operario',       convenio: 'Metalúrgico (260/75)', jornada: 'Completa', schedule: 'C-001 4x2 Producción',    status: 'Activo', avatarBg: 'bg-slate-200',  avatarText: 'text-slate-600' },
-  { legajo: '0892', name: 'Roberto Gomez', dni: '27.663.300', category: 'Técnico',        convenio: 'Metalúrgico (260/75)', jornada: 'Completa', schedule: 'H-002 Soporte Nocturno',  status: 'Activo', avatarBg: 'bg-blue-100',   avatarText: 'text-primary' },
-]
-
 function calculateCuil(dni, sexo) {
   if (!dni || dni.length < 7) return ''
   const prefix = sexo === 'F' ? '27' : sexo === 'M' ? '20' : '23'
@@ -41,12 +59,13 @@ function calculateCuil(dni, sexo) {
 }
 
 export default function EmpleadosPage() {
-  const [employees, setEmployees] = useState(initialEmployees)
-  const [stats, setStats] = useState({ totalActivos: 37, jornadaCompleta: 30, jornadaParcial: 7, bajasEsteMes: 0 })
+  const [employees, setEmployees] = useState([])
+  const [stats, setStats] = useState({ totalActivos: 0, jornadaCompleta: 0, jornadaParcial: 0, bajasEsteMes: 0 })
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState({ category: '', jornada: '', status: '' })
   const [page, setPage] = useState(1)
   const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [form, setForm] = useState({
     nombre: '', apellido: '', dni: '', sexo: '', fechaIngreso: '',
     categoria: '', convenio: '', jornada: '',
@@ -60,7 +79,13 @@ export default function EmpleadosPage() {
     listEmployees().then((data) => {
       if (!cancelled) {
         setEmployees(data.items)
-        setStats(data.stats)
+        setStats({
+          totalActivos:    data.stats.active          ?? data.stats.totalActivos  ?? 0,
+          jornadaCompleta: data.stats.jornadaCompleta ?? 0,
+          jornadaParcial:  data.stats.jornadaParcial  ?? data.stats.partial       ?? 0,
+          bajasEsteMes:    data.stats.bajasEsteMes    ?? 0,
+        })
+        setLoading(false)
       }
     })
     return () => { cancelled = true }
@@ -87,9 +112,42 @@ export default function EmpleadosPage() {
 
   const handleSave = async (event) => {
     event.preventDefault()
-    const created = await createEmployee(form)
-    setEmployees((current) => [...current, created])
-    setOpen(false)
+    if (form.jornada === 'Parcial') {
+      const h = Number(form.parcialHoras)
+      if (!form.parcialHoras.trim() || Number.isNaN(h) || h < 1 || h > 7) {
+        alert('Indicá las horas diarias de la jornada parcial (entre 1 y 7).')
+        return
+      }
+    }
+    try {
+      const payload = {
+        ...form,
+        cuil,
+        jornada: form.jornada,
+        parcialHoras: form.jornada === 'Parcial' ? Number(form.parcialHoras) : undefined,
+      }
+      const created = await createEmployee(payload)
+      setEmployees((current) => [...current, {
+        id:       created.id,
+        legajo:   created.legajo,
+        name:     `${form.nombre} ${form.apellido}`,
+        dni:      form.dni,
+        category: form.categoria,
+        convenio: form.convenio,
+        jornada:  form.jornada,
+        jornadaHoras:
+          form.jornada === 'Parcial'
+            ? `${String(Number(form.parcialHoras)).replace(/\.0$/, '')}hs`
+            : null,
+        fichada:  form.fichada || null,
+        schedule: form.horario || null,
+        status:   'Activo',
+      }])
+      setOpen(false)
+      setForm({ nombre: '', apellido: '', dni: '', sexo: '', fechaIngreso: '', categoria: '', convenio: '', jornada: '', parcialHoras: '4', horario: '', fichada: 'Biométrico' })
+    } catch (err) {
+      alert(`Error al guardar: ${err.message}`)
+    }
   }
 
   const clearFilters = () => {
@@ -133,7 +191,7 @@ export default function EmpleadosPage() {
         >
           <option value="">Todas las categorías</option>
           <option>Administrativo</option>
-          <option>Operario</option>
+          <option>Operario / Planta</option>
           <option>Técnico</option>
           <option>Supervisor</option>
           <option>Gerencia</option>
@@ -174,6 +232,17 @@ export default function EmpleadosPage() {
       </button>
     </div>
   )
+
+  if (loading) {
+    return (
+      <AppShell topbarTitle="EMPLEADOS" topbarContent={topbarContent}>
+        <div className="flex flex-col items-center justify-center gap-3 py-32 text-on-surface-variant">
+          <span className="material-symbols-outlined animate-spin text-4xl opacity-40">progress_activity</span>
+          <p className="text-sm font-semibold">Cargando empleados...</p>
+        </div>
+      </AppShell>
+    )
+  }
 
   return (
     <AppShell topbarTitle="EMPLEADOS" topbarContent={topbarContent}>
@@ -225,24 +294,19 @@ export default function EmpleadosPage() {
                   {paginatedEmployees.map((employee) => {
                     const initials = getInitials(employee.name)
                     const categoryClass = getCategoryBadgeClass(employee.category)
-                    const isActivo = employee.status === 'Activo'
                     return (
                       <tr key={employee.legajo} className="transition-colors hover:bg-slate-50">
                         <td className="px-4 py-4 font-mono text-sm font-bold text-primary">{employee.legajo}</td>
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-3">
-                            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${employee.avatarBg} ${employee.avatarText}`}>
+                            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${employee.avatarBg ?? 'bg-blue-100'} ${employee.avatarText ?? 'text-primary'}`}>
                               {initials}
                             </div>
                             <div>
-                              {employee.detail ? (
-                                <Link to={routes.empleadoJuanPerez} className="text-sm font-bold hover:text-primary">
-                                  {employee.name}
-                                </Link>
-                              ) : (
-                                <p className="text-sm font-bold">{employee.name}</p>
-                              )}
-                              <p className="font-mono text-[11px] text-on-surface-variant">DNI {employee.dni}</p>
+                              <Link to={`/empleados/${employee.id}`} className="text-sm font-bold hover:text-primary">
+                                {employee.name}
+                              </Link>
+                              <p className="font-mono text-[11px] text-on-surface-variant">DNI {employee.dni ?? '—'}</p>
                             </div>
                           </div>
                         </td>
@@ -251,36 +315,22 @@ export default function EmpleadosPage() {
                             {employee.category}
                           </span>
                         </td>
-                        <td className="px-4 py-4 text-xs text-on-surface-variant">{employee.convenio}</td>
-                        <td className="px-4 py-4 text-xs font-medium">
-                          {employee.jornada}
-                          {employee.jornadaHoras && (
-                            <span className="ml-1 text-on-surface-variant">{employee.jornadaHoras}</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-4 text-xs text-on-surface-variant">{employee.schedule}</td>
+                        <td className="px-4 py-4 text-xs text-on-surface-variant">{employee.convenio || <span className="italic text-on-surface-variant/40">Sin convenio</span>}</td>
+                        <td className="px-4 py-4 text-xs font-medium">{textoJornadaLista(employee)}</td>
+                        <td className="px-4 py-4 text-xs text-on-surface-variant">{employee.schedule || <span className="italic text-on-surface-variant/40">Sin asignar</span>}</td>
                         <td className="px-4 py-4">
-                          <span className={`flex items-center gap-1.5 text-[11px] font-bold ${isActivo ? 'text-on-secondary-container' : 'text-slate-500'}`}>
-                            <span className={`h-2 w-2 rounded-full ${isActivo ? 'bg-on-secondary-container' : 'bg-slate-400'}`} />
-                            {employee.status}
+                          <span className={`flex items-center gap-1.5 text-[11px] font-bold ${getStatusTextClass(employee.status)}`}>
+                            <span className={`h-2 w-2 rounded-full ${getStatusDotClass(employee.status)}`} />
+                            {capitalize(employee.status)}
                           </span>
                         </td>
                         <td className="px-4 py-4">
-                          {employee.detail ? (
-                            <Link
-                              to={routes.empleadoJuanPerez}
-                              className="rounded border border-primary/20 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-primary hover:text-blue-900"
-                            >
-                              Ver
-                            </Link>
-                          ) : (
-                            <button
-                              type="button"
-                              className="rounded border border-primary/20 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-primary hover:text-blue-900"
-                            >
-                              Ver
-                            </button>
-                          )}
+                          <Link
+                            to={`/empleados/${employee.id}`}
+                            className="rounded border border-primary/20 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-primary hover:text-blue-900"
+                          >
+                            Ver
+                          </Link>
                         </td>
                       </tr>
                     )
@@ -311,7 +361,7 @@ export default function EmpleadosPage() {
               </div>
             </div>
           </>
-        )}
+        ) }
       </SectionCard>
 
       <Modal open={open} title="Nuevo Empleado" subtitle="Completá los datos del nuevo empleado." onClose={() => setOpen(false)}>
@@ -377,7 +427,6 @@ export default function EmpleadosPage() {
                 <option>Metalúrgico (260/75)</option>
                 <option>Gastronómico (389/04)</option>
                 <option>Construcción (76/75)</option>
-                <option>Otro</option>
               </select>
             </div>
             <div>
@@ -414,7 +463,7 @@ export default function EmpleadosPage() {
 
           <div className="grid grid-cols-2 gap-5">
             <div>
-              <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Horario asignado</label>
+              <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Horario / Ciclo asignado</label>
               <select value={form.horario} onChange={(e) => setForm((f) => ({ ...f, horario: e.target.value }))} className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30">
                 <option value="">Sin asignar</option>
                 <option>H-001 Planta Mañana</option>

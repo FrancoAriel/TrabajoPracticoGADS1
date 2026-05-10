@@ -15,7 +15,7 @@ export const mockEmployeeDetail = {
     id: 'emp_42', legajo: '0042', name: 'Juan Perez', initials: 'JP',
     status: 'Activo', category: 'Administrativo', convenio: 'Comercio (130/75)',
     dni: '30.111.222', cuil: '20-30111222-3', fechaIngreso: '10/03/2023',
-    jornada: 'Completa', fichada: 'Biométrico', schedule: 'H-003 Oficina central',
+    jornada: 'Completa', modalidadFichada: 'Biométrico', schedule: 'H-003 Oficina central',
   },
   scheduleConfig: {
     tipo: 'Fijo', nombre: 'Oficina central', vigencia: '01/06/2025 en adelante',

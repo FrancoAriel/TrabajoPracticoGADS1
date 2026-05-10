@@ -2,3 +2,9 @@ stitch/
 node_modules/
 dist/
 .vite/
+
+# Cursor MCP (puede contener PAT de Supabase u otros secretos)
+.cursor/mcp.json
+.env
+.env.*
+!.env.example

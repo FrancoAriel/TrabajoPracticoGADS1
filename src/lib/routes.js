@@ -2,6 +2,7 @@ export const routes = {
   dashboard: '/',
   login: '/login',
   empleados: '/empleados',
+  empleadoDetalle: '/empleados/:id',
   empleadoJuanPerez: '/empleados/juan-perez',
   fichadas: '/fichadas',
   horarios: '/horarios',
