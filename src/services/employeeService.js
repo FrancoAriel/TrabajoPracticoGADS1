@@ -4,12 +4,17 @@ import { apiClient } from '../lib/apiClient'
 
 let employeesState = [...mockEmployees]
 
-export async function listEmployees() {
+export async function listEmployees(params = {}) {
   if (!isApiMode()) {
     return { items: employeesState, stats: mockEmployeeStats }
   }
 
-  const response = await apiClient.get('/employees')
+  const sp = new URLSearchParams()
+  if (params.page) sp.set('page', String(params.page))
+  if (params.pageSize) sp.set('pageSize', String(params.pageSize))
+  if (params.search) sp.set('search', params.search)
+  const qs = sp.toString()
+  const response = await apiClient.get(`/employees${qs ? `?${qs}` : ''}`)
   return response.data
 }
 
