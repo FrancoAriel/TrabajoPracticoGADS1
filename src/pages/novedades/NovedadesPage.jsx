@@ -15,6 +15,9 @@ const TYPE_BADGE = {
   licencia_examen: 'bg-secondary-container/40 text-on-secondary-container',
   vacaciones: 'bg-primary-container/40 text-on-primary-container',
   permiso_especial: 'bg-secondary-container/40 text-on-secondary-container',
+  salida_anticipada: 'bg-error-container/20 text-error',
+  doble_fichada: 'bg-secondary-container/40 text-on-secondary-container',
+  horas_faltantes: 'bg-error-container/20 text-error',
 }
 
 const initialItems = [
@@ -47,6 +50,8 @@ const TYPE_LABEL = {
   permiso_especial: 'Permiso especial',
   salida_anticipada: 'Salida anticipada',
   horas_faltantes: 'Horas faltantes',
+  doble_fichada: 'Doble fichada',
+  licencia: 'Licencia',
 }
 
 function TypeBadge({ type }) {
@@ -112,22 +117,15 @@ function formatNewsQuantity(c, u) {
   return String(c)
 }
 
+/**
+ * El backend usa convención PascalCase con underscores (ej: "Horas_Extra_50",
+ * "Salida_Anticipada", "Doble_Fichada"). El frontend usa snake_case en TYPE_LABEL
+ * y TYPE_BADGE. Normalizamos pasando todo a lowercase: el separador "_" ya viene
+ * del backend, así no hay que adivinar dónde van las mayúsculas.
+ */
 function mapApiTipoToFilterKey(tipo) {
-  const map = {
-    Tardanza: 'tardanza',
-    Ausencia: 'ausencia',
-    Horas_extra_50: 'horas_extra_50',
-    Horas_extra_100: 'horas_extra_100',
-    Justificacion: 'justificacion',
-    Salida_anticipada: 'salida_anticipada',
-    Horas_faltantes: 'horas_faltantes',
-    Licencia: 'licencia',
-    Vacaciones: 'vacaciones',
-    Suspension: 'suspension',
-    Permiso_especial: 'permiso_especial',
-  }
   if (!tipo) return ''
-  return map[tipo] || String(tipo).toLowerCase()
+  return String(tipo).toLowerCase()
 }
 
 function mapEstadoToPill(estado) {
@@ -315,11 +313,17 @@ export default function NovedadesPage() {
             <div className="flex items-center gap-2">
               <FilterSelect value={filterType} onChange={(e) => setFilterType(e.target.value)}>
                 <option value="">Todos los tipos</option>
+                <option value="tardanza">Tardanza</option>
+                <option value="ausencia">Ausencia</option>
+                <option value="salida_anticipada">Salida anticipada</option>
                 <option value="horas_extra_50">Horas extra 50%</option>
                 <option value="horas_extra_100">Horas extra 100%</option>
+                <option value="doble_fichada">Doble fichada</option>
                 <option value="justificacion">Justificación</option>
-                <option value="ausencia">Ausencia</option>
-                <option value="tardanza">Tardanza</option>
+                <option value="licencia">Licencia</option>
+                <option value="vacaciones">Vacaciones</option>
+                <option value="permiso_especial">Permiso especial</option>
+                <option value="suspension">Suspensión</option>
               </FilterSelect>
               <FilterSelect value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
                 <option value="">Todos los estados</option>

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AppShell from '../../components/layout/AppShell'
+import Modal from '../../components/ui/Modal'
 import { routes } from '../../lib/routes'
+import { reprocessRange } from '../../services/reasoningService'
 
 const employees = [
   { name: 'Juan Perez', legajo: '0042', initials: 'JP', avatarClass: 'bg-blue-100 text-primary', normal: '176h', he50: '2h 30m', he100: '—', ausencias: '1 día', status: 'ok' },
@@ -23,10 +25,53 @@ function StatusPill({ status }) {
   return <span className="inline-flex items-center gap-1 text-[10px] font-bold text-tertiary"><span className="h-1.5 w-1.5 rounded-full bg-tertiary" />Pendiente</span>
 }
 
+function isoYmd(date = new Date()) {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+function firstDayOfMonth() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+}
+
 export default function CierrePage() {
   const [selected, setSelected] = useState(null)
+  const [reprocessOpen, setReprocessOpen] = useState(false)
+  const [reprocessDesde, setReprocessDesde] = useState(firstDayOfMonth())
+  const [reprocessHasta, setReprocessHasta] = useState(isoYmd())
+  const [reprocessDryRun, setReprocessDryRun] = useState(true)
+  const [reprocessLegajos, setReprocessLegajos] = useState('')
+  const [reprocessLoading, setReprocessLoading] = useState(false)
+  const [reprocessResult, setReprocessResult] = useState(null)
+  const [reprocessError, setReprocessError] = useState(null)
 
   useEffect(() => { document.title = 'Cierre Mensual - Executive Architect' }, [])
+
+  async function handleReprocess() {
+    setReprocessLoading(true)
+    setReprocessError(null)
+    setReprocessResult(null)
+    try {
+      const legajosArr = String(reprocessLegajos)
+        .split(',')
+        .map((s) => Number(s.trim()))
+        .filter((n) => Number.isFinite(n) && n > 0)
+      const res = await reprocessRange({
+        desde: reprocessDesde,
+        hasta: reprocessHasta,
+        dryRun: reprocessDryRun,
+        legajos: legajosArr.length ? legajosArr : undefined,
+      })
+      setReprocessResult(res?.data ?? res)
+    } catch (e) {
+      setReprocessError(e?.message ?? 'Error al reprocesar')
+    } finally {
+      setReprocessLoading(false)
+    }
+  }
 
   return (
     <AppShell topbarTitle="CIERRE MENSUAL">
@@ -40,6 +85,13 @@ export default function CierrePage() {
             <span className="material-symbols-outlined text-sm text-tertiary">pending</span>
             <span className="text-xs font-bold uppercase tracking-widest text-on-tertiary-container">Período abierto: Junio 2025</span>
           </div>
+          <button
+            onClick={() => setReprocessOpen(true)}
+            className="flex items-center gap-2 rounded-md border border-slate-200/70 bg-surface-container-lowest px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-container"
+            type="button"
+          >
+            <span className="material-symbols-outlined text-sm">replay</span> Reprocesar período
+          </button>
           <button disabled className="flex cursor-not-allowed items-center gap-2 rounded-md bg-slate-900 px-4 py-2 text-sm font-bold text-white opacity-40">
             <span className="material-symbols-outlined text-sm">lock</span> Ejecutar cierre
           </button>
@@ -202,6 +254,119 @@ export default function CierrePage() {
         </div>
         <p className="mt-5 text-xs text-on-surface-variant">El botón "Ejecutar cierre" se habilitará cuando todas las novedades estén aprobadas.</p>
       </div>
+
+      <Modal
+        open={reprocessOpen}
+        onClose={() => setReprocessOpen(false)}
+        title="Reprocesar período"
+        subtitle="Borra novedades automáticas previas del rango y vuelve a evaluar las 5 reglas del motor."
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Desde</label>
+              <input
+                type="date"
+                value={reprocessDesde}
+                onChange={(e) => setReprocessDesde(e.target.value)}
+                className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Hasta</label>
+              <input
+                type="date"
+                value={reprocessHasta}
+                onChange={(e) => setReprocessHasta(e.target.value)}
+                className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+              Legajos (opcional, separados por coma)
+            </label>
+            <input
+              type="text"
+              value={reprocessLegajos}
+              onChange={(e) => setReprocessLegajos(e.target.value)}
+              placeholder="Ej: 1, 2, 5 (vacío = todos los activos)"
+              className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={reprocessDryRun}
+              onChange={(e) => setReprocessDryRun(e.target.checked)}
+              className="h-4 w-4 rounded border-outline-variant"
+            />
+            <span>Simulación (no inserta novedades) — recomendado para previsualizar</span>
+          </label>
+
+          {reprocessError && (
+            <div className="rounded-md bg-error-container/30 px-3 py-2 text-sm text-error">
+              {reprocessError}
+            </div>
+          )}
+
+          {reprocessResult && (
+            <div className="rounded-md border border-outline-variant/40 bg-surface-container-low p-3 text-sm">
+              <p className="mb-2 font-bold">Resultado{reprocessResult.dryRun ? ' (simulación)' : ''}</p>
+              <div className="grid grid-cols-4 gap-2 text-xs">
+                <div className="rounded bg-green-50 px-2 py-1">
+                  <span className="font-bold text-green-700">{reprocessResult.totals?.created ?? 0}</span> creadas
+                </div>
+                <div className="rounded bg-blue-50 px-2 py-1">
+                  <span className="font-bold text-blue-700">{reprocessResult.totals?.ok ?? 0}</span> OK
+                </div>
+                <div className="rounded bg-slate-100 px-2 py-1">
+                  <span className="font-bold text-slate-700">{reprocessResult.totals?.skipped ?? 0}</span> omitidas
+                </div>
+                <div className="rounded bg-red-50 px-2 py-1">
+                  <span className="font-bold text-red-700">{reprocessResult.totals?.error ?? 0}</span> errores
+                </div>
+              </div>
+              {reprocessResult.byRule && (
+                <div className="mt-3">
+                  <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Por regla</p>
+                  <ul className="space-y-0.5 text-xs">
+                    {Object.entries(reprocessResult.byRule).map(([rule, counts]) => (
+                      <li key={rule} className="flex justify-between gap-3">
+                        <span className="capitalize">{rule.replace(/_/g, ' ')}</span>
+                        <span className="text-on-surface-variant">
+                          creadas: <b className="text-on-surface">{counts.created}</b>, ok: {counts.ok}, omitidas: {counts.skipped}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={() => setReprocessOpen(false)}
+              className="rounded-md border border-outline-variant/40 bg-surface-container-lowest px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-container"
+            >
+              Cerrar
+            </button>
+            <button
+              type="button"
+              onClick={handleReprocess}
+              disabled={reprocessLoading || !reprocessDesde || !reprocessHasta}
+              className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-bold text-on-primary disabled:opacity-40"
+            >
+              {reprocessLoading && <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>}
+              {reprocessDryRun ? 'Simular' : 'Reprocesar'}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </AppShell>
   )
 }
