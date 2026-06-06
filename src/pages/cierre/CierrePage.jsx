@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import AppShell from '../../components/layout/AppShell'
 import Modal from '../../components/ui/Modal'
 import { routes } from '../../lib/routes'
+import { createClosure, getCurrentClosure, runClosure } from '../../services/closureService'
 import { reprocessRange } from '../../services/reasoningService'
 
 const employees = [
@@ -39,9 +40,14 @@ function firstDayOfMonth() {
 
 export default function CierrePage() {
   const [selected, setSelected] = useState(null)
+  const [closureData, setClosureData] = useState(null)
+  const [closureLoading, setClosureLoading] = useState(true)
+  const [closureActionLoading, setClosureActionLoading] = useState(false)
+  const [closureMessage, setClosureMessage] = useState('')
+  const [closureError, setClosureError] = useState('')
   const [reprocessOpen, setReprocessOpen] = useState(false)
-  const [reprocessDesde, setReprocessDesde] = useState(firstDayOfMonth())
-  const [reprocessHasta, setReprocessHasta] = useState(isoYmd())
+  const [reprocessDesde, setReprocessDesde] = useState(() => firstDayOfMonth())
+  const [reprocessHasta, setReprocessHasta] = useState(() => isoYmd())
   const [reprocessDryRun, setReprocessDryRun] = useState(true)
   const [reprocessLegajos, setReprocessLegajos] = useState('')
   const [reprocessLoading, setReprocessLoading] = useState(false)
@@ -49,6 +55,89 @@ export default function CierrePage() {
   const [reprocessError, setReprocessError] = useState(null)
 
   useEffect(() => { document.title = 'Cierre Mensual - Executive Architect' }, [])
+
+  async function loadClosure() {
+    setClosureLoading(true)
+    setClosureError('')
+    try {
+      setClosureData(await getCurrentClosure())
+    } catch (e) {
+      setClosureError(e?.message ?? 'No se pudo cargar el cierre.')
+    } finally {
+      setClosureLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadClosure()
+  }, [])
+
+  const currentPeriod = closureData?.currentPeriod ?? 'Junio 2025'
+  const stats = closureData?.stats ?? { liquidated: 39, pending: 3, he50: '42h 15m', he100: '8h 00m' }
+  const closureEmployees = (closureData?.employeeBreakdown?.length ? closureData.employeeBreakdown : employees).map((emp) => ({
+    name: emp.name,
+    legajo: emp.legajo ?? String(emp.id ?? '').padStart(4, '0'),
+    initials: emp.initials ?? String(emp.name ?? 'NA').split(/\s+/).slice(0, 2).map((p) => p[0]).join('').toUpperCase(),
+    avatarClass: emp.avatarClass ?? 'bg-blue-100 text-primary',
+    normal: emp.normal ?? `${emp.workedDays ?? 0} días`,
+    he50: emp.he50 ?? '0',
+    he100: emp.he100 ?? '0',
+    ausencias: emp.ausencias ?? String(emp.unjustifiedAbsences ?? 0),
+    status: emp.status ?? (emp.estado === 'OK' ? 'ok' : 'pendiente'),
+  }))
+  const closureChecklist = closureData?.checklist?.length
+    ? closureData.checklist.map((item, index) => {
+        if (typeof item === 'string') {
+          return {
+            key: `checklist-${index}`,
+            icon: 'pending',
+            iconFill: false,
+            iconClass: 'text-tertiary',
+            bg: 'bg-tertiary-container/20 border-tertiary/20',
+            title: item,
+            sub: 'Pendiente de validación',
+            badge: 'Pendiente',
+            badgeClass: 'text-on-surface-variant',
+            link: index === 0,
+          }
+        }
+
+        return {
+          key: item.key ?? `checklist-${index}`,
+          icon: item.done ? 'check_circle' : 'pending',
+          iconFill: item.done,
+          iconClass: item.done ? 'text-green-600' : 'text-tertiary',
+          bg: item.done ? 'bg-green-50 border-green-200' : 'bg-tertiary-container/20 border-tertiary/20',
+          title: item.title,
+          sub: item.sub,
+          badge: item.done ? 'Completado' : 'Pendiente',
+          badgeClass: item.done ? 'text-green-700' : 'text-on-surface-variant',
+          link: item.key === 'review-pending-news' && !item.done,
+        }
+      })
+    : checklist
+
+  async function handleRunClosure() {
+    setClosureActionLoading(true)
+    setClosureMessage('')
+    setClosureError('')
+    try {
+      let closure = closureData?.currentClosure
+      if (!closure?.id) {
+        const created = await createClosure({ periodo: currentPeriod })
+        closure = { id: created.id_cierre ?? created.id, periodo: created.periodo, estado: created.estado }
+      }
+      const result = await runClosure(closure.id, {
+        archivoExportado: `cierre_${currentPeriod.replace(/\s+/g, '_')}.csv`,
+      })
+      setClosureMessage(`Cierre ejecutado. Novedades incluidas: ${result.novedadesIncluidas ?? 0}.`)
+      await loadClosure()
+    } catch (e) {
+      setClosureError(e?.message ?? 'No se pudo ejecutar el cierre.')
+    } finally {
+      setClosureActionLoading(false)
+    }
+  }
 
   async function handleReprocess() {
     setReprocessLoading(true)
@@ -66,6 +155,7 @@ export default function CierrePage() {
         legajos: legajosArr.length ? legajosArr : undefined,
       })
       setReprocessResult(res?.data ?? res)
+      await loadClosure()
     } catch (e) {
       setReprocessError(e?.message ?? 'Error al reprocesar')
     } finally {
@@ -83,7 +173,7 @@ export default function CierrePage() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 rounded-lg bg-tertiary-container/40 px-4 py-2">
             <span className="material-symbols-outlined text-sm text-tertiary">pending</span>
-            <span className="text-xs font-bold uppercase tracking-widest text-on-tertiary-container">Período abierto: Junio 2025</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-on-tertiary-container">Período abierto: {currentPeriod}</span>
           </div>
           <button
             onClick={() => setReprocessOpen(true)}
@@ -92,17 +182,29 @@ export default function CierrePage() {
           >
             <span className="material-symbols-outlined text-sm">replay</span> Reprocesar período
           </button>
-          <button disabled className="flex cursor-not-allowed items-center gap-2 rounded-md bg-slate-900 px-4 py-2 text-sm font-bold text-white opacity-40">
-            <span className="material-symbols-outlined text-sm">lock</span> Ejecutar cierre
+          <button
+            type="button"
+            onClick={handleRunClosure}
+            disabled={closureActionLoading || closureLoading || Number(stats.pending ?? 0) > 0}
+            className="flex items-center gap-2 rounded-md bg-slate-900 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {closureActionLoading ? <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span> : <span className="material-symbols-outlined text-sm">lock_open</span>}
+            {closureData?.currentClosure?.id ? 'Ejecutar cierre' : 'Crear y cerrar'}
           </button>
         </div>
       </div>
 
+      {(closureMessage || closureError) && (
+        <div className={`mb-6 rounded-lg px-4 py-3 text-sm font-semibold ${closureError ? 'bg-error-container/30 text-error' : 'bg-green-50 text-green-700'}`}>
+          {closureError || closureMessage}
+        </div>
+      )}
+
       <div className="mb-6 grid grid-cols-4 gap-4">
-        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Horas trabajadas</p><p className="font-headline text-2xl font-black text-primary">1.240</p></div>
-        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">HE 50% acumuladas</p><p className="font-headline text-2xl font-black text-tertiary">42h 30m</p></div>
-        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">HE 100% acumuladas</p><p className="font-headline text-2xl font-black text-error">8h 00m</p></div>
-        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Novedades pendientes</p><p className="font-headline text-2xl font-black text-on-secondary-container">9</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Novedades aprobadas</p><p className="font-headline text-2xl font-black text-primary">{stats.liquidated ?? 0}</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">HE 50% acumuladas</p><p className="font-headline text-2xl font-black text-tertiary">{stats.he50 ?? '0'}</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">HE 100% acumuladas</p><p className="font-headline text-2xl font-black text-error">{stats.he100 ?? '0'}</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Novedades pendientes</p><p className="font-headline text-2xl font-black text-on-secondary-container">{stats.pending ?? 0}</p></div>
       </div>
 
       <div className="mb-6 grid grid-cols-3 gap-4">
@@ -118,9 +220,9 @@ export default function CierrePage() {
         </div>
         <div className="relative overflow-hidden rounded-xl bg-slate-900 p-5 text-white">
           <span className="material-symbols-outlined absolute -bottom-3 -right-3 text-7xl opacity-10">point_of_sale</span>
-          <p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-slate-400">Junio 2025</p>
+          <p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-slate-400">{currentPeriod}</p>
           <p className="text-sm font-black">EN PROGRESO</p>
-          <p className="mt-0.5 text-xs text-slate-400">9 novedades pendientes</p>
+          <p className="mt-0.5 text-xs text-slate-400">{stats.pending ?? 0} novedades pendientes</p>
           <Link to={routes.novedades} className="mt-3 flex items-center gap-1 text-xs font-bold text-blue-300 hover:underline">
             <span className="material-symbols-outlined text-sm">arrow_forward</span> Revisar novedades
           </Link>
@@ -136,7 +238,7 @@ export default function CierrePage() {
         <div className="col-span-12 overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest lg:col-span-7">
           <div className="flex items-center justify-between gap-3 border-b border-slate-100 p-5">
             <h3 className="flex shrink-0 items-center gap-2 font-headline text-xs font-extrabold tracking-[0.2em]">
-              <span className="material-symbols-outlined text-sm">analytics</span> DESGLOSE POR EMPLEADO — JUNIO 2025
+              <span className="material-symbols-outlined text-sm">analytics</span> DESGLOSE POR EMPLEADO — {currentPeriod.toUpperCase()}
             </h3>
             <span className="shrink-0 rounded-full bg-tertiary-container/30 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-tertiary">BORRADOR</span>
           </div>
@@ -153,7 +255,7 @@ export default function CierrePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {employees.map((emp) => (
+                {closureEmployees.map((emp) => (
                   <tr key={emp.legajo} onClick={() => setSelected(emp)} className={`cursor-pointer transition-colors hover:bg-slate-50 ${selected?.legajo === emp.legajo ? 'bg-primary-container/20' : ''}`}>
                     <td className={`px-5 py-3.5${selected?.legajo === emp.legajo ? ' border-l-4 border-primary' : ''}`}>
                       <div className="flex items-center gap-2">
@@ -196,7 +298,7 @@ export default function CierrePage() {
                   <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-black ${selected.avatarClass}`}>{selected.initials}</div>
                   <div>
                     <p className="text-sm font-bold">{selected.name}</p>
-                    <p className="text-xs text-on-surface-variant">Período: Junio 2025</p>
+                    <p className="text-xs text-on-surface-variant">Período: {currentPeriod}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -235,8 +337,8 @@ export default function CierrePage() {
           <span className="material-symbols-outlined text-sm">checklist</span> CHECKLIST DE CIERRE
         </h3>
         <div className="space-y-2.5">
-          {checklist.map((item, i) => (
-            <div key={i} className={`flex items-center gap-4 rounded-lg border p-4 ${item.bg}`}>
+          {closureChecklist.map((item) => (
+            <div key={item.key ?? item.title} className={`flex items-center gap-4 rounded-lg border p-4 ${item.bg}`}>
               <span className="material-symbols-outlined shrink-0 text-sm" style={item.iconFill ? { fontVariationSettings: "'FILL' 1" } : undefined}>{item.icon}</span>
               <div className="flex-1">
                 <p className="text-sm font-bold">{item.title}</p>
@@ -252,7 +354,7 @@ export default function CierrePage() {
             </div>
           ))}
         </div>
-        <p className="mt-5 text-xs text-on-surface-variant">El botón "Ejecutar cierre" se habilitará cuando todas las novedades estén aprobadas.</p>
+        <p className="mt-5 text-xs text-on-surface-variant">El botón "Ejecutar cierre" se habilita cuando no quedan novedades pendientes del período.</p>
       </div>
 
       <Modal

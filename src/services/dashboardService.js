@@ -20,6 +20,7 @@ const TYPE_LABEL = {
   permiso_especial: 'Permiso especial',
   salida_anticipada: 'Salida anticipada',
   horas_faltantes: 'Horas faltantes',
+  doble_fichada: 'Doble fichada',
 }
 
 const TYPE_BADGE = {
@@ -36,24 +37,12 @@ const TYPE_BADGE = {
   permiso_especial: 'bg-secondary-container/40 text-on-secondary-container',
   salida_anticipada: 'bg-tertiary-container/40 text-on-tertiary-container',
   horas_faltantes: 'bg-tertiary-container/40 text-on-tertiary-container',
+  doble_fichada: 'bg-secondary-container/40 text-on-secondary-container',
 }
 
 function mapApiTipoToFilterKey(tipo) {
-  const map = {
-    Tardanza: 'tardanza',
-    Ausencia: 'ausencia',
-    Horas_extra_50: 'horas_extra_50',
-    Horas_extra_100: 'horas_extra_100',
-    Justificacion: 'justificacion',
-    Salida_anticipada: 'salida_anticipada',
-    Horas_faltantes: 'horas_faltantes',
-    Licencia: 'licencia',
-    Vacaciones: 'vacaciones',
-    Suspension: 'suspension',
-    Permiso_especial: 'permiso_especial',
-  }
   if (!tipo) return ''
-  return map[tipo] || String(tipo).toLowerCase()
+  return String(tipo).toLowerCase()
 }
 
 function formatApiDate(isoDate) {
@@ -119,12 +108,30 @@ function newsDateMatchesToday(raw, todayIso) {
   return false
 }
 
+function newsDateMatchesMonth(raw, reference = new Date()) {
+  if (raw == null) return false
+  const normalized = String(raw).trim()
+  const head = normalized.slice(0, 10)
+  if (/^\d{4}-\d{2}-\d{2}$/.test(head)) {
+    const year = Number(head.slice(0, 4))
+    const month = Number(head.slice(5, 7)) - 1
+    return year === reference.getFullYear() && month === reference.getMonth()
+  }
+  const time = Date.parse(normalized)
+  if (Number.isNaN(time)) return false
+  const parsed = new Date(time)
+  return parsed.getFullYear() === reference.getFullYear() && parsed.getMonth() === reference.getMonth()
+}
+
 function alertVisualForUiType(uiType) {
   if (uiType === 'ausencia' || uiType === 'suspension') {
     return { icon: 'person_alert', border: 'border-error', accent: 'text-error', badge: 'bg-error/5 border-error/20 text-error' }
   }
   if (uiType === 'tardanza' || uiType === 'salida_anticipada' || uiType === 'horas_faltantes') {
     return { icon: 'schedule', border: 'border-tertiary', accent: 'text-tertiary', badge: 'bg-tertiary/5 border-tertiary/20 text-tertiary' }
+  }
+  if (uiType === 'doble_fichada') {
+    return { icon: 'sync_problem', border: 'border-primary', accent: 'text-primary', badge: 'bg-primary/5 border-primary/20 text-primary' }
   }
   if (uiType === 'horas_extra_50' || uiType === 'horas_extra_100') {
     return { icon: 'more_time', border: 'border-primary', accent: 'text-primary', badge: 'bg-primary/5 border-primary/20 text-primary' }
@@ -255,10 +262,12 @@ function buildDailySummary({ activeTotal, punchItems, todayNewsItems }) {
   let tardanzas = 0
   let ausenciasNov = 0
   let licencias = 0
+  let dobleFichadasNov = 0
   for (const n of todayNewsItems) {
     const k = mapApiTipoToFilterKey(n.type)
     if (k === 'tardanza') tardanzas += 1
     if (k === 'ausencia') ausenciasNov += 1
+    if (k === 'doble_fichada') dobleFichadasNov += 1
     if (isLicenciaLikeNews(n)) licencias += 1
   }
 
@@ -292,7 +301,7 @@ function buildDailySummary({ activeTotal, punchItems, todayNewsItems }) {
     {
       key: 'double',
       label: 'Doble fichada',
-      value: String(dobleEntradaEmpleados),
+      value: String(Math.max(dobleEntradaEmpleados, dobleFichadasNov)),
       icon: 'error_outline',
       valueClassName: 'text-primary',
       iconClassName: 'text-primary',
@@ -366,6 +375,10 @@ export async function getDashboard() {
   const rawItems = newsEnvelope?.items ?? newsEnvelope?.data?.items ?? []
   const pendingItems = rawItems.filter((n) => isPendingNewsStatus(n.status))
   const todayNewsItems = rawItems.filter((n) => newsDateMatchesToday(n.date, todayIso))
+  const monthNewsItems = rawItems.filter((n) => newsDateMatchesMonth(n.date))
+  const monthHe50 = sumHeMinutesFromNews(monthNewsItems, 'horas_extra_50')
+  const monthHe100 = sumHeMinutesFromNews(monthNewsItems, 'horas_extra_100')
+  const monthDoublePunches = monthNewsItems.filter((n) => mapApiTipoToFilterKey(n.type) === 'doble_fichada').length
 
   let punchItems = punchRes?.items ?? []
   punchItems = [...punchItems].sort((a, b) => {
@@ -386,6 +399,12 @@ export async function getDashboard() {
     ...base,
     dailySummarySource: 'api',
     dailySummary,
+    periodStatus: {
+      ...(base?.periodStatus || {}),
+      he50: formatHoursMinutesShort(monthHe50),
+      he100: formatHoursMinutesShort(monthHe100),
+      doublePunches: String(monthDoublePunches),
+    },
     pendingNewsSource: 'api',
     pendingNewsTable: pendingItems.map(mapNewsRowForDashboard),
     pendingNewsCount: pendingItems.length,

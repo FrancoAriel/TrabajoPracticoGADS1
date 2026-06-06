@@ -23,7 +23,7 @@ export const mockDashboard = {
     { id: 'alert_5', name: 'Martin Sosa', legajo: 'Leg. 0027', status: 'Salida anticipada',        icon: 'exit_to_app',  border: 'border-tertiary', accent: 'text-tertiary', badge: 'bg-tertiary/5 border-tertiary/20 text-tertiary', filled: true },
   ],
   periodStatus: {
-    period: 'Junio 2025', businessDaysElapsed: '9 / 21', progressPercent: 43, he50: '42h 15m', he100: '8h 00m', unjustifiedAbsences: '3', closureStatusLabel: 'Cierre en borrador - sin cerrar',
+    period: 'Junio 2025', businessDaysElapsed: '9 / 21', progressPercent: 43, he50: '42h 15m', he100: '8h 00m', doublePunches: '2', unjustifiedAbsences: '3', closureStatusLabel: 'Cierre en borrador - sin cerrar',
   },
   recentActivity: [
     { initials: 'JP', name: 'Juan Perez', detail: 'Entrada · 09:15', status: 'Tardanza', avatar: 'bg-primary', statusClassName: 'text-tertiary' },

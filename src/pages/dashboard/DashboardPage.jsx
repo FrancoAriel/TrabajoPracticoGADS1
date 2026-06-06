@@ -387,6 +387,10 @@ export default function DashboardPage() {
                 <span className="text-sm font-bold text-primary">{periodStatus?.he100 || '00h 00m'}</span>
               </div>
               <div className="flex items-center justify-between">
+                <span className="text-sm text-on-surface-variant">Dobles fichadas</span>
+                <span className="text-sm font-bold text-primary">{periodStatus?.doublePunches || '0'}</span>
+              </div>
+              <div className="flex items-center justify-between">
                 <span className="text-sm text-on-surface-variant">Ausencias sin justificar</span>
                 <span className="text-sm font-bold text-error">{periodStatus?.unjustifiedAbsences || '0'}</span>
               </div>
@@ -462,7 +466,7 @@ export default function DashboardPage() {
                 <th className="px-5 py-3.5 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Cantidad</th>
                 <th className="px-5 py-3.5 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Estado</th>
                 <th className="px-5 py-3.5 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Origen</th>
-                <th className="px-5 py-3.5 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant" />
+                <th className="px-5 py-3.5 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant"><span className="sr-only">Acciones</span></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">

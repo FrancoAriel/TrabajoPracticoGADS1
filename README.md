@@ -103,6 +103,10 @@ Vista previa de produccion:
 npm run preview
 ```
 
+## Documentacion de flujos
+
+- `docs/flujos-admin-contador.md`: flujos requeridos para administrador y contador segun la especificacion del trabajo practico.
+
 ## Rutas React previstas
 
 - `/` Dashboard
