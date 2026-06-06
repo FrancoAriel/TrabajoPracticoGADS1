@@ -222,3 +222,36 @@ Tareas pendientes agregadas al PRD de estado:
 - P0: confirmar `GET /api/closures/current` sin `Invalid API key`.
 - P0: reiniciar frontend con `VITE_API_BASE_URL=/api`.
 - P1: reejecutar E2E real de cierre, novedades, reproceso y exportaciones.
+
+## 11. Actualizacion posterior: API key configurada y E2E real
+
+Fecha: 2026-06-06.
+
+Se recibieron credenciales reales de Supabase y se configuro localmente el backend sin versionar secretos.
+
+Cambios realizados:
+
+- Backend `.env` local actualizado con `SUPABASE_SERVICE_ROLE_KEY` real.
+- Frontend `.env` local actualizado con `VITE_API_BASE_URL=/api` para usar proxy Vite.
+- Backend reiniciado en `http://127.0.0.1:3000`.
+- Frontend reiniciado en `http://127.0.0.1:5173`.
+- Se actualizo `/home/maxi/TrabajoPracticoGADS1-backend/.env.example` para evitar el placeholder anterior.
+- Se actualizo `.env.example` del frontend para recomendar `/api`.
+- Se agrego validacion defensiva en `src/lib/supabase.js` del backend para fallar con mensaje claro si falta una service role real.
+
+Validaciones reales ejecutadas:
+
+- `GET /health`: 200 OK.
+- `GET /api/closures/current`: 200 OK con periodo `Junio 2026` y 6 empleados activos.
+- `GET /api/news?pageSize=3`: 200 OK con novedades reales.
+- `POST /api/reasoning/reprocess-range` con `dryRun=true`: 200 OK, `created=16`, `ok=30`, `skipped=20`, `error=0`.
+- `POST /api/exports` para reporte `employees`: 201 Created con `downloadUrl`.
+- E2E navegador contra API real via proxy Vite: `1 passed`.
+- `npm run build`: `✓ built`.
+
+Pendientes que siguen vigentes:
+
+- No se ejecuto cierre mensual real para no cerrar el periodo `Junio 2026` sin confirmacion explicita.
+- No se ejecuto reproceso con `dryRun=false` para no modificar novedades automaticas reales sin confirmacion explicita.
+- Falta validar descarga y contenido de todos los CSV, no solo generacion del reporte de empleados.
+- Falta validar aprobacion/rechazo real de novedades desde UI.

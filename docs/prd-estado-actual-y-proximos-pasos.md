@@ -8,7 +8,7 @@ Documentar el estado real del trabajo practico Labor Pulse / Executive Architect
 
 La aplicacion ya cuenta con la migracion React de las pantallas principales, integracion preparada contra backend, motor de reglas V4 expuesto desde UI, cierre mensual conectado a endpoints nuevos y exportaciones CSV conectables a API.
 
-El bloqueo principal actual no es de UI: el backend local usa una `SUPABASE_SERVICE_ROLE_KEY` placeholder, por eso Supabase devuelve `Invalid API key` en endpoints con datos reales. Ademas, para desarrollo local el frontend debe usar el proxy Vite (`VITE_API_BASE_URL=/api`) o el backend debe permitir explicitamente el origin del puerto usado.
+El bloqueo por `SUPABASE_SERVICE_ROLE_KEY` placeholder fue resuelto localmente el 2026-06-06 cargando una service role real en el `.env` no versionado del backend. Para desarrollo local, el frontend queda configurado con proxy Vite (`VITE_API_BASE_URL=/api`) para evitar CORS. Siguen pendientes las validaciones destructivas controladas: cierre real, reproceso real sin `dryRun` y aprobacion/rechazo real de novedades.
 
 ## 3. Cambios implementados en frontend
 
@@ -255,9 +255,10 @@ Resultados actuales:
 
 - `GET /health`: OK.
 - `GET /api/exports/options`: OK.
-- `GET /api/closures/current`: falla por `Invalid API key`.
-- `GET /api/news`: falla por `Invalid API key`.
-- `POST /api/reasoning/reprocess-range`: falla por `Invalid API key`.
+- `GET /api/closures/current`: OK con datos reales.
+- `GET /api/news`: OK con novedades reales.
+- `POST /api/reasoning/reprocess-range` con `dryRun=true`: OK.
+- `POST /api/exports` para reporte de empleados: OK.
 
 ### 6.4 React Doctor
 
@@ -276,35 +277,20 @@ Lectura:
 
 ## 7. Bloqueos actuales
 
-### 7.1 Supabase service role invalida
+### 7.1 Supabase service role
 
-Estado comprobado:
+Estado actual:
 
-- La key local tiene formato placeholder.
-- No empieza con `eyJ`.
-- Supabase responde `401 Invalid API key`.
+- Resuelto localmente el 2026-06-06.
+- El backend usa una `SUPABASE_SERVICE_ROLE_KEY` real en `.env`, archivo ignorado por Git.
+- `GET /api/closures/current` responde 200 OK con datos reales.
+- Se agrego validacion defensiva en backend para detectar placeholders o ausencia de key al iniciar.
 
-Impacto:
+Pendiente operativo:
 
-- No se puede validar cierre real.
-- No se puede validar reproceso real.
-- No se puede validar novedades reales.
-- No se puede validar exportaciones reales con datos.
-
-Accion requerida:
-
-1. Entrar a Supabase Project Settings > API.
-2. Copiar `service_role` real.
-3. Configurar `/home/maxi/TrabajoPracticoGADS1-backend/.env`:
-
-```env
-SUPABASE_URL=https://dkmxzzveiuyvpiuamtua.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=eyJ...
-PORT=3000
-```
-
-4. Reiniciar backend.
-5. Probar `curl http://localhost:3000/api/closures/current`.
+1. No commitear secretos.
+2. Configurar la misma variable en Render/hosting si se prueba backend desplegado.
+3. Mantener `.env.example` solo con placeholder descriptivo.
 
 ### 7.2 Configuracion local frontend/backend
 
@@ -327,12 +313,13 @@ Alternativa:
 
 ### P0 - Desbloqueo obligatorio
 
-1. Cargar `SUPABASE_SERVICE_ROLE_KEY` valida en backend.
-2. Reiniciar backend y confirmar `GET /health`.
-3. Confirmar que `GET /api/closures/current` deja de devolver `Invalid API key`.
-4. Confirmar que el frontend usa `VITE_API_BASE_URL=/api` o que CORS permite el origin exacto.
-5. Reiniciar frontend para que tome `.env`.
-6. Reejecutar smoke API desde navegador en `/#/cierre`.
+1. Configurar `SUPABASE_SERVICE_ROLE_KEY` valida en backend local. Estado: hecho.
+2. Reiniciar backend y confirmar `GET /health`. Estado: hecho.
+3. Confirmar que `GET /api/closures/current` deja de devolver `Invalid API key`. Estado: hecho.
+4. Confirmar que el frontend usa `VITE_API_BASE_URL=/api` o que CORS permite el origin exacto. Estado: hecho local.
+5. Reiniciar frontend para que tome `.env`. Estado: hecho.
+6. Reejecutar smoke API desde navegador en `/#/cierre`. Estado: hecho, E2E real paso.
+7. Configurar la misma service role en el backend desplegado si se usa Render/produccion. Estado: pendiente.
 
 ### P1 - Validacion real del motor de reglas
 

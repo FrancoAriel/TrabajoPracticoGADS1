@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useCallback } from 'react'
 import AppShell from '../../components/layout/AppShell'
 import Modal from '../../components/ui/Modal'
 import { isApiMode } from '../../config/env'
-import { listNews, approveNews, rejectNews } from '../../services/newsService'
+import { createNews, listNews, approveNews, rejectNews } from '../../services/newsService'
 
 const TYPE_BADGE = {
   horas_extra_50: 'bg-tertiary-container/40 text-on-tertiary-container',
@@ -128,6 +128,14 @@ function mapApiTipoToFilterKey(tipo) {
   return String(tipo).toLowerCase()
 }
 
+function mapFilterKeyToApiTipo(tipo) {
+  if (!tipo) return ''
+  return String(tipo)
+    .split('_')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('_')
+}
+
 function mapEstadoToPill(estado) {
   if (estado === 'Aprobada') return 'Aprobado'
   if (estado === 'Rechazada') return 'Rechazado'
@@ -164,41 +172,43 @@ export default function NovedadesPage() {
   const [search, setSearch] = useState('')
   const [filterType, setFilterType] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
-  const [items, setItems] = useState(initialItems)
-  const [kpiStats, setKpiStats] = useState({ pending: 9, approved: 4, rejected: 1, total: 28 })
-  const [loading, setLoading] = useState(false)
+  const [items, setItems] = useState(() => (api ? [] : initialItems))
+  const [kpiStats, setKpiStats] = useState(() => (api ? { pending: 0, approved: 0, rejected: 0, total: 0 } : { pending: 9, approved: 4, rejected: 1, total: 28 }))
+  const [loading, setLoading] = useState(() => api)
   const [dataReady, setDataReady] = useState(() => !api)
   const [selectedId, setSelectedId] = useState(null)
   const [openCreate, setOpenCreate] = useState(false)
   const [openReject, setOpenReject] = useState(false)
   const [novType, setNovType] = useState('')
   const [toast, setToast] = useState('')
+  const [loadError, setLoadError] = useState('')
+  const [createLoading, setCreateLoading] = useState(false)
 
   useEffect(() => { document.title = 'Novedades - Executive Architect' }, [])
 
-  const loadNews = useCallback(() => {
+  const loadNews = useCallback(async () => {
     if (!api) return
     setLoading(true)
-    listNews({ pageSize: 500 })
-      .then((data) => {
-        const rows = (data.items ?? []).map(mapNewsItemFromApi)
-        setItems(rows)
-        const st = data.stats ?? {}
-        setKpiStats({
-          pending:  st.pending ?? 0,
-          approved: st.approved ?? 0,
-          rejected: st.rejected ?? 0,
-          total:    (st.pending ?? 0) + (st.approved ?? 0) + (st.rejected ?? 0),
-        })
+    setLoadError('')
+    try {
+      const data = await listNews({ pageSize: 500 })
+      const rows = (data.items ?? []).map(mapNewsItemFromApi)
+      setItems(rows)
+      const st = data.stats ?? {}
+      setKpiStats({
+        pending: st.pending ?? 0,
+        approved: st.approved ?? 0,
+        rejected: st.rejected ?? 0,
+        total: (st.pending ?? 0) + (st.approved ?? 0) + (st.rejected ?? 0),
       })
-      .catch(() => {
-        setItems([])
-        setKpiStats({ pending: 0, approved: 0, rejected: 0, total: 0 })
-      })
-      .finally(() => {
-        setLoading(false)
-        setDataReady(true)
-      })
+    } catch (error) {
+      setItems([])
+      setKpiStats({ pending: 0, approved: 0, rejected: 0, total: 0 })
+      setLoadError(error?.message ?? 'No se pudieron cargar las novedades.')
+    } finally {
+      setLoading(false)
+      setDataReady(true)
+    }
   }, [api])
 
   useEffect(() => {
@@ -227,7 +237,7 @@ export default function NovedadesPage() {
       try {
         await approveNews(selected.rawId ?? selected.id)
         showToast('Novedad aprobada correctamente.')
-        loadNews()
+        await loadNews()
         setSelectedId(null)
       } catch (e) {
         showToast(`Error: ${e.message}`)
@@ -245,7 +255,7 @@ export default function NovedadesPage() {
         await rejectNews(selected.rawId ?? selected.id, '')
         showToast('Novedad rechazada.')
         setOpenReject(false)
-        loadNews()
+        await loadNews()
         setSelectedId(null)
       } catch (e) {
         showToast(`Error: ${e.message}`)
@@ -277,11 +287,65 @@ export default function NovedadesPage() {
           <p className="text-sm font-semibold">Cargando novedades...</p>
         </div>
       </AppShell>
-    )
+      )
+  }
+
+  const handleCreate = async (e) => {
+    e.preventDefault()
+    if (!api) {
+      setOpenCreate(false)
+      showToast('Novedad cargada. Estado: Pendiente.')
+      return
+    }
+
+    const formData = new FormData(e.currentTarget)
+    const employeeRef = String(formData.get('employeeRef') ?? '')
+    const legajo = Number(employeeRef.split('·')[0]?.trim())
+    const tipo = String(formData.get('tipo') ?? '')
+    const fechaDesde = String(formData.get('fechaDesde') ?? '')
+    const fechaHasta = String(formData.get('fechaHasta') ?? '')
+    const cantidadRaw = String(formData.get('cantidad') ?? '').trim()
+    const observacion = String(formData.get('observacion') ?? '').trim()
+    const unidad = HORAS_TYPES.includes(tipo) ? 'Horas' : MINUTOS_TYPES.includes(tipo) ? 'Minutos' : 'Dias'
+
+    if (!Number.isFinite(legajo) || !tipo || !fechaDesde) {
+      showToast('Completá empleado, tipo y fecha desde.')
+      return
+    }
+
+    setCreateLoading(true)
+    try {
+      await createNews({
+        legajo,
+        tipo: mapFilterKeyToApiTipo(tipo),
+        fechaDesde,
+        fechaHasta: fechaHasta || null,
+        cantidad: cantidadRaw === '' ? null : Number(cantidadRaw),
+        unidad,
+        observacion: observacion || null,
+        idUsuarioCreacion: null,
+      })
+      await loadNews()
+      setOpenCreate(false)
+      setNovType('')
+      e.currentTarget.reset()
+      setSelectedId(null)
+      showToast('Novedad cargada. Estado: Pendiente.')
+    } catch (error) {
+      showToast(`Error: ${error.message}`)
+    } finally {
+      setCreateLoading(false)
+    }
   }
 
   return (
     <AppShell topbarTitle="NOVEDADES" topbarContent={topbarContent}>
+      {loadError ? (
+        <div className="mb-4 rounded-lg border border-error/20 bg-error-container/20 px-4 py-3 text-sm text-error">
+          {loadError}
+        </div>
+      ) : null}
+
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h2 className="font-headline text-2xl font-extrabold tracking-tight text-on-background">Gestión de Novedades</h2>
@@ -453,15 +517,15 @@ export default function NovedadesPage() {
       </div>
 
       <Modal open={openCreate} title="Nueva novedad" subtitle="Cargá una novedad manual para un empleado." onClose={() => setOpenCreate(false)} size="max-w-lg">
-        <form className="space-y-5 px-8 py-6" onSubmit={(e) => { e.preventDefault(); setOpenCreate(false); showToast('Novedad cargada. Estado: Pendiente.') }}>
+        <form className="space-y-5 px-8 py-6" onSubmit={handleCreate}>
           <Field label="Empleado *">
-            <SelectInput required>
+            <SelectInput required name="employeeRef">
               <option value="">Seleccionar empleado...</option>
               {employeeOptions.map((o) => <option key={o}>{o}</option>)}
             </SelectInput>
           </Field>
           <Field label="Tipo de novedad *">
-            <SelectInput required value={novType} onChange={(e) => setNovType(e.target.value)}>
+            <SelectInput required name="tipo" value={novType} onChange={(e) => setNovType(e.target.value)}>
               <option value="">Seleccionar tipo...</option>
               <optgroup label="Horas extra">
                 <option value="horas_extra_50">Horas extra 50%</option>
@@ -482,13 +546,13 @@ export default function NovedadesPage() {
             </SelectInput>
           </Field>
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Fecha desde *"><TextInput required type="date" /></Field>
-            <Field label="Fecha hasta"><TextInput type="date" /></Field>
+            <Field label="Fecha desde *"><TextInput required type="date" name="fechaDesde" /></Field>
+            <Field label="Fecha hasta"><TextInput type="date" name="fechaHasta" /></Field>
           </div>
           {HORAS_TYPES.includes(novType) && (
             <Field label="Cantidad de horas *">
               <div className="relative">
-                <TextInput type="number" min="0.5" max="24" step="0.5" placeholder="Ej: 2" required />
+                <TextInput type="number" min="0.5" max="24" step="0.5" placeholder="Ej: 2" required name="cantidad" />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant">hs</span>
               </div>
             </Field>
@@ -496,7 +560,7 @@ export default function NovedadesPage() {
           {MINUTOS_TYPES.includes(novType) && (
             <Field label="Cantidad de minutos *">
               <div className="relative">
-                <TextInput type="number" min="1" max="480" placeholder="Ej: 15" required />
+                <TextInput type="number" min="1" max="480" placeholder="Ej: 15" required name="cantidad" />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant">min</span>
               </div>
             </Field>
@@ -504,15 +568,15 @@ export default function NovedadesPage() {
           {DIAS_TYPES.includes(novType) && (
             <Field label="Cantidad de días *">
               <div className="relative">
-                <TextInput type="number" min="1" max="365" placeholder="Ej: 1" required />
+                <TextInput type="number" min="1" max="365" placeholder="Ej: 1" required name="cantidad" />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant">días</span>
               </div>
             </Field>
           )}
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Fecha de creación *"><TextInput required type="date" defaultValue={new Date().toISOString().slice(0, 10)} /></Field>
+            <Field label="Fecha de creación *"><TextInput required type="date" defaultValue={new Date().toISOString().slice(0, 10)} disabled /></Field>
             <Field label="Creado por *">
-              <SelectInput required>
+              <SelectInput required disabled>
                 <option>Administrator</option>
                 <option>Supervisor RRHH</option>
                 <option>Jefe de área</option>
@@ -520,12 +584,13 @@ export default function NovedadesPage() {
             </Field>
           </div>
           <Field label="Observación">
-            <textarea rows={2} placeholder="Detalle adicional (opcional)..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            <textarea name="observacion" rows={2} placeholder="Detalle adicional (opcional)..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
           </Field>
           <div className="flex gap-3 border-t border-slate-100 pt-2">
-            <button type="button" onClick={() => setOpenCreate(false)} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">Cancelar</button>
-            <button type="submit" className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary/90">
-              <span className="material-symbols-outlined text-sm">add</span> Cargar novedad
+            <button type="button" onClick={() => setOpenCreate(false)} disabled={createLoading} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low disabled:opacity-50">Cancelar</button>
+            <button type="submit" disabled={createLoading} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary/90 disabled:opacity-50">
+              {createLoading ? <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span> : <span className="material-symbols-outlined text-sm">add</span>}
+              Cargar novedad
             </button>
           </div>
         </form>

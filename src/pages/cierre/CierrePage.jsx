@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AppShell from '../../components/layout/AppShell'
 import Modal from '../../components/ui/Modal'
+import { isApiMode } from '../../config/env'
 import { routes } from '../../lib/routes'
 import { createClosure, getCurrentClosure, runClosure } from '../../services/closureService'
 import { reprocessRange } from '../../services/reasoningService'
@@ -39,6 +40,7 @@ function firstDayOfMonth() {
 }
 
 export default function CierrePage() {
+  const api = isApiMode()
   const [selected, setSelected] = useState(null)
   const [closureData, setClosureData] = useState(null)
   const [closureLoading, setClosureLoading] = useState(true)
@@ -72,9 +74,15 @@ export default function CierrePage() {
     loadClosure()
   }, [])
 
-  const currentPeriod = closureData?.currentPeriod ?? 'Junio 2025'
-  const stats = closureData?.stats ?? { liquidated: 39, pending: 3, he50: '42h 15m', he100: '8h 00m' }
-  const closureEmployees = (closureData?.employeeBreakdown?.length ? closureData.employeeBreakdown : employees).map((emp) => ({
+  const currentPeriod = closureData?.currentPeriod ?? (api ? '—' : 'Junio 2025')
+  const stats = closureData?.stats ?? (api ? { liquidated: 0, pending: 0, he50: '0', he100: '0' } : { liquidated: 39, pending: 3, he50: '42h 15m', he100: '8h 00m' })
+  const periodCards = closureData?.periodCards?.length ? closureData.periodCards : (api ? [] : [
+    { id: 'may-2025', label: 'Mayo 2025', status: 'Cerrado', sub: 'Cerrado el 05/06/2025' },
+    { id: 'jun-2025', label: 'Junio 2025', status: 'En progreso', sub: '3 novedades pendientes' },
+    { id: 'jul-2025', label: 'Julio 2025', status: 'Futuro', sub: 'Aún no iniciado' },
+  ])
+  const rawEmployees = closureData?.employeeBreakdown?.length ? closureData.employeeBreakdown : (api ? [] : employees)
+  const closureEmployees = rawEmployees.map((emp) => ({
     name: emp.name,
     legajo: emp.legajo ?? String(emp.id ?? '').padStart(4, '0'),
     initials: emp.initials ?? String(emp.name ?? 'NA').split(/\s+/).slice(0, 2).map((p) => p[0]).join('').toUpperCase(),
@@ -115,7 +123,22 @@ export default function CierrePage() {
           link: item.key === 'review-pending-news' && !item.done,
         }
       })
-    : checklist
+    : (api ? [] : checklist)
+
+  const hasClosureData = Boolean(closureData)
+  const closureStatus = closureData?.currentClosure?.estado ?? 'Borrador'
+  const isClosedClosure = closureStatus === 'Cerrado'
+
+  if (api && closureLoading && !hasClosureData) {
+    return (
+      <AppShell topbarTitle="CIERRE MENSUAL">
+        <div className="flex flex-col items-center justify-center gap-3 py-32 text-on-surface-variant">
+          <span className="material-symbols-outlined animate-spin text-4xl opacity-40">progress_activity</span>
+          <p className="text-sm font-semibold">Cargando datos de cierre...</p>
+        </div>
+      </AppShell>
+    )
+  }
 
   async function handleRunClosure() {
     setClosureActionLoading(true)
@@ -165,6 +188,13 @@ export default function CierrePage() {
 
   return (
     <AppShell topbarTitle="CIERRE MENSUAL">
+      {api && closureLoading && hasClosureData ? (
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-primary/15 bg-primary/5 px-4 py-3 text-sm text-primary">
+          <span className="material-symbols-outlined animate-spin text-base">progress_activity</span>
+          Actualizando datos del cierre...
+        </div>
+      ) : null}
+
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="font-headline text-2xl font-extrabold tracking-tight text-on-background">Cierre Mensual</h2>
@@ -173,7 +203,9 @@ export default function CierrePage() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 rounded-lg bg-tertiary-container/40 px-4 py-2">
             <span className="material-symbols-outlined text-sm text-tertiary">pending</span>
-            <span className="text-xs font-bold uppercase tracking-widest text-on-tertiary-container">Período abierto: {currentPeriod}</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-on-tertiary-container">
+              Período {isClosedClosure ? 'cerrado' : 'abierto'}: {currentPeriod}
+            </span>
           </div>
           <button
             onClick={() => setReprocessOpen(true)}
@@ -185,11 +217,11 @@ export default function CierrePage() {
           <button
             type="button"
             onClick={handleRunClosure}
-            disabled={closureActionLoading || closureLoading || Number(stats.pending ?? 0) > 0}
+            disabled={isClosedClosure || closureActionLoading || closureLoading || Number(stats.pending ?? 0) > 0}
             className="flex items-center gap-2 rounded-md bg-slate-900 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
           >
             {closureActionLoading ? <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span> : <span className="material-symbols-outlined text-sm">lock_open</span>}
-            {closureData?.currentClosure?.id ? 'Ejecutar cierre' : 'Crear y cerrar'}
+            {isClosedClosure ? 'Período cerrado' : closureData?.currentClosure?.id ? 'Ejecutar cierre' : 'Crear y cerrar'}
           </button>
         </div>
       </div>
@@ -208,30 +240,44 @@ export default function CierrePage() {
       </div>
 
       <div className="mb-6 grid grid-cols-3 gap-4">
-        <div className="flex items-center justify-between rounded-xl border border-slate-200/50 border-l-4 border-l-green-600 bg-surface-container-lowest p-5">
-          <div>
-            <p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Mayo 2025</p>
-            <p className="text-sm font-black text-green-700">CERRADO</p>
-            <p className="mt-0.5 text-xs text-on-surface-variant">Cerrado el 05/06/2025</p>
+        {periodCards.length ? periodCards.map((card) => {
+          const normalizedStatus = String(card.status ?? '').toLowerCase()
+          const isClosed = normalizedStatus === 'cerrado'
+          const isCurrent = normalizedStatus === 'en progreso'
+          const wrapperClass = isCurrent
+            ? 'relative overflow-hidden rounded-xl bg-slate-900 p-5 text-white'
+            : isClosed
+              ? 'flex items-center justify-between rounded-xl border border-slate-200/50 border-l-4 border-l-green-600 bg-surface-container-lowest p-5'
+              : 'rounded-xl bg-surface-container-highest p-5 opacity-50'
+          const titleClass = isCurrent ? 'text-slate-400' : 'text-on-surface-variant'
+          const statusClass = isClosed ? 'text-green-700' : isCurrent ? 'text-white' : 'text-on-surface-variant'
+          const subClass = isCurrent ? 'text-slate-400' : 'text-on-surface-variant'
+
+          return (
+            <div key={card.id ?? card.label} className={wrapperClass}>
+              {isCurrent ? <span className="material-symbols-outlined absolute -bottom-3 -right-3 text-7xl opacity-10">point_of_sale</span> : null}
+              <div>
+                <p className={`mb-1 font-headline text-[10px] font-bold uppercase tracking-widest ${titleClass}`}>{card.label}</p>
+                <p className={`text-sm font-black uppercase ${statusClass}`}>{card.status}</p>
+                <p className={`mt-0.5 text-xs ${subClass}`}>{card.sub ?? (isCurrent ? `${stats.pending ?? 0} novedades pendientes` : 'Sin detalle adicional')}</p>
+                {isCurrent ? (
+                  <Link to={routes.novedades} className="mt-3 flex items-center gap-1 text-xs font-bold text-blue-300 hover:underline">
+                    <span className="material-symbols-outlined text-sm">arrow_forward</span> Revisar novedades
+                  </Link>
+                ) : null}
+              </div>
+              {isClosed ? (
+                <Link to={routes.exportaciones} className="flex shrink-0 items-center gap-1 text-xs font-bold text-primary hover:underline">
+                  <span className="material-symbols-outlined text-sm">download</span> Exportar
+                </Link>
+              ) : null}
+            </div>
+          )
+        }) : (
+          <div className="col-span-3 rounded-xl border border-dashed border-slate-200 bg-surface-container-lowest p-8 text-center text-sm text-on-surface-variant">
+            No hay tarjetas de período disponibles para mostrar.
           </div>
-          <Link to={routes.exportaciones} className="flex shrink-0 items-center gap-1 text-xs font-bold text-primary hover:underline">
-            <span className="material-symbols-outlined text-sm">download</span> Exportar
-          </Link>
-        </div>
-        <div className="relative overflow-hidden rounded-xl bg-slate-900 p-5 text-white">
-          <span className="material-symbols-outlined absolute -bottom-3 -right-3 text-7xl opacity-10">point_of_sale</span>
-          <p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-slate-400">{currentPeriod}</p>
-          <p className="text-sm font-black">EN PROGRESO</p>
-          <p className="mt-0.5 text-xs text-slate-400">{stats.pending ?? 0} novedades pendientes</p>
-          <Link to={routes.novedades} className="mt-3 flex items-center gap-1 text-xs font-bold text-blue-300 hover:underline">
-            <span className="material-symbols-outlined text-sm">arrow_forward</span> Revisar novedades
-          </Link>
-        </div>
-        <div className="rounded-xl bg-surface-container-highest p-5 opacity-50">
-          <p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Julio 2025</p>
-          <p className="text-sm font-black text-on-surface-variant">PENDIENTE</p>
-          <p className="mt-0.5 text-xs text-on-surface-variant">Aún no iniciado</p>
-        </div>
+        )}
       </div>
 
       <div className="mb-6 grid grid-cols-12 gap-6">
@@ -240,7 +286,9 @@ export default function CierrePage() {
             <h3 className="flex shrink-0 items-center gap-2 font-headline text-xs font-extrabold tracking-[0.2em]">
               <span className="material-symbols-outlined text-sm">analytics</span> DESGLOSE POR EMPLEADO — {currentPeriod.toUpperCase()}
             </h3>
-            <span className="shrink-0 rounded-full bg-tertiary-container/30 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-tertiary">BORRADOR</span>
+            <span className={`shrink-0 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${isClosedClosure ? 'bg-green-50 text-green-700' : 'bg-tertiary-container/30 text-tertiary'}`}>
+              {closureStatus}
+            </span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
@@ -255,7 +303,7 @@ export default function CierrePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {closureEmployees.map((emp) => (
+                {closureEmployees.length ? closureEmployees.map((emp) => (
                   <tr key={emp.legajo} onClick={() => setSelected(emp)} className={`cursor-pointer transition-colors hover:bg-slate-50 ${selected?.legajo === emp.legajo ? 'bg-primary-container/20' : ''}`}>
                     <td className={`px-5 py-3.5${selected?.legajo === emp.legajo ? ' border-l-4 border-primary' : ''}`}>
                       <div className="flex items-center gap-2">
@@ -272,7 +320,14 @@ export default function CierrePage() {
                     <td className="px-5 py-3.5 text-center text-sm text-on-surface-variant">{emp.ausencias}</td>
                     <td className="px-5 py-3.5 text-center"><StatusPill status={emp.status} /></td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-sm text-on-surface-variant">
+                      <span className="material-symbols-outlined mb-2 block text-3xl opacity-30">group_off</span>
+                      No hay empleados con datos de cierre para el período actual.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -337,9 +392,9 @@ export default function CierrePage() {
           <span className="material-symbols-outlined text-sm">checklist</span> CHECKLIST DE CIERRE
         </h3>
         <div className="space-y-2.5">
-          {closureChecklist.map((item) => (
+          {closureChecklist.length ? closureChecklist.map((item) => (
             <div key={item.key ?? item.title} className={`flex items-center gap-4 rounded-lg border p-4 ${item.bg}`}>
-              <span className="material-symbols-outlined shrink-0 text-sm" style={item.iconFill ? { fontVariationSettings: "'FILL' 1" } : undefined}>{item.icon}</span>
+              <span className={`material-symbols-outlined shrink-0 text-sm ${item.iconClass ?? ''}`} style={item.iconFill ? { fontVariationSettings: "'FILL' 1" } : undefined}>{item.icon}</span>
               <div className="flex-1">
                 <p className="text-sm font-bold">{item.title}</p>
                 <p className="text-xs text-on-surface-variant">{item.sub}</p>
@@ -352,7 +407,11 @@ export default function CierrePage() {
                 <span className={`shrink-0 text-[10px] font-bold uppercase ${item.badgeClass}`}>{item.badge}</span>
               )}
             </div>
-          ))}
+          )) : (
+            <div className="rounded-lg border border-dashed border-slate-200 p-6 text-center text-sm text-on-surface-variant">
+              No hay validaciones de cierre disponibles para este período.
+            </div>
+          )}
         </div>
         <p className="mt-5 text-xs text-on-surface-variant">El botón "Ejecutar cierre" se habilita cuando no quedan novedades pendientes del período.</p>
       </div>
@@ -363,11 +422,16 @@ export default function CierrePage() {
         title="Reprocesar período"
         subtitle="Borra novedades automáticas previas del rango y vuelve a evaluar las 5 reglas del motor."
       >
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-4 px-8 py-6">
+          <div className="rounded-lg border border-tertiary/20 bg-tertiary-container/20 px-4 py-3 text-xs text-on-tertiary-container">
+            El reproceso elimina novedades automáticas previas del rango seleccionado y recalcula reglas. Usá simulación para validar antes de impactar datos.
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Desde</label>
+              <label htmlFor="reprocess-desde" className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Desde</label>
               <input
+                id="reprocess-desde"
                 type="date"
                 value={reprocessDesde}
                 onChange={(e) => setReprocessDesde(e.target.value)}
@@ -375,8 +439,9 @@ export default function CierrePage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Hasta</label>
+              <label htmlFor="reprocess-hasta" className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Hasta</label>
               <input
+                id="reprocess-hasta"
                 type="date"
                 value={reprocessHasta}
                 onChange={(e) => setReprocessHasta(e.target.value)}
@@ -386,10 +451,11 @@ export default function CierrePage() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+            <label htmlFor="reprocess-legajos" className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
               Legajos (opcional, separados por coma)
             </label>
             <input
+              id="reprocess-legajos"
               type="text"
               value={reprocessLegajos}
               onChange={(e) => setReprocessLegajos(e.target.value)}
@@ -417,7 +483,7 @@ export default function CierrePage() {
           {reprocessResult && (
             <div className="rounded-md border border-outline-variant/40 bg-surface-container-low p-3 text-sm">
               <p className="mb-2 font-bold">Resultado{reprocessResult.dryRun ? ' (simulación)' : ''}</p>
-              <div className="grid grid-cols-4 gap-2 text-xs">
+              <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
                 <div className="rounded bg-green-50 px-2 py-1">
                   <span className="font-bold text-green-700">{reprocessResult.totals?.created ?? 0}</span> creadas
                 </div>
@@ -436,7 +502,7 @@ export default function CierrePage() {
                   <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Por regla</p>
                   <ul className="space-y-0.5 text-xs">
                     {Object.entries(reprocessResult.byRule).map(([rule, counts]) => (
-                      <li key={rule} className="flex justify-between gap-3">
+                      <li key={rule} className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
                         <span className="capitalize">{rule.replace(/_/g, ' ')}</span>
                         <span className="text-on-surface-variant">
                           creadas: <b className="text-on-surface">{counts.created}</b>, ok: {counts.ok}, omitidas: {counts.skipped}
