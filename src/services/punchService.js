@@ -31,7 +31,7 @@ export async function listPunches(params = {}) {
 
 export async function createManualPunch(payload) {
   if (!isApiMode()) return { ok: true, ...payload }
-  const raw = await apiClient.post('/punches/manual', payload)
+  const raw = await apiClient.post('/punches', { origen: 'Manual', ...payload })
   return raw?.data ?? raw
 }
 

@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect, useCallback } from 'react'
 import AppShell from '../../components/layout/AppShell'
 import Modal from '../../components/ui/Modal'
 import { isApiMode } from '../../config/env'
+import { getSession } from '../../lib/session'
 import { createNews, listNews, approveNews, rejectNews } from '../../services/newsService'
 
 const TYPE_BADGE = {
@@ -17,6 +18,8 @@ const TYPE_BADGE = {
   permiso_especial: 'bg-secondary-container/40 text-on-secondary-container',
   salida_anticipada: 'bg-error-container/20 text-error',
   doble_fichada: 'bg-secondary-container/40 text-on-secondary-container',
+  descanso_no_tomado: 'bg-error-container/20 text-error',
+  descanso_excedido: 'bg-tertiary-container/40 text-on-tertiary-container',
   horas_faltantes: 'bg-error-container/20 text-error',
 }
 
@@ -51,6 +54,8 @@ const TYPE_LABEL = {
   salida_anticipada: 'Salida anticipada',
   horas_faltantes: 'Horas faltantes',
   doble_fichada: 'Doble fichada',
+  descanso_no_tomado: 'Descanso no tomado',
+  descanso_excedido: 'Descanso excedido',
   licencia: 'Licencia',
 }
 
@@ -88,7 +93,7 @@ function SelectInput({ children, ...props }) {
 }
 
 const HORAS_TYPES = ['horas_extra_50', 'horas_extra_100']
-const MINUTOS_TYPES = ['tardanza']
+const MINUTOS_TYPES = ['tardanza', 'descanso_no_tomado', 'descanso_excedido']
 const DIAS_TYPES = ['justificacion', 'ausencia', 'licencia_enfermedad', 'licencia_examen', 'vacaciones', 'permiso_especial', 'suspension']
 
 function formatApiDate(isoDate) {
@@ -169,6 +174,7 @@ function mapNewsItemFromApi(n) {
 
 export default function NovedadesPage() {
   const api = isApiMode()
+  const canMutate = !api || getSession()?.user?.role === 'Admin'
   const [search, setSearch] = useState('')
   const [filterType, setFilterType] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
@@ -183,6 +189,7 @@ export default function NovedadesPage() {
   const [toast, setToast] = useState('')
   const [loadError, setLoadError] = useState('')
   const [createLoading, setCreateLoading] = useState(false)
+  const [creationDate] = useState(() => new Date().toISOString().slice(0, 10))
 
   useEffect(() => { document.title = 'Novedades - Executive Architect' }, [])
 
@@ -233,6 +240,7 @@ export default function NovedadesPage() {
 
   const approve = async () => {
     if (!selected) return
+    if (!window.confirm(`Aprobar la novedad ${selected.id}?`)) return
     if (api) {
       try {
         await approveNews(selected.rawId ?? selected.id)
@@ -250,6 +258,7 @@ export default function NovedadesPage() {
 
   const reject = async () => {
     if (!selected) return
+    if (!window.confirm(`Rechazar la novedad ${selected.id}?`)) return
     if (api) {
       try {
         await rejectNews(selected.rawId ?? selected.id, '')
@@ -351,9 +360,11 @@ export default function NovedadesPage() {
           <h2 className="font-headline text-2xl font-extrabold tracking-tight text-on-background">Gestión de Novedades</h2>
           <p className="mt-1 text-sm text-on-surface-variant">Revisión y aprobación de novedades del período.</p>
         </div>
-        <button type="button" onClick={() => setOpenCreate(true)} className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90">
-          <span className="material-symbols-outlined text-sm">add</span> Nueva novedad
-        </button>
+        {canMutate ? (
+          <button type="button" onClick={() => setOpenCreate(true)} className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90">
+            <span className="material-symbols-outlined text-sm">add</span> Nueva novedad
+          </button>
+        ) : null}
       </div>
 
       <div className="mb-8 grid grid-cols-4 gap-4">
@@ -383,6 +394,8 @@ export default function NovedadesPage() {
                 <option value="horas_extra_50">Horas extra 50%</option>
                 <option value="horas_extra_100">Horas extra 100%</option>
                 <option value="doble_fichada">Doble fichada</option>
+                <option value="descanso_no_tomado">Descanso no tomado</option>
+                <option value="descanso_excedido">Descanso excedido</option>
                 <option value="justificacion">Justificación</option>
                 <option value="licencia">Licencia</option>
                 <option value="vacaciones">Vacaciones</option>
@@ -500,7 +513,7 @@ export default function NovedadesPage() {
                   <p className="mb-1.5 text-[10px] font-bold uppercase text-on-surface-variant">Observación</p>
                   <p className="text-xs text-on-background">{selected.obs}</p>
                 </div>
-                {selected.status === 'Pendiente' && (
+                {canMutate && selected.status === 'Pendiente' && (
                   <div className="flex gap-3 pt-1">
                     <button type="button" onClick={approve} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-on-secondary-container/30 bg-on-secondary-container/15 py-2.5 text-xs font-bold text-on-secondary-container transition-colors hover:bg-on-secondary-container/25">
                       <span className="material-symbols-outlined text-sm">check_circle</span> Aprobar
@@ -574,7 +587,7 @@ export default function NovedadesPage() {
             </Field>
           )}
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Fecha de creación *"><TextInput required type="date" defaultValue={new Date().toISOString().slice(0, 10)} disabled /></Field>
+            <Field label="Fecha de creación *"><TextInput required type="date" defaultValue={creationDate} disabled /></Field>
             <Field label="Creado por *">
               <SelectInput required disabled>
                 <option>Administrator</option>
@@ -584,7 +597,7 @@ export default function NovedadesPage() {
             </Field>
           </div>
           <Field label="Observación">
-            <textarea name="observacion" rows={2} placeholder="Detalle adicional (opcional)..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            <textarea name="observacion" aria-label="Observación" rows={2} placeholder="Detalle adicional (opcional)..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
           </Field>
           <div className="flex gap-3 border-t border-slate-100 pt-2">
             <button type="button" onClick={() => setOpenCreate(false)} disabled={createLoading} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low disabled:opacity-50">Cancelar</button>
@@ -599,7 +612,7 @@ export default function NovedadesPage() {
       <Modal open={openReject} title="Rechazar novedad" onClose={() => setOpenReject(false)} size="max-w-sm">
         <form className="space-y-4 px-8 py-6" onSubmit={(e) => { e.preventDefault(); reject() }}>
           <Field label="Motivo de rechazo *">
-            <textarea required rows={3} placeholder="Indicá el motivo del rechazo..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-error focus:outline-none focus:ring-2 focus:ring-error/30" />
+            <textarea required aria-label="Motivo de rechazo" rows={3} placeholder="Indicá el motivo del rechazo..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-error focus:outline-none focus:ring-2 focus:ring-error/30" />
           </Field>
           <div className="flex gap-3">
             <button type="button" onClick={() => setOpenReject(false)} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">Cancelar</button>

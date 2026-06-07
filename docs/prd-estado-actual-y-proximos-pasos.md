@@ -442,3 +442,145 @@ La entrega se considera cerrada cuando:
 8. E2E navegador pasa sin errores de consola relevantes.
 9. `npm run build` pasa.
 10. Los pendientes P0 y P1 estan cerrados o documentados como fuera de alcance.
+
+## 10. Actualizacion 2026-06-07 - Implementacion de cierre de alcance
+
+### 10.1 Backend implementado
+
+1. Autenticacion con token firmado tipo JWT sin dependencias nuevas.
+2. Middleware `requireAuth` para rutas privadas.
+3. Middleware `requireRole` para permisos por rol.
+4. Login real contra tabla `usuario`, con rechazo de usuarios inactivos.
+5. Fallback temporal de desarrollo para login `admin` / `admin`, antes de consultar Supabase, con usuario `Admin Sistema` y rol `Admin`.
+6. Proteccion de rutas:
+   - Admin: empleados, fichadas, horarios, reproceso, alta/aprobacion/rechazo de novedades y ejecucion de cierre.
+   - Admin/Contador: novedades, cierre y exportaciones.
+   - Admin/Contador/Empleado: dashboard.
+7. Registro generico de fichadas desde `POST /api/punches` con origen `Manual`, `Biometrico`, `Qr`, `Pin` o `Api`.
+8. Evaluacion automatica de reglas despues de registrar fichadas manuales/simuladas.
+9. Baja logica de empleados en lugar de eliminacion fisica.
+10. Bloqueo de eliminacion destructiva de fichadas, novedades y cierres.
+11. Regla nueva de descanso no tomado o excedido basada en `descanso_minimo_min`.
+12. Exportaciones CSV con historial persistible en tabla `exportacion` si la migracion esta aplicada.
+13. Descarga de exportaciones historicas reconstruyendo el CSV si el backend se reinicio.
+14. Catalogos alineados a CSV como unico formato operativo.
+
+### 10.2 Frontend implementado
+
+1. Sesion persistida en `localStorage`.
+2. Inyeccion automatica de `Authorization: Bearer` en requests API.
+3. Limpieza de sesion ante `401`.
+4. Rutas protegidas en modo API.
+5. Menu lateral filtrado segun rol.
+6. Topbar muestra usuario real de sesion.
+7. Novedades reconoce `Descanso_No_Tomado` y `Descanso_Excedido`.
+8. Contador ve novedades/cierre/exportaciones en modo solo lectura.
+9. Acciones criticas de cierre, reproceso y aprobacion/rechazo piden confirmacion.
+10. Fichadas permite registrar origen simulado: manual, biometrico, QR, PIN o API.
+11. Exportaciones muestra CSV como unico formato operativo.
+12. Descarga de CSV agrega `access_token` cuando usa link directo.
+
+### 10.3 Base de datos / migraciones
+
+1. Se agregaron al enum `tipo_novedad_enum`:
+   - `Descanso_No_Tomado`
+   - `Descanso_Excedido`
+2. Se agrego migracion para tabla `exportacion`.
+3. Pendiente operativo: aplicar ambas migraciones en Supabase real antes de validar descanso e historial persistido.
+
+### 10.4 Validacion ejecutada
+
+1. Frontend: `npm run build` OK.
+2. Backend: `node --check` OK en rutas, app, auth y servicio de reglas modificados.
+3. API smoke:
+   - `GET /health`: OK.
+   - `GET /api/closures/current` sin token: `401` esperado.
+   - `POST /api/auth/login` con usuario Admin real: OK.
+   - `POST /api/auth/login` con `admin` / `admin`: OK.
+   - Token del fallback `admin` / `admin` contra `/api/closures/current`: OK.
+   - `GET /api/closures/current` con token: OK.
+   - `GET /api/exports/options` con token: OK.
+   - `GET /api/news?pageSize=1` con token: OK.
+   - `POST /api/exports` para empleados CSV: OK.
+   - descarga CSV: OK.
+   - `POST /api/punches` con origen `Qr`: OK, luego se limpio la fichada de smoke.
+4. React Doctor:
+   - Corregidas advertencias nuevas de Novedades.
+   - Persisten dos warnings de calidad no bloqueantes: `EmpleadoDetallePage.jsx` y `CierrePage.jsx`.
+
+### 10.5 Pendientes reales restantes
+
+P0 - Aplicar migraciones en Supabase:
+
+1. Ejecutar migracion de enum con `Descanso_No_Tomado` y `Descanso_Excedido`.
+2. Ejecutar migracion de tabla `exportacion`.
+3. Verificar que `POST /api/exports` persista historial.
+4. Verificar que la regla de descanso pueda insertar novedades reales.
+
+P0 - Validacion funcional completa con datos reales:
+
+1. Crear dataset demo con fichadas para tardanza, ausencia, salida anticipada, HE 50, HE 100, doble fichada y descanso.
+2. Ejecutar reproceso `dryRun=true`.
+3. Ejecutar reproceso real solo con confirmacion.
+4. Validar que automaticas se regeneran y manuales no se eliminan.
+5. Validar dashboard, novedades y cierre despues del reproceso.
+
+P1 - Seguridad y roles:
+
+1. Crear o confirmar usuario Contador real.
+2. Probar que Contador no pueda modificar novedades ni ejecutar cierre/reproceso.
+3. Crear o confirmar usuario Empleado real.
+4. Probar que Empleado no acceda a pantallas Admin.
+5. Reemplazar o desactivar el fallback `admin` / `admin` antes de cualquier despliegue no local.
+6. Definir una credencial demo segura si se necesita presentar sin depender de passwords reales de Supabase.
+
+P1 - Cierre mensual:
+
+1. Validar bloqueo con novedades pendientes.
+2. Aprobar/rechazar novedades reales.
+3. Ejecutar cierre real.
+4. Confirmar snapshot en `cierre_mensual_detalle`.
+5. Verificar que no pueda eliminarse destructivamente.
+
+P1 - Exportaciones:
+
+1. Generar y descargar todos los CSV: fichadas, novedades, empleados, cierre, horas extra y asignaciones.
+2. Validar columnas contra necesidad del contador.
+3. Confirmar historial visible en UI despues de aplicar tabla `exportacion`.
+
+P2 - Calidad:
+
+1. Resolver warnings restantes de React Doctor.
+2. Agregar pruebas automatizadas si se permite tooling.
+3. Preparar guion de demo con credenciales sin exponer secretos.
+
+## 11. Actualizacion 2026-06-07 - Login demo local
+
+### 11.1 Cambio aplicado
+
+Se agrego un acceso de desarrollo hardcodeado para destrabar pruebas manuales locales:
+
+- Usuario: `admin`
+- Password: `admin`
+- Rol: `Admin`
+- Nombre visible: `Admin Sistema`
+
+Este fallback vive en el backend y se ejecuta antes de consultar Supabase. No modifica la base de datos ni depende de la tabla `usuario`.
+
+### 11.2 Archivos involucrados
+
+- `/home/maxi/TrabajoPracticoGADS1-backend/src/routes/auth.js`
+
+### 11.3 Validacion ejecutada
+
+1. `node --check src/routes/auth.js`: OK.
+2. `POST /api/auth/login` con `admin` / `admin`: OK.
+3. Token obtenido contra `GET /api/closures/current`: OK, respuesta `200`.
+
+### 11.4 Pendiente de seguridad
+
+Este acceso debe considerarse temporal. Antes de entregar en un entorno compartido o productivo hay que:
+
+1. Quitar el fallback `admin` / `admin`, o protegerlo con una variable de entorno tipo `ENABLE_DEV_LOGIN=true`.
+2. Crear usuarios demo reales en Supabase con roles `Admin`, `Contador` y `Empleado`.
+3. Documentar credenciales demo sin exponer service role ni claves privadas.

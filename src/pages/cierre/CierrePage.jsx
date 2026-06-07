@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import AppShell from '../../components/layout/AppShell'
 import Modal from '../../components/ui/Modal'
 import { isApiMode } from '../../config/env'
+import { getSession } from '../../lib/session'
 import { routes } from '../../lib/routes'
 import { createClosure, getCurrentClosure, runClosure } from '../../services/closureService'
 import { reprocessRange } from '../../services/reasoningService'
@@ -41,6 +42,7 @@ function firstDayOfMonth() {
 
 export default function CierrePage() {
   const api = isApiMode()
+  const canMutate = !api || getSession()?.user?.role === 'Admin'
   const [selected, setSelected] = useState(null)
   const [closureData, setClosureData] = useState(null)
   const [closureLoading, setClosureLoading] = useState(true)
@@ -141,6 +143,7 @@ export default function CierrePage() {
   }
 
   async function handleRunClosure() {
+    if (!window.confirm(`Vas a cerrar el período ${currentPeriod}. Esta acción genera snapshot de cierre. ¿Continuar?`)) return
     setClosureActionLoading(true)
     setClosureMessage('')
     setClosureError('')
@@ -163,6 +166,7 @@ export default function CierrePage() {
   }
 
   async function handleReprocess() {
+    if (!reprocessDryRun && !window.confirm('Vas a reprocesar el período y reemplazar novedades automáticas del rango. ¿Continuar?')) return
     setReprocessLoading(true)
     setReprocessError(null)
     setReprocessResult(null)
@@ -207,22 +211,26 @@ export default function CierrePage() {
               Período {isClosedClosure ? 'cerrado' : 'abierto'}: {currentPeriod}
             </span>
           </div>
-          <button
-            onClick={() => setReprocessOpen(true)}
-            className="flex items-center gap-2 rounded-md border border-slate-200/70 bg-surface-container-lowest px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-container"
-            type="button"
-          >
-            <span className="material-symbols-outlined text-sm">replay</span> Reprocesar período
-          </button>
-          <button
-            type="button"
-            onClick={handleRunClosure}
-            disabled={isClosedClosure || closureActionLoading || closureLoading || Number(stats.pending ?? 0) > 0}
-            className="flex items-center gap-2 rounded-md bg-slate-900 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {closureActionLoading ? <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span> : <span className="material-symbols-outlined text-sm">lock_open</span>}
-            {isClosedClosure ? 'Período cerrado' : closureData?.currentClosure?.id ? 'Ejecutar cierre' : 'Crear y cerrar'}
-          </button>
+          {canMutate ? (
+            <>
+              <button
+                onClick={() => setReprocessOpen(true)}
+                className="flex items-center gap-2 rounded-md border border-slate-200/70 bg-surface-container-lowest px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-container"
+                type="button"
+              >
+                <span className="material-symbols-outlined text-sm">replay</span> Reprocesar período
+              </button>
+              <button
+                type="button"
+                onClick={handleRunClosure}
+                disabled={isClosedClosure || closureActionLoading || closureLoading || Number(stats.pending ?? 0) > 0}
+                className="flex items-center gap-2 rounded-md bg-slate-900 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {closureActionLoading ? <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span> : <span className="material-symbols-outlined text-sm">lock_open</span>}
+                {isClosedClosure ? 'Período cerrado' : closureData?.currentClosure?.id ? 'Ejecutar cierre' : 'Crear y cerrar'}
+              </button>
+            </>
+          ) : null}
         </div>
       </div>
 

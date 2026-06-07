@@ -1,5 +1,7 @@
 import { NavLink } from 'react-router-dom'
+import { isApiMode } from '../../config/env'
 import { primaryNavigation, routes } from '../../lib/routes'
+import { clearSession, getSession } from '../../lib/session'
 
 function navClassName({ isActive }) {
   return [
@@ -11,6 +13,11 @@ function navClassName({ isActive }) {
 }
 
 export default function Sidebar() {
+  const role = getSession()?.user?.role
+  const navItems = isApiMode() && role === 'Contador'
+    ? primaryNavigation.filter((item) => [routes.dashboard, routes.novedades, routes.cierre, routes.exportaciones].includes(item.to))
+    : primaryNavigation
+
   return (
     <aside className="fixed left-0 top-0 z-50 flex h-screen w-64 flex-col bg-slate-100 py-6">
       <div className="mb-8 px-6">
@@ -26,7 +33,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 space-y-1 px-4">
-        {primaryNavigation.map((item) => (
+        {navItems.map((item) => (
           <NavLink key={item.to} to={item.to} end={item.to === routes.dashboard} className={navClassName}>
             <span className="material-symbols-outlined">{item.icon}</span>
             <span>{item.label}</span>
@@ -40,7 +47,7 @@ export default function Sidebar() {
             <span className="material-symbols-outlined">help</span>
             <span>Support</span>
           </a>
-          <NavLink to={routes.login} className="flex items-center gap-3 px-3 py-2 text-sm font-bold tracking-tight text-slate-600 transition-colors hover:bg-slate-200">
+          <NavLink onClick={clearSession} to={routes.login} className="flex items-center gap-3 px-3 py-2 text-sm font-bold tracking-tight text-slate-600 transition-colors hover:bg-slate-200">
             <span className="material-symbols-outlined">logout</span>
             <span>Sign Out</span>
           </NavLink>

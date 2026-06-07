@@ -3,9 +3,7 @@ import AppShell from '../../components/layout/AppShell'
 import { createExport, getExportOptions, resolveDownloadUrl } from '../../services/exportService'
 
 const FORMAT_BADGE = {
-  XLSX: 'bg-green-100 text-green-700',
   CSV: 'bg-blue-100 text-blue-700',
-  PDF: 'bg-red-100 text-red-700',
 }
 
 const reportCards = [
@@ -15,7 +13,7 @@ const reportCards = [
     title: 'Reporte de Fichadas', sub: 'Listado completo por período',
     selects: [
       { label: 'Período', opts: ['Junio 2025', 'Mayo 2025', 'Abril 2025'] },
-      { label: 'Formato', opts: ['Excel (.xlsx)', 'CSV', 'PDF'] },
+      { label: 'Formato', field: 'format', opts: ['CSV'] },
     ],
     btnClass: 'bg-primary hover:bg-primary/90',
   },
@@ -25,7 +23,7 @@ const reportCards = [
     title: 'Reporte de Novedades', sub: 'Por empleado o período',
     selects: [
       { label: 'Período', opts: ['Junio 2025', 'Mayo 2025', 'Abril 2025'] },
-      { label: 'Formato', opts: ['Excel (.xlsx)', 'CSV', 'PDF'] },
+      { label: 'Formato', field: 'format', opts: ['CSV'] },
     ],
     btnClass: 'bg-tertiary hover:bg-tertiary/90',
   },
@@ -35,7 +33,7 @@ const reportCards = [
     title: 'Liquidación Mensual', sub: 'Para sistema de liquidación',
     selects: [
       { label: 'Período cerrado', opts: ['Mayo 2025 (cerrado)', 'Abril 2025 (cerrado)', 'Marzo 2025 (cerrado)'] },
-      { label: 'Formato', opts: ['Excel (.xlsx)', 'CSV'] },
+      { label: 'Formato', field: 'format', opts: ['CSV'] },
     ],
     btnClass: 'bg-on-background hover:opacity-90',
   },
@@ -55,7 +53,7 @@ const reportCards = [
     title: 'Nómina de Empleados', sub: 'Datos maestros del personal',
     selects: [
       { label: 'Sector', opts: ['Todos', 'Administrativo', 'Planta', 'Soporte'] },
-      { label: 'Formato', opts: ['Excel (.xlsx)', 'CSV', 'PDF'] },
+      { label: 'Formato', field: 'format', opts: ['CSV'] },
     ],
     btnClass: 'bg-primary hover:bg-primary/90',
   },
@@ -65,18 +63,18 @@ const reportCards = [
     title: 'Horarios Asignados', sub: 'Asignaciones vigentes',
     selects: [
       { label: 'Tipo', opts: ['Todos', 'Horario fijo', 'Ciclo rotativo'] },
-      { label: 'Formato', opts: ['Excel (.xlsx)', 'CSV'] },
+      { label: 'Formato', field: 'format', opts: ['CSV'] },
     ],
     btnClass: 'bg-on-secondary-container hover:opacity-90',
   },
 ]
 
 const history = [
-  { report: 'Reporte de Fichadas', period: 'Mayo 2025', format: 'XLSX', date: '05/06/2025 14:22', user: 'Administrator' },
-  { report: 'Liquidación Mensual', period: 'Mayo 2025', format: 'XLSX', date: '05/06/2025 14:18', user: 'Administrator' },
+  { report: 'Reporte de Fichadas', period: 'Mayo 2025', format: 'CSV', date: '05/06/2025 14:22', user: 'Administrator' },
+  { report: 'Liquidación Mensual', period: 'Mayo 2025', format: 'CSV', date: '05/06/2025 14:18', user: 'Administrator' },
   { report: 'Horas Extra', period: 'Mayo 2025', format: 'CSV', date: '04/06/2025 09:05', user: 'Supervisor RRHH' },
-  { report: 'Nómina de Empleados', period: '—', format: 'PDF', date: '01/06/2025 11:40', user: 'Administrator' },
-  { report: 'Reporte de Novedades', period: 'Abril 2025', format: 'XLSX', date: '07/05/2025 16:10', user: 'Supervisor RRHH' },
+  { report: 'Nómina de Empleados', period: '—', format: 'CSV', date: '01/06/2025 11:40', user: 'Administrator' },
+  { report: 'Reporte de Novedades', period: 'Abril 2025', format: 'CSV', date: '07/05/2025 16:10', user: 'Supervisor RRHH' },
 ]
 
 export default function ExportacionesPage() {

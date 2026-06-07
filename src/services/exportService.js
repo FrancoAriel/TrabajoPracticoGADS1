@@ -2,6 +2,7 @@ import { isApiMode } from '../config/env'
 import { env } from '../config/env'
 import { mockExports } from '../data/mock/exports'
 import { apiClient } from '../lib/apiClient'
+import { getAuthToken } from '../lib/session'
 
 export async function getExportOptions() {
   if (!isApiMode()) {
@@ -27,7 +28,13 @@ export function resolveDownloadUrl(downloadUrl) {
   if (!downloadUrl) return '#'
   if (/^(https?:|blob:)/.test(downloadUrl)) return downloadUrl
   const base = env.apiBaseUrl || ''
-  if (downloadUrl.startsWith('/api/')) return downloadUrl
-  if (downloadUrl.startsWith('/')) return `${base}${downloadUrl}`
-  return `${base}/${downloadUrl}`
+  const raw = downloadUrl.startsWith('/api/')
+    ? downloadUrl
+    : downloadUrl.startsWith('/')
+      ? `${base}${downloadUrl}`
+      : `${base}/${downloadUrl}`
+  const token = getAuthToken()
+  if (!token || !raw.includes('/exports/')) return raw
+  const sep = raw.includes('?') ? '&' : '?'
+  return `${raw}${sep}access_token=${encodeURIComponent(token)}`
 }

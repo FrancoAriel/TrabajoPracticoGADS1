@@ -337,7 +337,7 @@ export default function FichadasPage() {
   const initialLoadPendingRef = useRef(api)
   const [initialLoading, setInitialLoading] = useState(api)
   const [manualForm, setManualForm] = useState({
-    legajo: '', fecha: today, hora: '09:00', tipo: 'Entrada',
+    legajo: '', fecha: today, hora: '09:00', tipo: 'Entrada', origen: 'Manual',
   })
   const [corrForm, setCorrForm] = useState({
     fecha: today, hora: '09:00', tipo: 'Entrada',
@@ -464,7 +464,7 @@ export default function FichadasPage() {
       return
     }
     try {
-      const res = await createManualPunch({ legajo: legajoNum, fechaHora, tipo: manualForm.tipo })
+      const res = await createManualPunch({ legajo: legajoNum, fechaHora, tipo: manualForm.tipo, origen: manualForm.origen })
       const extra = extraMsgFromAttendanceEvaluation(res?.attendanceEvaluation)
       showToast(`Fichada manual registrada.${extra}`.trim())
       setOpenManual(false)
@@ -819,12 +819,21 @@ export default function FichadasPage() {
               ))}
             </div>
           </Field>
+          <Field label="Origen *">
+            <SelectInput required value={manualForm.origen} onChange={(e) => setManualForm((f) => ({ ...f, origen: e.target.value }))}>
+              <option value="Manual">Manual</option>
+              <option value="Biometrico">Biométrico</option>
+              <option value="Qr">QR</option>
+              <option value="Pin">PIN / Teclado</option>
+              <option value="Api">API externa</option>
+            </SelectInput>
+          </Field>
           <Field label="Motivo *">
             <textarea required rows={2} placeholder="Describí el motivo del registro manual..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
           </Field>
           <div className="flex items-start gap-2 rounded-lg border border-tertiary/20 bg-tertiary-container/20 p-3">
             <span className="material-symbols-outlined mt-0.5 text-sm text-tertiary">info</span>
-            <p className="text-[11px] text-on-tertiary-container">Quedará marcada como <strong>Manual</strong> con tu usuario y el motivo ingresado.</p>
+            <p className="text-[11px] text-on-tertiary-container">Quedará registrada con origen trazable. Biométrico, QR, PIN y API son orígenes simulados para la entrega.</p>
           </div>
           <div className="flex gap-3 border-t border-slate-100 pt-2">
             <button type="button" onClick={() => setOpenManual(false)} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">Cancelar</button>
