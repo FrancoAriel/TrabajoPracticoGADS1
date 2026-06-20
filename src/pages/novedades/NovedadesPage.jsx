@@ -4,6 +4,7 @@ import Modal from '../../components/ui/Modal'
 import { isApiMode } from '../../config/env'
 import { getSession } from '../../lib/session'
 import { createNews, listNews, approveNews, rejectNews } from '../../services/newsService'
+import { listEmployees } from '../../services/employeeService'
 
 const TYPE_BADGE = {
   horas_extra_50: 'bg-tertiary-container/40 text-on-tertiary-container',
@@ -33,6 +34,7 @@ const initialItems = [
 ]
 
 const employeeOptions = ['0042 · Juan Perez', '0018 · Ana Gomez', '0027 · Martin Sosa', '0031 · Luis Diaz', '0050 · Carla Ruiz', '0093 · Carlos Méndez', '0105 · Lucía Ferrero', '0158 · Maria Alvez']
+// employeeOptions is used as fallback in non-api mode only
 
 function StatusPill({ status }) {
   if (status === 'Pendiente') return <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-tertiary"><span className="h-1.5 w-1.5 rounded-full bg-tertiary" />Pendiente</span>
@@ -94,7 +96,7 @@ function SelectInput({ children, ...props }) {
 
 const HORAS_TYPES = ['horas_extra_50', 'horas_extra_100']
 const MINUTOS_TYPES = ['tardanza', 'descanso_no_tomado', 'descanso_excedido']
-const DIAS_TYPES = ['justificacion', 'ausencia', 'licencia_enfermedad', 'licencia_examen', 'vacaciones', 'permiso_especial', 'suspension']
+const DIAS_TYPES = ['justificacion', 'ausencia', 'licencia', 'vacaciones', 'permiso_especial', 'suspension']
 
 function formatApiDate(isoDate) {
   if (!isoDate) return '—'
@@ -190,6 +192,7 @@ export default function NovedadesPage() {
   const [loadError, setLoadError] = useState('')
   const [createLoading, setCreateLoading] = useState(false)
   const [creationDate] = useState(() => new Date().toISOString().slice(0, 10))
+  const [apiEmployees, setApiEmployees] = useState([])
 
   useEffect(() => { document.title = 'Novedades - Executive Architect' }, [])
 
@@ -221,6 +224,13 @@ export default function NovedadesPage() {
   useEffect(() => {
     loadNews()
   }, [loadNews])
+
+  useEffect(() => {
+    if (!api) return
+    listEmployees({ pageSize: 200 }).then((data) => {
+      setApiEmployees(data.items ?? [])
+    }).catch(() => {})
+  }, [api])
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3000) }
 
@@ -534,7 +544,13 @@ export default function NovedadesPage() {
           <Field label="Empleado *">
             <SelectInput required name="employeeRef">
               <option value="">Seleccionar empleado...</option>
-              {employeeOptions.map((o) => <option key={o}>{o}</option>)}
+              {api
+                ? apiEmployees.map((e) => {
+                    const label = `${String(e.legajo).padStart(4, '0')} · ${e.name ?? e.nombre ?? ''}`
+                    return <option key={e.legajo} value={label}>{label}</option>
+                  })
+                : employeeOptions.map((o) => <option key={o}>{o}</option>)
+              }
             </SelectInput>
           </Field>
           <Field label="Tipo de novedad *">
@@ -547,8 +563,7 @@ export default function NovedadesPage() {
               <optgroup label="Ausencias y licencias">
                 <option value="justificacion">Justificación de ausencia</option>
                 <option value="ausencia">Ausencia injustificada</option>
-                <option value="licencia_enfermedad">Licencia por enfermedad</option>
-                <option value="licencia_examen">Licencia por examen</option>
+                <option value="licencia">Licencia</option>
                 <option value="vacaciones">Vacaciones parciales</option>
                 <option value="permiso_especial">Permiso especial</option>
               </optgroup>
