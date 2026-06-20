@@ -273,7 +273,7 @@ export default function DashboardPage() {
         {heroMetrics.map((metric) => (
           <HeroMetricCard key={metric.label} metric={metric} />
         ))}
-        <Link to={routes.cierre} className="group relative block overflow-hidden rounded-lg bg-on-background p-5 transition-colors hover:bg-slate-800">
+        <Link to={routes.cierre} className="group relative block overflow-hidden rounded-lg bg-on-background dark:bg-surface-container-highest p-5 transition-colors hover:bg-slate-800 dark:hover:bg-surface-container-high">
           <p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-slate-400">Cierre actual</p>
           <h3 className="flex items-center gap-2 font-headline text-2xl font-black text-white">
             {currentClosure?.periodLabel || monthPeriod.periodLabel}{' '}
@@ -402,7 +402,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="px-5 pb-5">
-              <Link to={routes.cierre} className="block w-full rounded-lg bg-on-background py-2.5 text-center text-xs font-bold uppercase tracking-widest text-white transition-opacity hover:opacity-90">
+              <Link to={routes.cierre} className="block w-full rounded-lg bg-on-background dark:bg-primary dark:text-on-primary py-2.5 text-center text-xs font-bold uppercase tracking-widest text-white transition-opacity hover:opacity-90">
                 Ir al cierre mensual
               </Link>
             </div>
@@ -517,11 +517,11 @@ export default function DashboardPage() {
           <span className="material-symbols-outlined text-sm">history</span>
           Fichadas del dia
         </Link>
-        <Link to={routes.novedades} className="flex items-center gap-2 rounded-lg bg-on-secondary-container px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-white shadow-sm transition-opacity hover:opacity-90">
+        <Link to={routes.novedades} className="flex items-center gap-2 rounded-lg bg-on-secondary-container dark:bg-primary dark:text-on-primary px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-white shadow-sm transition-opacity hover:opacity-90">
           <span className="material-symbols-outlined text-sm">edit_notifications</span>
           Gestionar novedades
         </Link>
-        <Link to={routes.cierre} className="flex items-center gap-2 rounded-lg bg-on-background px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-white shadow-sm transition-opacity hover:opacity-90">
+        <Link to={routes.cierre} className="flex items-center gap-2 rounded-lg bg-on-background dark:bg-primary dark:text-on-primary px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-white shadow-sm transition-opacity hover:opacity-90">
           <span className="material-symbols-outlined text-sm">point_of_sale</span>
           Cierre mensual
         </Link>

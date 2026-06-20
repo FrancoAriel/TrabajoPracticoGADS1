@@ -38,7 +38,7 @@ const employeeOptions = ['0042 · Juan Perez', '0018 · Ana Gomez', '0027 · Mar
 
 function StatusPill({ status }) {
   if (status === 'Pendiente') return <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-tertiary"><span className="h-1.5 w-1.5 rounded-full bg-tertiary" />Pendiente</span>
-  if (status === 'Aprobado') return <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-700"><span className="h-1.5 w-1.5 rounded-full bg-green-600" />Aprobado</span>
+  if (status === 'Aprobado') return <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-700 dark:text-green-400"><span className="h-1.5 w-1.5 rounded-full bg-green-600" />Aprobado</span>
   return <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-error"><span className="h-1.5 w-1.5 rounded-full bg-error" />Rechazado</span>
 }
 
@@ -387,7 +387,7 @@ export default function NovedadesPage() {
       <div className="grid grid-cols-12 gap-6">
         <div className="relative col-span-12 overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest lg:col-span-7">
           {loading && api && dataReady ? (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface-container-lowest/80">
               <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
             </div>
           ) : null}
@@ -637,7 +637,7 @@ export default function NovedadesPage() {
       </Modal>
 
       {toast && (
-        <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-3 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-2xl">
+        <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-3 rounded-xl bg-slate-900 dark:bg-surface-container-highest px-5 py-3 text-sm font-semibold text-white shadow-2xl">
           <span className="material-symbols-outlined text-green-400" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
           {toast}
         </div>

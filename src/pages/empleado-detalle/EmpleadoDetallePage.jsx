@@ -371,7 +371,7 @@ export default function EmpleadoDetallePage() {
             </div>
             <div className="flex w-full shrink-0 flex-wrap items-stretch justify-start gap-3 sm:w-auto sm:justify-end">
               <div
-                className="flex min-w-[min(100%,18rem)] flex-1 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_2px_8px_-2px_rgba(15,23,42,0.08),0_1px_2px_rgba(15,23,42,0.04)] sm:max-w-md sm:flex-initial dark:border-outline-variant/30 dark:bg-surface-container-low"
+                className="flex min-w-[min(100%,18rem)] flex-1 overflow-hidden rounded-2xl border border-slate-200/90 bg-surface-container-lowest shadow-[0_2px_8px_-2px_rgba(15,23,42,0.08),0_1px_2px_rgba(15,23,42,0.04)] sm:max-w-md sm:flex-initial dark:border-outline-variant/30 dark:bg-surface-container-low"
                 role="group"
                 aria-label="Estado laboral del empleado"
               >
@@ -612,7 +612,7 @@ export default function EmpleadoDetallePage() {
                     value={editForm.parcialHoras}
                     onChange={ef('parcialHoras')}
                     placeholder="Ej: 4"
-                    className="w-32 rounded-lg border border-outline-variant/40 bg-white px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    className="w-32 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                   <span className="text-sm font-medium text-on-surface-variant">hs / día <span className="text-on-surface-variant/60">(máx. 7)</span></span>
                 </div>
@@ -832,7 +832,7 @@ export default function EmpleadoDetallePage() {
 
       {editToast && (
         <div
-          className={`fixed bottom-6 right-6 z-[60] flex max-w-md items-start gap-3 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-2xl ${editToast.ok ? 'bg-slate-900' : 'bg-slate-900 ring-2 ring-red-500/60'}`}
+          className={`fixed bottom-6 right-6 z-[60] flex max-w-md items-start gap-3 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-2xl dark:bg-surface-container-highest ${editToast.ok ? 'bg-slate-900' : 'bg-slate-900 ring-2 ring-red-500/60'}`}
           role="status"
           aria-live="polite"
         >

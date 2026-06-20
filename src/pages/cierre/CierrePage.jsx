@@ -17,7 +17,7 @@ const employees = [
 ]
 
 const checklist = [
-  { icon: 'check_circle', iconFill: true, iconClass: 'text-green-600', bg: 'bg-green-50 border-green-200', title: 'Novedades del período 1–10 aprobadas', sub: '4 novedades procesadas', badge: 'Completado', badgeClass: 'text-green-700' },
+  { icon: 'check_circle', iconFill: true, iconClass: 'text-green-600', bg: 'bg-green-50 border-green-200 dark:bg-green-950/40 dark:border-green-900/50', title: 'Novedades del período 1–10 aprobadas', sub: '4 novedades procesadas', badge: 'Completado', badgeClass: 'text-green-700 dark:text-green-400' },
   { icon: 'pending', iconFill: false, iconClass: 'text-tertiary', bg: 'bg-tertiary-container/20 border-tertiary/20', title: 'Aprobar novedades pendientes', sub: '9 novedades esperando revisión', badge: null, link: true },
   { icon: 'radio_button_unchecked', iconFill: false, iconClass: 'text-outline-variant', bg: 'bg-surface-container-low opacity-50', title: 'Validar totales con RRHH', sub: 'Pendiente de novedades aprobadas', badge: 'Pendiente', badgeClass: 'text-on-surface-variant' },
   { icon: 'radio_button_unchecked', iconFill: false, iconClass: 'text-outline-variant', bg: 'bg-surface-container-low opacity-50', title: 'Exportar liquidación final', sub: 'Disponible al cerrar el período', badge: 'Pendiente', badgeClass: 'text-on-surface-variant' },
@@ -117,11 +117,11 @@ export default function CierrePage() {
           icon: item.done ? 'check_circle' : 'pending',
           iconFill: item.done,
           iconClass: item.done ? 'text-green-600' : 'text-tertiary',
-          bg: item.done ? 'bg-green-50 border-green-200' : 'bg-tertiary-container/20 border-tertiary/20',
+          bg: item.done ? 'bg-green-50 border-green-200 dark:bg-green-950/40 dark:border-green-900/50' : 'bg-tertiary-container/20 border-tertiary/20',
           title: item.title,
           sub: item.sub,
           badge: item.done ? 'Completado' : 'Pendiente',
-          badgeClass: item.done ? 'text-green-700' : 'text-on-surface-variant',
+          badgeClass: item.done ? 'text-green-700 dark:text-green-400' : 'text-on-surface-variant',
           link: item.key === 'review-pending-news' && !item.done,
         }
       })
@@ -224,7 +224,7 @@ export default function CierrePage() {
                 type="button"
                 onClick={handleRunClosure}
                 disabled={isClosedClosure || closureActionLoading || closureLoading || Number(stats.pending ?? 0) > 0}
-                className="flex items-center gap-2 rounded-md bg-slate-900 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-2 rounded-md bg-slate-900 dark:bg-primary dark:text-on-primary px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {closureActionLoading ? <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span> : <span className="material-symbols-outlined text-sm">lock_open</span>}
                 {isClosedClosure ? 'Período cerrado' : closureData?.currentClosure?.id ? 'Ejecutar cierre' : 'Crear y cerrar'}
@@ -253,12 +253,12 @@ export default function CierrePage() {
           const isClosed = normalizedStatus === 'cerrado'
           const isCurrent = normalizedStatus === 'en progreso'
           const wrapperClass = isCurrent
-            ? 'relative overflow-hidden rounded-xl bg-slate-900 p-5 text-white'
+            ? 'relative overflow-hidden rounded-xl bg-slate-900 dark:bg-surface-container-highest p-5 text-white'
             : isClosed
               ? 'flex items-center justify-between rounded-xl border border-slate-200/50 border-l-4 border-l-green-600 bg-surface-container-lowest p-5'
               : 'rounded-xl bg-surface-container-highest p-5 opacity-50'
           const titleClass = isCurrent ? 'text-slate-400' : 'text-on-surface-variant'
-          const statusClass = isClosed ? 'text-green-700' : isCurrent ? 'text-white' : 'text-on-surface-variant'
+          const statusClass = isClosed ? 'text-green-700 dark:text-green-400' : isCurrent ? 'text-white' : 'text-on-surface-variant'
           const subClass = isCurrent ? 'text-slate-400' : 'text-on-surface-variant'
 
           return (

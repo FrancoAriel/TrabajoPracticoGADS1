@@ -4,7 +4,7 @@ export default function StatCard({ label, value, icon, valueClassName = 'text-on
       <p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">{label}</p>
       <h3 className={`font-headline text-2xl font-black ${valueClassName}`}>{value}</h3>
       {icon ? (
-        <span className="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-black/5 transition-transform group-hover:scale-110">
+        <span className="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl text-on-surface/5 transition-transform group-hover:scale-110">
           {icon}
         </span>
       ) : null}

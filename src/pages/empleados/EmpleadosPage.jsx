@@ -641,7 +641,7 @@ export default function EmpleadosPage() {
                     value={form.parcialHoras}
                     onChange={(e) => setForm((f) => ({ ...f, parcialHoras: e.target.value }))}
                     placeholder="Ej: 4"
-                    className="w-32 rounded-lg border border-outline-variant/40 bg-white px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    className="w-32 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                   <span className="text-sm font-medium text-on-surface-variant">hs / día <span className="text-on-surface-variant/60">(máx. 7)</span></span>
                 </div>

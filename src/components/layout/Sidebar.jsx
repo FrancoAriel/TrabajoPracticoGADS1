@@ -7,7 +7,7 @@ function navClassName({ isActive }) {
   return [
     'flex items-center gap-3 px-3 py-2.5 font-bold tracking-tight text-sm transition-all duration-200 cursor-pointer active:scale-95',
     isActive
-      ? 'bg-slate-300 text-blue-900 border-r-4 border-blue-700'
+      ? 'bg-slate-300 text-blue-900 border-r-4 border-blue-700 dark:text-primary dark:border-primary'
       : 'text-slate-600 hover:bg-slate-200',
   ].join(' ')
 }

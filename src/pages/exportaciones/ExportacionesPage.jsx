@@ -35,7 +35,7 @@ const reportCards = [
       { label: 'Período cerrado', opts: ['Mayo 2025 (cerrado)', 'Abril 2025 (cerrado)', 'Marzo 2025 (cerrado)'] },
       { label: 'Formato', field: 'format', opts: ['CSV'] },
     ],
-    btnClass: 'bg-on-background hover:opacity-90',
+    btnClass: 'bg-on-background dark:bg-primary dark:text-on-primary hover:opacity-90',
   },
   {
     key: 'overtime',
@@ -65,7 +65,7 @@ const reportCards = [
       { label: 'Tipo', opts: ['Todos', 'Horario fijo', 'Ciclo rotativo'] },
       { label: 'Formato', field: 'format', opts: ['CSV'] },
     ],
-    btnClass: 'bg-on-secondary-container hover:opacity-90',
+    btnClass: 'bg-on-secondary-container dark:bg-primary dark:text-on-primary hover:opacity-90',
   },
 ]
 
@@ -254,7 +254,7 @@ export default function ExportacionesPage() {
       </div>
 
       {toast && (
-        <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-3 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-2xl">
+        <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-3 rounded-xl bg-slate-900 dark:bg-surface-container-highest px-5 py-3 text-sm font-semibold text-white shadow-2xl">
           <span className="material-symbols-outlined text-green-400" style={{ fontVariationSettings: "'FILL' 1" }}>download</span>
           {toast}
         </div>

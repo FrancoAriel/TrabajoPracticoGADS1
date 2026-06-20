@@ -570,7 +570,7 @@ export default function FichadasPage() {
 
       <div className="relative overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest">
         {loading && !initialLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface-container-lowest/70">
             <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
           </div>
         )}
@@ -735,15 +735,15 @@ export default function FichadasPage() {
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-3">
-                <div className="rounded-lg border-b-2 border-error bg-white p-3">
+                <div className="rounded-lg border-b-2 border-error bg-surface-container-lowest p-3">
                   <p className="text-[10px] font-bold uppercase text-on-surface-variant">Tardanza</p>
                   <p className="text-base font-black text-error">{selected.tipo === 'Entrada' && !api ? '6 min' : '—'}</p>
                 </div>
-                <div className="rounded-lg border-b-2 border-primary bg-white p-3">
+                <div className="rounded-lg border-b-2 border-primary bg-surface-container-lowest p-3">
                   <p className="text-[10px] font-bold uppercase text-on-surface-variant">Horas extra</p>
                   <p className="text-base font-black text-primary">{selected.tipo === 'Salida' && !api ? '105 min' : '—'}</p>
                 </div>
-                <div className="rounded-lg border-b-2 border-on-secondary-container bg-white p-3">
+                <div className="rounded-lg border-b-2 border-on-secondary-container bg-surface-container-lowest p-3">
                   <p className="text-[10px] font-bold uppercase text-on-surface-variant">Efectivo</p>
                   <p className="text-base font-black text-on-secondary-container">{selected.tipo === 'Salida' && !api ? '9h 45m' : '—'}</p>
                 </div>
@@ -907,7 +907,7 @@ export default function FichadasPage() {
         </form>
       </Modal>
       {toast && (
-        <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-3 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-2xl">
+        <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-3 rounded-xl bg-slate-900 dark:bg-surface-container-highest px-5 py-3 text-sm font-semibold text-white shadow-2xl">
           <span className="material-symbols-outlined text-green-400" style={{ fontVariationSettings: '"FILL" 1' }}>check_circle</span>
           {toast}
         </div>

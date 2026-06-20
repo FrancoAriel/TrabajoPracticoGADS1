@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { getSession } from '../../lib/session'
+import ThemeToggle from '../ui/ThemeToggle'
 
 export default function Topbar({ title, children }) {
   const [open, setOpen] = useState(false)
@@ -22,12 +23,13 @@ export default function Topbar({ title, children }) {
         {children}
       </div>
       <div className="flex items-center gap-6">
+        <ThemeToggle />
         <div className="relative" ref={ref}>
-          <button type="button" onClick={() => setOpen((v) => !v)} className="text-slate-500 transition-all hover:text-blue-900">
+          <button type="button" onClick={() => setOpen((v) => !v)} className="text-slate-500 transition-all hover:text-on-surface">
             <span className="material-symbols-outlined">notifications</span>
           </button>
           {open && (
-            <div className="absolute right-0 top-10 z-50 w-72 overflow-hidden rounded-xl border border-slate-200/50 bg-white shadow-xl">
+            <div className="absolute right-0 top-10 z-50 w-72 overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest shadow-xl">
               <div className="border-b border-slate-100 px-4 py-3">
                 <p className="font-headline text-xs font-extrabold uppercase tracking-widest text-on-background">Notificaciones</p>
               </div>
