@@ -584,3 +584,167 @@ Este acceso debe considerarse temporal. Antes de entregar en un entorno comparti
 1. Quitar el fallback `admin` / `admin`, o protegerlo con una variable de entorno tipo `ENABLE_DEV_LOGIN=true`.
 2. Crear usuarios demo reales en Supabase con roles `Admin`, `Contador` y `Empleado`.
 3. Documentar credenciales demo sin exponer service role ni claves privadas.
+
+## 12. Actualizacion 2026-06-19 - Validacion E2E completa con datos reales
+
+### 12.1 Contexto
+
+Se ejecuto una sesion de validacion completa de punta a punta contra Supabase real. Se cubrieron todos los modulos funcionales del PRD: motor de reglas, roles, novedades, cierre, exportaciones y trazabilidad de fichadas. Se corrigieron bugs encontrados durante la validacion.
+
+### 12.2 Dataset de prueba cargado en Supabase
+
+Para cubrir todas las reglas del motor se insertaron fichadas reales con entrada y salida via SQL Editor de Supabase:
+
+- Lunes 15/06/2026: entrada 08:00, salida 20:00 → cubre Horas Extra 50% (dia habil, salida tarde).
+- Domingo 14/06/2026: entrada 09:00, salida 13:00 → cubre Horas Extra 100% (domingo).
+- Martes 16/06/2026: 4 fichadas (entrada 08:00, salida 12:00, entrada 13:00, salida 17:00) → cubre Descanso.
+- Miercoles 17/06/2026: dos fichadas de entrada a las 08:00 y 08:03 → cubre Doble Fichada.
+
+Nota: los valores del enum `tipo_fichada_enum` y `origen_fichada_enum` en Supabase usan mayuscula inicial (`Entrada`, `Salida`, `Biometrico`), no minuscula como en el migration original. Usar la mayuscula al insertar directamente por SQL.
+
+### 12.3 Motor de reglas - validacion completa
+
+Se ejecuto `POST /api/reasoning/reprocess-range` en modo simulacion (`dryRun=true`) para Junio 2026.
+
+Resultado: 72 creadas, 149 OK, 119 omitidas, 0 errores.
+
+Desglose por regla confirmado:
+
+| Regla             | Resultado               |
+| ----------------- | ----------------------- |
+| Tardanza          | 1 creada                |
+| Ausencia          | 1 creada                |
+| Salida Anticipada | 2 OK (ya existian)      |
+| Horas Extra 50%   | 2 creadas               |
+| Horas Extra 100%  | incluida en Horas Extra |
+| Doble Fichada     | 1 creada                |
+| Descanso          | 1 creada                |
+
+Las 7 reglas del motor V4 generan novedades correctas sobre datos reales. Estado: validado.
+
+### 12.4 Usuarios y roles - creacion y validacion
+
+Se crearon dos usuarios reales en la tabla `usuario` de Supabase:
+
+Contador:
+
+- `nombre`: Contador Demo
+- `email`: contador@demo.com
+- `password`: contador123
+- `rol`: contador
+- `estado`: activo
+- `legajo`: NULL
+
+Empleado:
+
+- `nombre`: Empleado Demo
+- `email`: empleado@demo.com
+- `password`: empleado123
+- `rol`: empleado
+- `estado`: activo
+- `legajo`: 1 (Carlos Juan Ramirez)
+
+Restriccion importante: el enum `rol_usuario_enum` usa minusculas (`admin`, `contador`, `empleado`). El enum `estado_usuario_enum` tambien usa minusculas (`activo`).
+
+Validacion por rol ejecutada:
+
+- Admin (`admin` / `admin`): acceso completo a todas las pantallas. Puede aprobar/rechazar novedades, ejecutar cierre, reprocesar. Estado: OK.
+- Contador (`contador@demo.com` / `contador123`): ve solo Dashboard, Novedades, Cierre y Exportaciones en el sidebar. No tiene botones de aprobar/rechazar en novedades ni de ejecutar cierre. El backend devuelve 403 si intenta esas acciones. Estado: OK.
+- Empleado (`empleado@demo.com` / `empleado123`): ve solo Dashboard en el sidebar. Si intenta navegar a cualquier otra ruta, `ProtectedRoute` lo redirige al dashboard. Estado: OK.
+
+### 12.5 Bugs corregidos en frontend
+
+#### Bug 1 - Selector de empleados hardcodeado en novedades manuales
+
+Archivo: `src/pages/novedades/NovedadesPage.jsx`
+
+El formulario de nueva novedad manual usaba una lista fija de empleados con legajos inventados (`0042 · Juan Perez`, `0018 · Ana Gomez`, etc.). Al intentar crear una novedad, el backend rechazaba con error de foreign key porque esos legajos no existian en la tabla `empleado`.
+
+Correccion aplicada:
+
+- Se importo `listEmployees` desde `employeeService`.
+- Se agrego estado `apiEmployees` que se carga al montar el componente llamando a `GET /api/employees`.
+- El selector muestra los empleados reales en modo API y la lista mock en modo sin API.
+
+#### Bug 2 - Tipos de novedad invalidos en el formulario manual
+
+Archivo: `src/pages/novedades/NovedadesPage.jsx`
+
+El formulario incluia los tipos `licencia_enfermedad` y `licencia_examen` que no existen en el enum `tipo_novedad_enum` de la base de datos. El backend rechazaba con error `invalid input value for enum`.
+
+Correccion aplicada:
+
+- Se eliminaron `licencia_enfermedad` y `licencia_examen` del formulario y de la constante `DIAS_TYPES`.
+- Se reemplazaron por el tipo valido `licencia`.
+
+#### Bug 3 - id_usuario_creacion null en novedades manuales
+
+Archivo: `src/pages/novedades/NovedadesPage.jsx`
+
+Al crear una novedad manual, el campo `idUsuarioCreacion` se enviaba siempre como `null`, perdiendo la trazabilidad del usuario que la creo.
+
+Correccion aplicada:
+
+- Se lee el ID del usuario desde `getSession()?.user?.id` (el backend incluye `id: user.id_usuario` en el payload del token).
+- El campo ahora se envia con el ID real del usuario autenticado.
+
+#### Bug 4 - Sidebar de Empleado mostraba todos los items del menu
+
+Archivo: `src/components/layout/Sidebar.jsx`
+
+El sidebar del rol Empleado mostraba todos los items de navegacion aunque el `ProtectedRoute` bloqueaba el acceso. Esto generaba confusion: los links eran visibles pero redirigian al dashboard.
+
+Correccion aplicada:
+
+- Se agrego filtro en el sidebar para el rol `Empleado`: solo se muestra el item Dashboard.
+- El comportamiento es consistente con el filtro ya existente para el rol `Contador`.
+
+### 12.6 Correccion trazable de fichadas - validacion
+
+Se probo el flujo completo de correccion de fichadas con API real:
+
+1. En la pantalla Fichadas, se selecciono una fichada existente.
+2. Se abrio el modal "Registrar Correccion" que muestra los datos originales (empleado, fecha, tipo, origen) y permite ingresar nueva fecha, hora, tipo y motivo.
+3. Se completo el formulario y se envio.
+4. Se confirmo en Supabase que se creo una nueva fila en la tabla `fichada` con `es_correccion = true` e `id_fichada_original` apuntando a la fichada original.
+
+La fichada original no se modifica. Estado: validado.
+
+### 12.7 Cierre mensual y exportaciones - estado
+
+Ambos modulos fueron validados previamente y su estado no cambio:
+
+- Cierre de Junio 2026: estado CERRADO. Snapshot en `cierre_mensual_detalle` confirmado. Inmutable.
+- Exportaciones: 6 tipos de CSV generados y descargados correctamente. Historial persiste en tabla `exportacion` de Supabase y sobrevive reinicios del backend.
+
+### 12.8 Pendientes reales al cierre de esta sesion
+
+Los siguientes puntos quedan pendientes. Los P0 son necesarios antes de cualquier presentacion o entrega. Los P1 son mejoras deseables.
+
+P0 - Seguridad antes de deploy publico:
+
+1. Proteger el fallback `admin` / `admin` con una variable de entorno `ENABLE_DEV_LOGIN=true` en `back/src/routes/auth.js`. Sin esta proteccion, cualquier persona que acceda al backend puede obtener un token de Admin.
+2. Verificar que el `.env` del backend (con `SUPABASE_SERVICE_ROLE_KEY`) no este commiteado en el repositorio.
+
+P1 - Formatos de exportacion:
+
+1. El PRD menciona Excel y PDF como formatos de exportacion. El sistema implementa solo CSV. Esto debe documentarse como decision tecnica: CSV es el formato operativo elegido para esta version. No requiere codigo adicional salvo que el evaluador lo exija.
+
+P2 - Entrega y demo:
+
+1. Preparar guion de demo para el rol Admin: login, cargar fichada, ejecutar reproceso, aprobar novedad, cerrar periodo, exportar CSV.
+2. Preparar guion de demo para el rol Contador: login, ver novedades, ver cierre, descargar exportacion.
+3. Congelar el scope del repositorio antes de la entrega: no agregar funcionalidad nueva, solo fixes criticos.
+4. Documentar en el README las credenciales demo y los pasos para levantar frontend y backend localmente.
+
+### 12.9 Credenciales demo
+
+Para ejecutar una demo completa del sistema se pueden usar estas credenciales:
+
+| Rol      | Usuario           | Password    |
+| -------- | ----------------- | ----------- |
+| Admin    | admin             | admin       |
+| Contador | contador@demo.com | contador123 |
+| Empleado | empleado@demo.com | empleado123 |
+
+El usuario Admin usa el fallback hardcodeado del backend (no consulta Supabase). Los usuarios Contador y Empleado estan en la tabla `usuario` de Supabase.
