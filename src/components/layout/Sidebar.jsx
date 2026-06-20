@@ -16,6 +16,8 @@ export default function Sidebar() {
   const role = getSession()?.user?.role
   const navItems = isApiMode() && role === 'Contador'
     ? primaryNavigation.filter((item) => [routes.dashboard, routes.novedades, routes.cierre, routes.exportaciones].includes(item.to))
+    : isApiMode() && role === 'Empleado'
+    ? primaryNavigation.filter((item) => item.to === routes.dashboard)
     : primaryNavigation
 
   return (
