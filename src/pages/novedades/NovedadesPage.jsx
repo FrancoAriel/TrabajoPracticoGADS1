@@ -342,7 +342,7 @@ export default function NovedadesPage() {
         cantidad: cantidadRaw === '' ? null : Number(cantidadRaw),
         unidad,
         observacion: observacion || null,
-        idUsuarioCreacion: null,
+        idUsuarioCreacion: getSession()?.user?.id ?? null,
       })
       await loadNews()
       setOpenCreate(false)
