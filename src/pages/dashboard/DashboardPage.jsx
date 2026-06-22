@@ -5,6 +5,37 @@ import PageHeader from '../../components/layout/PageHeader'
 import { routes } from '../../lib/routes'
 import { isApiMode } from '../../config/env'
 import { getDashboard } from '../../services/dashboardService'
+import { getSession } from '../../lib/session'
+import { getMyPunches, getMyNews, getMySummary } from '../../services/meService'
+
+/** Helpers de formato para la vista de autoconsulta del empleado */
+function formatMinutes(m) {
+  const n = Number(m)
+  if (!Number.isFinite(n) || n <= 0) return '0'
+  if (n < 60) return `${n} min`
+  const h = Math.floor(n / 60)
+  const rem = n % 60
+  return rem ? `${h}h ${rem}m` : `${h}h`
+}
+function formatDateISO(iso) {
+  if (!iso) return '—'
+  const [y, m, d] = String(iso).slice(0, 10).split('-')
+  return d ? `${d}/${m}/${y}` : iso
+}
+function formatTimestamp(iso) {
+  if (!iso) return '—'
+  const time = String(iso).slice(11, 16)
+  return time ? `${formatDateISO(iso)} · ${time}` : formatDateISO(iso)
+}
+function prettyType(t) {
+  return String(t ?? '—').replace(/_/g, ' ')
+}
+function newsStatusClass(status) {
+  const s = String(status ?? '').toLowerCase()
+  if (s.startsWith('aprob')) return 'text-green-700 dark:text-green-400'
+  if (s.startsWith('rechaz')) return 'text-error'
+  return 'text-tertiary'
+}
 
 const fallbackHeroMetrics = [
   {
@@ -139,11 +170,36 @@ export default function DashboardPage() {
   const dashboardDates = useMemo(() => getDashboardDates(), [])
   const monthPeriod = useMemo(() => getMonthPeriodStats(new Date()), [])
   const [dashboard, setDashboard] = useState(null)
+  const [meData, setMeData] = useState(null)
   const [loading, setLoading] = useState(() => isApiMode())
+
+  // El rol Empleado solo puede consultar lo propio: no se le carga el dashboard
+  // operativo (datos de toda la organizacion) ni se le muestran acciones de admin.
+  const role = isApiMode() ? getSession()?.user?.role : null
+  const isEmployee = role === 'Empleado'
+  const userName = getSession()?.user?.name
 
   useEffect(() => {
     document.title = 'Labor Pulse - Dashboard'
     let cancelled = false
+
+    if (isEmployee) {
+      // Autoconsulta: solo datos propios del empleado (router /api/me, scopeado por legajo del token).
+      Promise.all([
+        getMySummary().catch(() => null),
+        getMyNews().catch(() => null),
+        getMyPunches().catch(() => null),
+      ])
+        .then(([summary, news, punches]) => {
+          if (!cancelled) setMeData({ summary, news, punches })
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false)
+        })
+      return () => {
+        cancelled = true
+      }
+    }
 
     getDashboard()
       .then((data) => {
@@ -231,6 +287,117 @@ export default function DashboardPage() {
     }),
     [dashboard?.currentClosure, monthPeriod],
   )
+
+  if (isEmployee) {
+    if (loading && isApiMode()) {
+      return (
+        <AppShell topbarTitle="MI PANEL">
+          <div className="flex flex-col items-center justify-center gap-3 py-32 text-on-surface-variant">
+            <span className="material-symbols-outlined animate-spin text-4xl opacity-40">progress_activity</span>
+            <p className="text-sm font-semibold">Cargando tu panel...</p>
+          </div>
+        </AppShell>
+      )
+    }
+
+    const summary = meData?.summary
+    const myNews = meData?.news?.items ?? []
+    const myPunches = meData?.punches?.items ?? []
+    const myStats = [
+      { label: 'Dias presentes', value: String(summary?.presentDays ?? 0), valueClassName: 'text-on-secondary-container' },
+      { label: 'Tardanzas', value: formatMinutes(summary?.tardanzaMin), valueClassName: 'text-tertiary' },
+      { label: 'HE 50%', value: formatMinutes(summary?.he50Min), valueClassName: 'text-primary' },
+      { label: 'HE 100%', value: formatMinutes(summary?.he100Min), valueClassName: 'text-primary' },
+      { label: 'Ausencias', value: String(summary?.ausencias ?? 0), valueClassName: 'text-error' },
+      { label: 'Novedades pendientes', value: String(summary?.pendingNews ?? 0), valueClassName: 'text-tertiary' },
+    ]
+
+    return (
+      <AppShell topbarTitle="MI PANEL">
+        <PageHeader title="Mi panel" subtitle={`${userName ? `${userName} · ` : ''}${summary?.periodo ?? monthPeriod.periodLabel}`} />
+        <div className="mx-auto max-w-4xl space-y-5">
+          <div className="overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest">
+            <div className="border-b border-slate-100 px-5 py-4">
+              <h2 className="flex items-center gap-2 font-headline text-xs font-extrabold tracking-[0.2em]">
+                <span className="material-symbols-outlined text-sm">analytics</span>
+                MI RESUMEN DEL PERIODO
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 gap-px bg-slate-100 md:grid-cols-3">
+              {myStats.map((item) => (
+                <div key={item.label} className="bg-surface-container-lowest p-5">
+                  <p className="mb-1.5 text-[10px] font-bold uppercase text-on-surface-variant">{item.label}</p>
+                  <span className={`font-headline text-2xl font-black ${item.valueClassName}`}>{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-12 gap-5">
+            <div className="col-span-12 space-y-5 lg:col-span-6">
+              <div className="overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest">
+                <div className="border-b border-slate-100 px-5 py-4">
+                  <h2 className="flex items-center gap-2 font-headline text-xs font-extrabold tracking-[0.2em]">
+                    <span className="material-symbols-outlined text-sm">notification_important</span>
+                    MIS NOVEDADES
+                  </h2>
+                </div>
+                <div className="divide-y divide-slate-100">
+                  {myNews.length === 0 ? (
+                    <p className="px-5 py-8 text-center text-sm text-on-surface-variant">No tenes novedades en el periodo.</p>
+                  ) : (
+                    myNews.map((n) => (
+                      <div key={n.id} className="flex items-center gap-4 px-5 py-3.5">
+                        <div className="flex-1">
+                          <p className="text-sm font-bold">{prettyType(n.type)}</p>
+                          <p className="text-xs text-on-surface-variant">
+                            {formatDateISO(n.date)}
+                            {n.quantity != null ? ` · ${n.quantity} ${String(n.unit ?? '').toLowerCase()}` : ''}
+                          </p>
+                        </div>
+                        <span className={`text-[10px] font-bold uppercase tracking-wide ${newsStatusClass(n.status)}`}>{n.status}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="col-span-12 space-y-5 lg:col-span-6">
+              <div className="overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest">
+                <div className="border-b border-slate-100 px-5 py-4">
+                  <h2 className="flex items-center gap-2 font-headline text-xs font-extrabold tracking-[0.2em]">
+                    <span className="material-symbols-outlined text-sm">fingerprint</span>
+                    MIS FICHADAS
+                  </h2>
+                </div>
+                <div className="divide-y divide-slate-100">
+                  {myPunches.length === 0 ? (
+                    <p className="px-5 py-8 text-center text-sm text-on-surface-variant">No tenes fichadas en el periodo.</p>
+                  ) : (
+                    myPunches.map((p) => (
+                      <div key={p.id} className="flex items-center gap-4 px-5 py-3">
+                        <span className={`material-symbols-outlined text-lg ${p.type === 'Entrada' ? 'text-primary' : 'text-on-surface-variant'}`}>
+                          {p.type === 'Entrada' ? 'login' : 'logout'}
+                        </span>
+                        <div className="flex-1">
+                          <p className="text-sm font-bold">{p.type}{p.correction ? ' (corregida)' : ''}</p>
+                          <p className="text-xs text-on-surface-variant">{formatTimestamp(p.timestamp)}</p>
+                        </div>
+                        <span className="text-[10px] font-bold uppercase tracking-wide text-on-surface-variant">{p.origin}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p className="px-1 text-[11px] text-on-surface-variant">Solo se muestran tus propios datos del periodo.</p>
+        </div>
+      </AppShell>
+    )
+  }
 
   if (loading && isApiMode()) {
     return (

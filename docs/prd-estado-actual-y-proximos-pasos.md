@@ -748,3 +748,84 @@ Para ejecutar una demo completa del sistema se pueden usar estas credenciales:
 | Empleado | empleado@demo.com | empleado123 |
 
 El usuario Admin usa el fallback hardcodeado del backend (no consulta Supabase). Los usuarios Contador y Empleado estan en la tabla `usuario` de Supabase.
+
+## 13. Actualizacion 2026-06-20 - Modo oscuro y revision de gaps vs consigna
+
+### 13.1 Modo claro / oscuro (dark mode)
+
+Se agrego soporte de tema claro/oscuro con un boton de alternancia (sol/luna) en la barra superior.
+
+Como funciona:
+
+- El tema es la clase `dark` en `<html>`. La eleccion se guarda en `localStorage` y, si no hay eleccion previa, respeta la preferencia del sistema. Un script inline en `index.html` aplica el tema antes del render para evitar parpadeo.
+- Todos los colores se definen como variables CSS en `src/index.css`: esquema claro en `:root`, oscuro en `html.dark`. `tailwind.config.js` apunta los tokens y la escala `slate` a esas variables, asi el cambio de tema no toca el color de cada componente.
+- Las paletas de estado chicas (chips verde/rojo/azul) se dejan claras a proposito; las superficies que deben ser oscuras siempre (toasts, scrim de modales) se fijaron para no invertirse.
+
+Validacion: se reviso pantalla por pantalla buscando combinaciones de bajo contraste en oscuro y se corrigieron todas (botones de accion, toasts, avatares, fila de checklist de cierre). `npm run build` OK.
+
+Archivos: `tailwind.config.js`, `src/index.css`, `index.html`, `src/lib/theme.js`, `src/components/ui/ThemeToggle.jsx`, mas ajustes `dark:` puntuales en Topbar, Sidebar, Modal, StatCard y las pantallas. Detalle completo en `docs/modo-oscuro.md`.
+
+### 13.2 Revision de gaps de la consigna del TP no reflejados en el PRD de alcance
+
+Se reviso la consigna original contra lo implementado. Resultado por punto:
+
+| # | Punto del TP | Estado | Detalle |
+| - | ------------ | ------ | ------- |
+| 1 | Pantalla de autoconsulta del empleado | Implementado (frontend + backend) | Cerrado. Ver 13.3 y 13.5. |
+| 2 | Vista de solo lectura del Contador | Implementado | `canMutate = solo Admin` oculta aprobar/rechazar (Novedades) y cierre/reproceso (Cierre); backend responde 403. Reutiliza las pantallas del admin sin botones. |
+| 3 | Riesgo de buddy punching (QR/PIN) | No mitigado (confirmado) | El backend confirmo que `POST /punches` confia en el `legajo` del body y `Qr`/`Pin` son solo etiquetas sin verificacion. El TP solo lo pide como riesgo a reconocer. Pendiente: documentar el riesgo y su mitigacion. |
+| 4 | Caso concreto "descanso excedido" (77 vs 60 min) | Confirmado | El backend calcula el ejemplo exacto: pausa 77 vs 60 -> `Descanso_Excedido`, `cantidad=17`, observacion "pausa de 77 min, excede el parametro de 60 min". Funcion `evaluateDescanso` en `attendanceEvaluation.js`. Falta dejar el caso como criterio de aceptacion en el PRD de alcance. |
+| 5 | Referencia legal art. 208 LCT | No incluido | Cosmetico/documental. |
+| 6 | Stack .NET / EF / SQL Server | Cubierto | Documentado como decision tecnica (se usa Node/Express/Supabase). |
+| 7 | Tipos de fichada para break/descanso | Modelado por inferencia (confirmado) | `tipo_fichada_enum` solo tiene `Entrada`/`Salida`. El backend infiere la pausa del par Salida+Entrada del mediodia (2da y 3ra fichada del dia). Limitacion: la inferencia es posicional rigida y solo evalua una pausa por dia (con 6 fichadas ignora la segunda). |
+
+Hallazgos adicionales del backend (a tener en cuenta para la consigna):
+
+- El motor tiene 6 reglas implementadas con minutos exactos y anti-duplicacion. Los umbrales son parametrizables por horario (tabla `horario`).
+- Estan hardcodeadas: la ventana de doble fichada (`DOUBLE_PUNCH_WINDOW_MIN = 5`) y la clasificacion HE 100% (domingo/feriado). No hay parametrizacion por empresa (el motor opera global sobre empleados activos). El TP pide no hardcodear reglas de empresa: anotar como decision o pendiente segun lo exija el evaluador.
+- El rol Contador quedo bien acotado (read + export; aprobar/rechazar/cerrar/reprocesar devuelven 403).
+
+### 13.3 Fix - Vista propia del rol Empleado en el dashboard
+
+Problema detectado:
+
+- El rol Empleado entraba al mismo `DashboardPage` del administrador. Aunque el menu lateral ya estaba filtrado y `ProtectedRoute` bloqueaba la navegacion, el empleado veia botones de acciones de admin (que lo redirigian al inicio) y, sobre todo, datos de toda la organizacion (alertas y novedades de otros empleados), porque `getDashboard()` no filtra por el usuario logueado.
+
+Correccion aplicada (solo frontend):
+
+- Archivo: `src/pages/dashboard/DashboardPage.jsx`.
+- Para el rol Empleado se renderiza una vista personal simple (`MI PANEL`): saludo con su nombre y el periodo actual, sin acciones de admin ni datos de terceros.
+- Para el empleado no se ejecuta la carga del dashboard operativo (se evita traer datos org-wide).
+
+Esta correccion fue el primer paso; el segundo (mostrar datos propios reales) se completo en 13.5.
+
+### 13.4 Pendientes agregados a la lista
+
+P2 - Documentacion de la consigna:
+
+1. Agregar al PRD de alcance una nota sobre el riesgo de buddy punching (QR/PIN) y su mitigacion (el biometrico lo reduce). Confirmado por el backend: no hay defensa implementada.
+2. Documentar el caso de aceptacion de "descanso excedido" (ejemplo 77 vs 60 min) como criterio de validacion. El backend ya lo calcula correctamente.
+3. Opcional: citar art. 208 LCT en la licencia por enfermedad.
+
+P2 - Parametrizacion del motor (segun lo exija el evaluador):
+
+1. La ventana de doble fichada (5 min) y la regla HE 100% (domingo/feriado) estan hardcodeadas. Evaluar moverlas a configuracion por horario/empresa.
+
+### 13.5 Cierre del punto 1 - Autoconsulta del empleado con datos reales
+
+El backend implemento el scoping por empleado (router `/api/me`, filtrado siempre por el `legajo` del token, sin posibilidad de evadirlo por query params). Endpoints:
+
+- `GET /api/me/summary` - resumen propio del periodo (dias presentes, tardanzas, HE 50/100, ausencias, novedades pendientes).
+- `GET /api/me/news` - novedades propias con estado (Pendiente/Aprobada/Rechazada) + stats.
+- `GET /api/me/punches` - fichadas propias del periodo (entrada/salida, origen, correccion).
+
+Todos aceptan rango opcional `?desde=&hasta=` (default: mes actual) y estan permitidos para rol Empleado (y Admin). Contador y otros roles reciben 403.
+
+Frontend conectado:
+
+- Nuevo service `src/services/meService.js` con `getMySummary`, `getMyNews`, `getMyPunches`.
+- `src/pages/dashboard/DashboardPage.jsx`: la vista `MI PANEL` del empleado ahora consume esos endpoints y muestra su resumen, sus novedades y sus fichadas. Incluye loader y estados vacios. No expone acciones de admin ni datos de terceros.
+
+Estado: el punto 1 (autoconsulta del empleado del TP) queda cubierto de punta a punta. Validacion: `npm run build` OK; falta smoke manual logueado como Empleado contra el backend real.
+
+Limitacion conocida del backend: la inferencia de pausa para la regla de descanso es posicional (solo la primera pausa del dia); los endpoints `/api/me` no paginan (volumen bajo por empleado/mes).
