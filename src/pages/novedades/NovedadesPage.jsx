@@ -187,6 +187,7 @@ export default function NovedadesPage() {
   const [selectedId, setSelectedId] = useState(null)
   const [openCreate, setOpenCreate] = useState(false)
   const [openReject, setOpenReject] = useState(false)
+  const [approveLoading, setApproveLoading] = useState(false)
   const [novType, setNovType] = useState('')
   const [toast, setToast] = useState('')
   const [loadError, setLoadError] = useState('')
@@ -249,9 +250,9 @@ export default function NovedadesPage() {
   const clearFilters = () => { setFilterType(''); setFilterStatus('') }
 
   const approve = async () => {
-    if (!selected) return
-    if (!window.confirm(`Aprobar la novedad ${selected.id}?`)) return
+    if (!selected || approveLoading) return
     if (api) {
+      setApproveLoading(true)
       try {
         await approveNews(selected.rawId ?? selected.id)
         showToast('Novedad aprobada correctamente.')
@@ -259,6 +260,8 @@ export default function NovedadesPage() {
         setSelectedId(null)
       } catch (e) {
         showToast(`Error: ${e.message}`)
+      } finally {
+        setApproveLoading(false)
       }
       return
     }
@@ -266,12 +269,11 @@ export default function NovedadesPage() {
     showToast('Novedad aprobada correctamente.')
   }
 
-  const reject = async () => {
+  const reject = async (motivo = '') => {
     if (!selected) return
-    if (!window.confirm(`Rechazar la novedad ${selected.id}?`)) return
     if (api) {
       try {
-        await rejectNews(selected.rawId ?? selected.id, '')
+        await rejectNews(selected.rawId ?? selected.id, motivo)
         showToast('Novedad rechazada.')
         setOpenReject(false)
         await loadNews()
@@ -379,7 +381,7 @@ export default function NovedadesPage() {
 
       <div className="mb-8 grid grid-cols-4 gap-4">
         <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Pendientes</p><p className="font-headline text-2xl font-black text-tertiary">{kpiStats.pending}</p></div>
-        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Aprobadas</p><p className="font-headline text-2xl font-black text-on-secondary-container">{kpiStats.approved}</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Aprobadas</p><p className="font-headline text-2xl font-black text-green-700 dark:text-green-400">{kpiStats.approved}</p></div>
         <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Rechazadas</p><p className="font-headline text-2xl font-black text-error">{kpiStats.rejected}</p></div>
         <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Total (en vista)</p><p className="font-headline text-2xl font-black text-primary">{kpiStats.total}</p></div>
       </div>
@@ -525,8 +527,18 @@ export default function NovedadesPage() {
                 </div>
                 {canMutate && selected.status === 'Pendiente' && (
                   <div className="flex gap-3 pt-1">
-                    <button type="button" onClick={approve} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-on-secondary-container/30 bg-on-secondary-container/15 py-2.5 text-xs font-bold text-on-secondary-container transition-colors hover:bg-on-secondary-container/25">
-                      <span className="material-symbols-outlined text-sm">check_circle</span> Aprobar
+                    <button
+                      type="button"
+                      onClick={approve}
+                      disabled={approveLoading}
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-green-600/25 bg-green-600/10 py-2.5 text-xs font-bold text-green-700 transition-colors hover:bg-green-600/15 disabled:cursor-wait disabled:opacity-60 dark:text-green-400"
+                    >
+                      {approveLoading ? (
+                        <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>
+                      ) : (
+                        <span className="material-symbols-outlined text-sm">check_circle</span>
+                      )}
+                      {approveLoading ? 'Aprobando...' : 'Aprobar'}
                     </button>
                     <button type="button" onClick={() => setOpenReject(true)} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-error/25 bg-error/10 py-2.5 text-xs font-bold text-error transition-colors hover:bg-error/15">
                       <span className="material-symbols-outlined text-sm">cancel</span> Rechazar
@@ -625,9 +637,13 @@ export default function NovedadesPage() {
       </Modal>
 
       <Modal open={openReject} title="Rechazar novedad" onClose={() => setOpenReject(false)} size="max-w-sm">
-        <form className="space-y-4 px-8 py-6" onSubmit={(e) => { e.preventDefault(); reject() }}>
+        <form className="space-y-4 px-8 py-6" onSubmit={(e) => {
+          e.preventDefault()
+          const motivo = new FormData(e.currentTarget).get('motivo')
+          reject(String(motivo ?? '').trim())
+        }}>
           <Field label="Motivo de rechazo *">
-            <textarea required aria-label="Motivo de rechazo" rows={3} placeholder="Indicá el motivo del rechazo..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-error focus:outline-none focus:ring-2 focus:ring-error/30" />
+            <textarea required name="motivo" aria-label="Motivo de rechazo" rows={3} placeholder="Indicá el motivo del rechazo..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-error focus:outline-none focus:ring-2 focus:ring-error/30" />
           </Field>
           <div className="flex gap-3">
             <button type="button" onClick={() => setOpenReject(false)} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">Cancelar</button>

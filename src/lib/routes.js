@@ -1,10 +1,15 @@
 export const routes = {
   dashboard: '/',
   login: '/login',
+  miArea: '/mi-area',
+  miFichadas: '/mi-area/fichadas',
+  miNovedades: '/mi-area/novedades',
+  miFichar: '/mi-area/fichar',
   empleados: '/empleados',
   empleadoDetalle: '/empleados/:id',
   empleadoJuanPerez: '/empleados/juan-perez',
   fichadas: '/fichadas',
+  fichar: '/fichar',
   horarios: '/horarios',
   novedades: '/novedades',
   cierre: '/cierre',
@@ -19,4 +24,10 @@ export const primaryNavigation = [
   { label: 'Novedades', icon: 'notification_important', to: routes.novedades },
   { label: 'Cierre mensual', icon: 'payments', to: routes.cierre },
   { label: 'Exportaciones', icon: 'output', to: routes.exportaciones },
+]
+
+export const employeeNavigation = [
+  { label: 'Mi resumen', icon: 'dashboard', to: routes.miArea },
+  { label: 'Mis fichadas', icon: 'fingerprint', to: routes.miFichadas },
+  { label: 'Mis novedades', icon: 'notification_important', to: routes.miNovedades },
 ]

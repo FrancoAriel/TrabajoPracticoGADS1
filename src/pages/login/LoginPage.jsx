@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { login } from '../../services/authService'
+import { Link, useNavigate } from 'react-router-dom'
+import { login, homeRouteForSession } from '../../services/authService'
+import { routes } from '../../lib/routes'
 
 const initialErrors = {
   username: false,
@@ -40,11 +41,11 @@ export default function LoginPage() {
 
     window.setTimeout(async () => {
       try {
-        await login(username.trim(), password)
+        const session = await login(username.trim(), password)
         setIsSuccess(true)
 
         window.setTimeout(() => {
-          navigate('/')
+          navigate(homeRouteForSession(session))
         }, 400)
       } catch {
         setErrors({ ...initialErrors, login: true })
@@ -79,7 +80,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} noValidate>
             <div className="mb-5">
               <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
-                Usuario o legajo
+                Usuario, legajo o DNI
               </label>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-outline">
@@ -155,10 +156,26 @@ export default function LoginPage() {
           </form>
 
           <p className="mt-6 text-center text-[11px] text-on-surface-variant">
-            Credenciales de demo: <span className="font-bold text-on-background">admin</span> /{' '}
+            Demo admin: <span className="font-bold text-on-background">admin</span> /{' '}
             <span className="font-bold text-on-background">admin</span>
+            <span className="mx-2 text-on-surface-variant/40">·</span>
+            Empleado: tu <span className="font-bold text-on-background">DNI</span> como usuario y contraseña
           </p>
         </div>
+
+        <Link
+          to={routes.fichar}
+          className="group mt-4 flex items-center gap-4 rounded-2xl border border-slate-200/50 bg-surface-container-lowest/70 px-5 py-4 shadow-sm transition-all hover:border-primary/25 hover:bg-surface-container-lowest hover:shadow-md"
+        >
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-surface-container-low text-on-surface-variant transition-colors group-hover:bg-primary-container/40 group-hover:text-primary">
+            <span className="material-symbols-outlined text-2xl">fingerprint</span>
+          </div>
+          <div className="min-w-0 flex-1 text-left">
+            <p className="text-sm font-bold text-on-background">Fichar asistencia</p>
+            <p className="text-[11px] text-on-surface-variant">Terminal para empleados</p>
+          </div>
+          <span className="material-symbols-outlined text-lg text-outline transition-transform group-hover:translate-x-0.5 group-hover:text-primary">arrow_forward</span>
+        </Link>
 
         <p className="mt-6 text-center text-[11px] text-on-surface-variant">© 2025 Executive Architect · Labor Management</p>
       </div>

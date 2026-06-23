@@ -1,9 +1,16 @@
 export const mockClosure = {
   currentPeriod: 'Junio 2025',
+  canClose: false,
+  isFuture: false,
+  isCurrentMonth: true,
+  availablePeriods: [
+    { label: 'Mayo 2025', status: 'Cerrado', isFuture: false, isCurrentMonth: false, closable: false },
+    { label: 'Junio 2025', status: 'En curso', isFuture: false, isCurrentMonth: true, closable: false },
+  ],
   stats: { liquidated: '39', pending: '3', he50: '42h 15m', he100: '8h 00m' },
   periodCards: [
     { id: 'may-2025', label: 'Mayo 2025', status: 'Cerrado' },
-    { id: 'jun-2025', label: 'Junio 2025', status: 'En progreso' },
+    { id: 'jun-2025', label: 'Junio 2025', status: 'En curso' },
     { id: 'jul-2025', label: 'Julio 2025', status: 'Futuro' },
   ],
   employeeBreakdown: [

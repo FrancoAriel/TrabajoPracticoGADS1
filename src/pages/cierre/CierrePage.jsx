@@ -28,6 +28,79 @@ function StatusPill({ status }) {
   return <span className="inline-flex items-center gap-1 text-[10px] font-bold text-tertiary"><span className="h-1.5 w-1.5 rounded-full bg-tertiary" />Pendiente</span>
 }
 
+function Field({ label, children, hint }) {
+  return (
+    <div>
+      <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">{label}</label>
+      {children}
+      {hint ? <p className="mt-1.5 text-[11px] text-on-surface-variant">{hint}</p> : null}
+    </div>
+  )
+}
+
+const INPUT = 'w-full rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30'
+
+function ReprocessResultPanel({ result }) {
+  if (!result) return null
+  const totals = result.totals ?? {}
+  const metrics = [
+    { label: 'Creadas', value: totals.created ?? 0, className: 'text-green-700' },
+    { label: 'OK', value: totals.ok ?? 0, className: 'text-primary' },
+    { label: 'Omitidas', value: totals.skipped ?? 0, className: 'text-on-surface-variant' },
+    { label: 'Errores', value: totals.error ?? 0, className: 'text-error' },
+  ]
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-slate-200/60 bg-surface-container-lowest">
+      <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+        <p className="text-xs font-bold uppercase tracking-wider text-on-background">
+          Resultado{result.dryRun ? ' · simulación' : ''}
+        </p>
+        {result.dryRun ? (
+          <span className="rounded-full bg-tertiary-container/40 px-2 py-0.5 text-[10px] font-bold uppercase text-tertiary">Preview</span>
+        ) : (
+          <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold uppercase text-green-700">Aplicado</span>
+        )}
+      </div>
+      <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-4">
+        {metrics.map((m) => (
+          <div key={m.label} className="rounded-lg bg-surface-container-low p-3 text-center">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">{m.label}</p>
+            <p className={`mt-1 font-headline text-xl font-black ${m.className}`}>{m.value}</p>
+          </div>
+        ))}
+      </div>
+      {result.byRule && Object.keys(result.byRule).length > 0 && (
+        <div className="border-t border-slate-100 px-4 py-3">
+          <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Detalle por regla</p>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[420px] text-left text-xs">
+              <thead>
+                <tr className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">
+                  <th className="pb-2 pr-3">Regla</th>
+                  <th className="pb-2 px-2 text-center">Creadas</th>
+                  <th className="pb-2 px-2 text-center">OK</th>
+                  <th className="pb-2 pl-2 text-center">Omitidas</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {Object.entries(result.byRule).map(([rule, counts]) => (
+                  <tr key={rule}>
+                    <td className="py-2 pr-3 font-medium capitalize text-on-background">{rule.replace(/_/g, ' ')}</td>
+                    <td className="px-2 py-2 text-center font-bold text-green-700">{counts.created ?? 0}</td>
+                    <td className="px-2 py-2 text-center font-bold text-primary">{counts.ok ?? 0}</td>
+                    <td className="pl-2 py-2 text-center font-bold text-on-surface-variant">{counts.skipped ?? 0}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function isoYmd(date = new Date()) {
   const y = date.getFullYear()
   const m = String(date.getMonth() + 1).padStart(2, '0')
@@ -44,6 +117,7 @@ export default function CierrePage() {
   const api = isApiMode()
   const canMutate = !api || getSession()?.user?.role === 'Admin'
   const [selected, setSelected] = useState(null)
+  const [selectedPeriod, setSelectedPeriod] = useState('')
   const [closureData, setClosureData] = useState(null)
   const [closureLoading, setClosureLoading] = useState(true)
   const [closureActionLoading, setClosureActionLoading] = useState(false)
@@ -57,14 +131,21 @@ export default function CierrePage() {
   const [reprocessLoading, setReprocessLoading] = useState(false)
   const [reprocessResult, setReprocessResult] = useState(null)
   const [reprocessError, setReprocessError] = useState(null)
+  const [closureConfirmOpen, setClosureConfirmOpen] = useState(false)
 
   useEffect(() => { document.title = 'Cierre Mensual - Executive Architect' }, [])
 
-  async function loadClosure() {
+  async function loadClosure(periodo = selectedPeriod) {
     setClosureLoading(true)
     setClosureError('')
     try {
-      setClosureData(await getCurrentClosure())
+      const data = await getCurrentClosure(periodo || undefined)
+      setClosureData(data)
+      if (data?.currentPeriod) {
+        setSelectedPeriod(data.currentPeriod)
+      }
+      if (data?.periodRange?.desde) setReprocessDesde(data.periodRange.desde)
+      if (data?.periodRange?.hasta) setReprocessHasta(data.periodRange.hasta)
     } catch (e) {
       setClosureError(e?.message ?? 'No se pudo cargar el cierre.')
     } finally {
@@ -75,6 +156,12 @@ export default function CierrePage() {
   useEffect(() => {
     loadClosure()
   }, [])
+
+  function selectPeriod(periodo) {
+    if (!periodo || periodo === selectedPeriod) return
+    setSelected(null)
+    loadClosure(periodo)
+  }
 
   const currentPeriod = closureData?.currentPeriod ?? (api ? '—' : 'Junio 2025')
   const stats = closureData?.stats ?? (api ? { liquidated: 0, pending: 0, he50: '0', he100: '0' } : { liquidated: 39, pending: 3, he50: '42h 15m', he100: '8h 00m' })
@@ -128,8 +215,21 @@ export default function CierrePage() {
     : (api ? [] : checklist)
 
   const hasClosureData = Boolean(closureData)
-  const closureStatus = closureData?.currentClosure?.estado ?? 'Borrador'
+  const closureStatus = closureData?.currentClosure?.estado ?? 'Abierto'
   const isClosedClosure = closureStatus === 'Cerrado'
+  const isFuturePeriod = Boolean(closureData?.isFuture)
+  const isCurrentMonth = Boolean(closureData?.isCurrentMonth)
+  const canClosePeriod = closureData?.canClose ?? (!isClosedClosure && !isFuturePeriod && Number(stats.pending ?? 0) === 0)
+  const availablePeriods = closureData?.availablePeriods ?? []
+
+  function periodOptionSuffix(period) {
+    if (period.status === 'Cerrado') return ' · Cerrado'
+    if (period.status === 'En curso') return ' · En curso'
+    if (period.isFuture) return ' · Futuro'
+    if (period.status === 'Pendiente') return ' · Pendiente'
+    if (period.status === 'Borrador') return ' · Borrador'
+    return ''
+  }
 
   if (api && closureLoading && !hasClosureData) {
     return (
@@ -142,8 +242,7 @@ export default function CierrePage() {
     )
   }
 
-  async function handleRunClosure() {
-    if (!window.confirm(`Vas a cerrar el período ${currentPeriod}. Esta acción genera snapshot de cierre. ¿Continuar?`)) return
+  async function executeRunClosure() {
     setClosureActionLoading(true)
     setClosureMessage('')
     setClosureError('')
@@ -157,7 +256,8 @@ export default function CierrePage() {
         archivoExportado: `cierre_${currentPeriod.replace(/\s+/g, '_')}.csv`,
       })
       setClosureMessage(`Cierre ejecutado. Novedades incluidas: ${result.novedadesIncluidas ?? 0}.`)
-      await loadClosure()
+      setClosureConfirmOpen(false)
+      await loadClosure(currentPeriod)
     } catch (e) {
       setClosureError(e?.message ?? 'No se pudo ejecutar el cierre.')
     } finally {
@@ -165,8 +265,16 @@ export default function CierrePage() {
     }
   }
 
+  function openClosureConfirm() {
+    setClosureConfirmOpen(true)
+  }
+
+  function closeClosureConfirm() {
+    if (closureActionLoading) return
+    setClosureConfirmOpen(false)
+  }
+
   async function handleReprocess() {
-    if (!reprocessDryRun && !window.confirm('Vas a reprocesar el período y reemplazar novedades automáticas del rango. ¿Continuar?')) return
     setReprocessLoading(true)
     setReprocessError(null)
     setReprocessResult(null)
@@ -182,12 +290,26 @@ export default function CierrePage() {
         legajos: legajosArr.length ? legajosArr : undefined,
       })
       setReprocessResult(res?.data ?? res)
-      await loadClosure()
+      await loadClosure(selectedPeriod || currentPeriod)
     } catch (e) {
       setReprocessError(e?.message ?? 'Error al reprocesar')
     } finally {
       setReprocessLoading(false)
     }
+  }
+
+  function openReprocessModal() {
+    setReprocessError(null)
+    setReprocessResult(null)
+    setReprocessDryRun(true)
+    setReprocessOpen(true)
+  }
+
+  function closeReprocessModal() {
+    if (reprocessLoading) return
+    setReprocessOpen(false)
+    setReprocessError(null)
+    setReprocessResult(null)
   }
 
   return (
@@ -202,19 +324,41 @@ export default function CierrePage() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="font-headline text-2xl font-extrabold tracking-tight text-on-background">Cierre Mensual</h2>
-          <p className="mt-1 text-sm text-on-surface-variant">Proceso de cierre y liquidación de horas del período.</p>
+          <p className="mt-1 text-sm text-on-surface-variant">Elegí cualquier mes anterior o el actual para revisar datos y ejecutar el cierre.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 rounded-lg bg-tertiary-container/40 px-4 py-2">
-            <span className="material-symbols-outlined text-sm text-tertiary">pending</span>
-            <span className="text-xs font-bold uppercase tracking-widest text-on-tertiary-container">
-              Período {isClosedClosure ? 'cerrado' : 'abierto'}: {currentPeriod}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative flex items-center">
+            <span className="material-symbols-outlined pointer-events-none absolute left-3 text-sm text-on-surface-variant">calendar_month</span>
+            <select
+              value={selectedPeriod || currentPeriod}
+              onChange={(e) => selectPeriod(e.target.value)}
+              disabled={closureLoading}
+              className="appearance-none rounded-lg border border-slate-200/70 bg-surface-container-lowest py-2 pl-9 pr-8 text-sm font-semibold text-on-background focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-60"
+            >
+              {(availablePeriods.length ? availablePeriods : [{ label: currentPeriod }]).map((p) => (
+                <option key={p.label} value={p.label} disabled={p.isFuture}>
+                  {p.label}{periodOptionSuffix(p)}
+                </option>
+              ))}
+            </select>
+            <span className="material-symbols-outlined pointer-events-none absolute right-2 text-base text-on-surface-variant">expand_more</span>
+          </div>
+          <div className={`flex items-center gap-2 rounded-lg px-4 py-2 ${
+            isClosedClosure
+              ? 'bg-green-50 text-green-700'
+              : isFuturePeriod
+                ? 'bg-surface-container-highest text-on-surface-variant'
+                : 'bg-tertiary-container/40 text-on-tertiary-container'
+          }`}>
+            <span className="material-symbols-outlined text-sm">{isClosedClosure ? 'lock' : isFuturePeriod ? 'event_upcoming' : 'pending'}</span>
+            <span className="text-xs font-bold uppercase tracking-widest">
+              {isClosedClosure ? 'Cerrado' : isFuturePeriod ? 'Futuro' : isCurrentMonth ? 'En curso' : 'Abierto'}
             </span>
           </div>
           {canMutate ? (
             <>
               <button
-                onClick={() => setReprocessOpen(true)}
+                onClick={openReprocessModal}
                 className="flex items-center gap-2 rounded-md border border-slate-200/70 bg-surface-container-lowest px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-container"
                 type="button"
               >
@@ -222,12 +366,12 @@ export default function CierrePage() {
               </button>
               <button
                 type="button"
-                onClick={handleRunClosure}
-                disabled={isClosedClosure || closureActionLoading || closureLoading || Number(stats.pending ?? 0) > 0}
+                onClick={openClosureConfirm}
+                disabled={!canClosePeriod || closureActionLoading || closureLoading}
                 className="flex items-center gap-2 rounded-md bg-slate-900 dark:bg-primary dark:text-on-primary px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {closureActionLoading ? <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span> : <span className="material-symbols-outlined text-sm">lock_open</span>}
-                {isClosedClosure ? 'Período cerrado' : closureData?.currentClosure?.id ? 'Ejecutar cierre' : 'Crear y cerrar'}
+                {isClosedClosure ? 'Período cerrado' : isFuturePeriod ? 'Período futuro' : closureData?.currentClosure?.id ? 'Ejecutar cierre' : 'Crear y cerrar'}
               </button>
             </>
           ) : null}
@@ -251,35 +395,47 @@ export default function CierrePage() {
         {periodCards.length ? periodCards.map((card) => {
           const normalizedStatus = String(card.status ?? '').toLowerCase()
           const isClosed = normalizedStatus === 'cerrado'
-          const isCurrent = normalizedStatus === 'en progreso'
-          const wrapperClass = isCurrent
-            ? 'relative overflow-hidden rounded-xl bg-slate-900 dark:bg-surface-container-highest p-5 text-white'
+          const isActive = card.label === (selectedPeriod || currentPeriod)
+          const isFuture = normalizedStatus === 'futuro'
+          const isInProgress = normalizedStatus === 'en curso' || normalizedStatus === 'en progreso'
+          const wrapperClass = isActive
+            ? 'relative cursor-pointer overflow-hidden rounded-xl bg-slate-900 dark:bg-surface-container-highest p-5 text-white ring-2 ring-primary/40'
             : isClosed
-              ? 'flex items-center justify-between rounded-xl border border-slate-200/50 border-l-4 border-l-green-600 bg-surface-container-lowest p-5'
-              : 'rounded-xl bg-surface-container-highest p-5 opacity-50'
-          const titleClass = isCurrent ? 'text-slate-400' : 'text-on-surface-variant'
-          const statusClass = isClosed ? 'text-green-700 dark:text-green-400' : isCurrent ? 'text-white' : 'text-on-surface-variant'
-          const subClass = isCurrent ? 'text-slate-400' : 'text-on-surface-variant'
+              ? 'flex cursor-pointer items-center justify-between rounded-xl border border-slate-200/50 border-l-4 border-l-green-600 bg-surface-container-lowest p-5 transition-colors hover:bg-slate-50'
+              : isFuture
+                ? 'cursor-not-allowed rounded-xl bg-surface-container-highest p-5 opacity-50'
+                : 'cursor-pointer rounded-xl bg-surface-container-highest p-5 transition-colors hover:bg-surface-container-low'
+          const titleClass = isActive ? 'text-slate-400' : 'text-on-surface-variant'
+          const statusClass = isClosed ? 'text-green-700 dark:text-green-400' : isActive ? 'text-white' : 'text-on-surface-variant'
+          const subClass = isActive ? 'text-slate-400' : 'text-on-surface-variant'
 
           return (
-            <div key={card.id ?? card.label} className={wrapperClass}>
-              {isCurrent ? <span className="material-symbols-outlined absolute -bottom-3 -right-3 text-7xl opacity-10">point_of_sale</span> : null}
+            <button
+              key={card.id ?? card.label}
+              type="button"
+              disabled={isFuture}
+              onClick={() => selectPeriod(card.label)}
+              className={`text-left ${wrapperClass}`}
+            >
+              {isActive ? <span className="material-symbols-outlined absolute -bottom-3 -right-3 text-7xl opacity-10">point_of_sale</span> : null}
               <div>
                 <p className={`mb-1 font-headline text-[10px] font-bold uppercase tracking-widest ${titleClass}`}>{card.label}</p>
                 <p className={`text-sm font-black uppercase ${statusClass}`}>{card.status}</p>
-                <p className={`mt-0.5 text-xs ${subClass}`}>{card.sub ?? (isCurrent ? `${stats.pending ?? 0} novedades pendientes` : 'Sin detalle adicional')}</p>
-                {isCurrent ? (
-                  <Link to={routes.novedades} className="mt-3 flex items-center gap-1 text-xs font-bold text-blue-300 hover:underline">
-                    <span className="material-symbols-outlined text-sm">arrow_forward</span> Revisar novedades
-                  </Link>
+                <p className={`mt-0.5 text-xs ${subClass}`}>
+                  {card.sub ?? (isActive ? `${stats.pending ?? 0} novedades pendientes` : isClosed ? 'Cierre finalizado' : isFuture ? 'Aún no iniciado' : isInProgress ? 'Mes en curso' : 'Pendiente de cierre')}
+                </p>
+                {isActive && !isClosed ? (
+                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-blue-300">
+                    <span className="material-symbols-outlined text-sm">visibility</span> Período en vista
+                  </span>
                 ) : null}
               </div>
               {isClosed ? (
-                <Link to={routes.exportaciones} className="flex shrink-0 items-center gap-1 text-xs font-bold text-primary hover:underline">
+                <Link to={routes.exportaciones} onClick={(e) => e.stopPropagation()} className="flex shrink-0 items-center gap-1 text-xs font-bold text-primary hover:underline">
                   <span className="material-symbols-outlined text-sm">download</span> Exportar
                 </Link>
               ) : null}
-            </div>
+            </button>
           )
         }) : (
           <div className="col-span-3 rounded-xl border border-dashed border-slate-200 bg-surface-container-lowest p-8 text-center text-sm text-on-surface-variant">
@@ -421,124 +577,185 @@ export default function CierrePage() {
             </div>
           )}
         </div>
-        <p className="mt-5 text-xs text-on-surface-variant">El botón "Ejecutar cierre" se habilita cuando no quedan novedades pendientes del período.</p>
+        <p className="mt-5 text-xs text-on-surface-variant">
+          Elegí el período a cerrar con el selector o las tarjetas. Podés cerrar meses anteriores cuando no queden novedades pendientes.
+        </p>
       </div>
 
       <Modal
         open={reprocessOpen}
-        onClose={() => setReprocessOpen(false)}
+        onClose={closeReprocessModal}
         title="Reprocesar período"
-        subtitle="Borra novedades automáticas previas del rango y vuelve a evaluar las 5 reglas del motor."
+        subtitle="Recalculá las reglas del motor sobre un rango de fechas."
+        size="max-w-lg"
       >
-        <div className="space-y-4 px-8 py-6">
-          <div className="rounded-lg border border-tertiary/20 bg-tertiary-container/20 px-4 py-3 text-xs text-on-tertiary-container">
-            El reproceso elimina novedades automáticas previas del rango seleccionado y recalcula reglas. Usá simulación para validar antes de impactar datos.
+        <div className="space-y-5 px-8 py-6">
+          <div className="flex items-start gap-3 rounded-xl border border-slate-200/60 bg-surface-container-low px-4 py-3">
+            <span className="material-symbols-outlined mt-0.5 text-base text-primary">info</span>
+            <p className="text-xs leading-relaxed text-on-surface-variant">
+              El reproceso elimina novedades automáticas previas del rango y vuelve a evaluar las reglas.
+              Usá <span className="font-bold text-on-background">simulación</span> antes de aplicar cambios reales.
+              Si podés, indicá legajos puntuales para que termine más rápido.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label htmlFor="reprocess-desde" className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Desde</label>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field label="Desde *">
               <input
                 id="reprocess-desde"
                 type="date"
                 value={reprocessDesde}
                 onChange={(e) => setReprocessDesde(e.target.value)}
-                className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className={INPUT}
               />
-            </div>
-            <div>
-              <label htmlFor="reprocess-hasta" className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Hasta</label>
+            </Field>
+            <Field label="Hasta *">
               <input
                 id="reprocess-hasta"
                 type="date"
                 value={reprocessHasta}
                 onChange={(e) => setReprocessHasta(e.target.value)}
-                className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className={INPUT}
               />
-            </div>
+            </Field>
           </div>
 
-          <div>
-            <label htmlFor="reprocess-legajos" className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
-              Legajos (opcional, separados por coma)
-            </label>
+          <Field label="Legajos" hint="Opcional. Separados por coma. Vacío = todos los empleados activos.">
             <input
               id="reprocess-legajos"
               type="text"
               value={reprocessLegajos}
               onChange={(e) => setReprocessLegajos(e.target.value)}
-              placeholder="Ej: 1, 2, 5 (vacío = todos los activos)"
-              className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+              placeholder="Ej: 1, 2, 5"
+              className={INPUT}
             />
+          </Field>
+
+          <div>
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Modo de ejecución</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setReprocessDryRun(true)}
+                className={`rounded-xl border px-3 py-3 text-left transition-all ${
+                  reprocessDryRun
+                    ? 'border-primary/30 bg-primary/5 shadow-sm'
+                    : 'border-slate-200/60 bg-surface-container-lowest hover:bg-surface-container-low'
+                }`}
+              >
+                <span className={`material-symbols-outlined text-lg ${reprocessDryRun ? 'text-primary' : 'text-on-surface-variant'}`}>science</span>
+                <p className={`mt-2 text-sm font-bold ${reprocessDryRun ? 'text-primary' : 'text-on-background'}`}>Simulación</p>
+                <p className="mt-0.5 text-[11px] text-on-surface-variant">No modifica datos</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setReprocessDryRun(false)}
+                className={`rounded-xl border px-3 py-3 text-left transition-all ${
+                  !reprocessDryRun
+                    ? 'border-error/30 bg-error/5 shadow-sm'
+                    : 'border-slate-200/60 bg-surface-container-lowest hover:bg-surface-container-low'
+                }`}
+              >
+                <span className={`material-symbols-outlined text-lg ${!reprocessDryRun ? 'text-error' : 'text-on-surface-variant'}`}>published_with_changes</span>
+                <p className={`mt-2 text-sm font-bold ${!reprocessDryRun ? 'text-error' : 'text-on-background'}`}>Aplicar cambios</p>
+                <p className="mt-0.5 text-[11px] text-on-surface-variant">Reemplaza novedades auto.</p>
+              </button>
+            </div>
           </div>
 
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={reprocessDryRun}
-              onChange={(e) => setReprocessDryRun(e.target.checked)}
-              className="h-4 w-4 rounded border-outline-variant"
-            />
-            <span>Simulación (no inserta novedades) — recomendado para previsualizar</span>
-          </label>
+          {!reprocessDryRun && (
+            <div className="flex items-start gap-3 rounded-xl border border-error/20 bg-error-container/10 px-4 py-3">
+              <span className="material-symbols-outlined text-base text-error">warning</span>
+              <p className="text-xs leading-relaxed text-error">
+                Vas a reemplazar novedades automáticas del rango seleccionado. Esta acción impacta datos reales.
+              </p>
+            </div>
+          )}
 
           {reprocessError && (
-            <div className="rounded-md bg-error-container/30 px-3 py-2 text-sm text-error">
-              {reprocessError}
+            <div className="flex items-start gap-3 rounded-xl border border-error/20 bg-error-container/15 px-4 py-3">
+              <span className="material-symbols-outlined text-base text-error">error</span>
+              <p className="text-sm font-semibold text-error">{reprocessError}</p>
             </div>
           )}
 
-          {reprocessResult && (
-            <div className="rounded-md border border-outline-variant/40 bg-surface-container-low p-3 text-sm">
-              <p className="mb-2 font-bold">Resultado{reprocessResult.dryRun ? ' (simulación)' : ''}</p>
-              <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
-                <div className="rounded bg-green-50 px-2 py-1">
-                  <span className="font-bold text-green-700">{reprocessResult.totals?.created ?? 0}</span> creadas
-                </div>
-                <div className="rounded bg-blue-50 px-2 py-1">
-                  <span className="font-bold text-blue-700">{reprocessResult.totals?.ok ?? 0}</span> OK
-                </div>
-                <div className="rounded bg-slate-100 px-2 py-1">
-                  <span className="font-bold text-slate-700">{reprocessResult.totals?.skipped ?? 0}</span> omitidas
-                </div>
-                <div className="rounded bg-red-50 px-2 py-1">
-                  <span className="font-bold text-red-700">{reprocessResult.totals?.error ?? 0}</span> errores
-                </div>
-              </div>
-              {reprocessResult.byRule && (
-                <div className="mt-3">
-                  <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Por regla</p>
-                  <ul className="space-y-0.5 text-xs">
-                    {Object.entries(reprocessResult.byRule).map(([rule, counts]) => (
-                      <li key={rule} className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-                        <span className="capitalize">{rule.replace(/_/g, ' ')}</span>
-                        <span className="text-on-surface-variant">
-                          creadas: <b className="text-on-surface">{counts.created}</b>, ok: {counts.ok}, omitidas: {counts.skipped}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
+          <ReprocessResultPanel result={reprocessResult} />
 
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex gap-3 border-t border-slate-100 pt-2">
             <button
               type="button"
-              onClick={() => setReprocessOpen(false)}
-              className="rounded-md border border-outline-variant/40 bg-surface-container-lowest px-4 py-2 text-sm font-bold text-on-surface hover:bg-surface-container"
+              onClick={closeReprocessModal}
+              disabled={reprocessLoading}
+              className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low disabled:opacity-50"
             >
-              Cerrar
+              Cancelar
             </button>
             <button
               type="button"
               onClick={handleReprocess}
               disabled={reprocessLoading || !reprocessDesde || !reprocessHasta}
-              className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-bold text-on-primary disabled:opacity-40"
+              className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50 ${
+                reprocessDryRun ? 'bg-primary' : 'bg-error'
+              }`}
             >
-              {reprocessLoading && <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>}
-              {reprocessDryRun ? 'Simular' : 'Reprocesar'}
+              {reprocessLoading ? (
+                <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>
+              ) : (
+                <span className="material-symbols-outlined text-sm">{reprocessDryRun ? 'science' : 'published_with_changes'}</span>
+              )}
+              {reprocessLoading ? 'Procesando...' : reprocessDryRun ? 'Ejecutar simulación' : 'Reprocesar y aplicar'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        open={closureConfirmOpen}
+        onClose={closeClosureConfirm}
+        title="Confirmar cierre mensual"
+        subtitle={currentPeriod}
+        size="max-w-md"
+      >
+        <div className="space-y-5 px-8 py-6">
+          <div className="flex items-start gap-3 rounded-xl border border-slate-200/60 bg-surface-container-low px-4 py-3">
+            <span className="material-symbols-outlined mt-0.5 text-base text-primary">lock</span>
+            <p className="text-sm leading-relaxed text-on-surface-variant">
+              Se generará un snapshot del período con las novedades aprobadas. Después del cierre podrás exportar la liquidación.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-lg bg-surface-container-low p-3 text-center">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Novedades aprobadas</p>
+              <p className="mt-1 font-headline text-xl font-black text-primary">{stats.liquidated ?? 0}</p>
+            </div>
+            <div className="rounded-lg bg-surface-container-low p-3 text-center">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Pendientes</p>
+              <p className="mt-1 font-headline text-xl font-black text-on-secondary-container">{stats.pending ?? 0}</p>
+            </div>
+          </div>
+
+          <div className="flex gap-3 border-t border-slate-100 pt-2">
+            <button
+              type="button"
+              onClick={closeClosureConfirm}
+              disabled={closureActionLoading}
+              className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={executeRunClosure}
+              disabled={closureActionLoading}
+              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-slate-900 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50 dark:bg-primary dark:text-on-primary"
+            >
+              {closureActionLoading ? (
+                <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>
+              ) : (
+                <span className="material-symbols-outlined text-sm">lock</span>
+              )}
+              {closureActionLoading ? 'Cerrando...' : 'Confirmar cierre'}
             </button>
           </div>
         </div>

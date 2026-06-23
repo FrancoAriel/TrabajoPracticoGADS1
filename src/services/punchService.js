@@ -1,4 +1,4 @@
-import { isApiMode } from '../config/env'
+import { env, isApiMode } from '../config/env'
 import { apiClient } from '../lib/apiClient'
 
 /**
@@ -32,6 +32,36 @@ export async function listPunches(params = {}) {
 export async function createManualPunch(payload) {
   if (!isApiMode()) return { ok: true, ...payload }
   const raw = await apiClient.post('/punches', { origen: 'Manual', ...payload })
+  return raw?.data ?? raw
+}
+
+/** Fichada por terminal (endpoint público, sin JWT). Solo legajo + tipo. */
+export async function createTerminalPunch({ legajo, tipo }) {
+  if (!isApiMode()) {
+    return {
+      empleado: { legajo: String(legajo).padStart(4, '0'), nombre: 'Demo', apellido: 'Empleado' },
+      fichada: { tipo, fecha_hora: new Date().toISOString() },
+    }
+  }
+
+  const response = await fetch(`${env.apiBaseUrl}/punches/pin`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ legajo, tipo }),
+  })
+
+  if (!response.ok) {
+    let message = 'No se pudo registrar la fichada'
+    try {
+      const body = await response.json()
+      message = body?.error?.message || message
+    } catch {
+      message = response.statusText || message
+    }
+    throw new Error(message)
+  }
+
+  const raw = await response.json()
   return raw?.data ?? raw
 }
 

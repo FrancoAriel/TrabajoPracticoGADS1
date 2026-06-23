@@ -549,6 +549,14 @@ export default function FichadasPage() {
           <p className="mt-1 text-sm text-on-surface-variant">Registros de asistencia del personal.</p>
         </div>
         <div className="flex gap-3">
+          <Link
+            to={routes.fichar}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 rounded-md border border-outline-variant/40 bg-surface-container-low px-4 py-2 text-sm font-semibold text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-primary"
+          >
+            <span className="material-symbols-outlined text-sm">open_in_new</span> Abrir terminal
+          </Link>
           <button
             type="button"
             onClick={() => { if (api) showToast('Reprocesamiento no disponible en API básica.'); else showToast('Interpretación reprocesada correctamente.') }}
@@ -833,7 +841,7 @@ export default function FichadasPage() {
           </Field>
           <div className="flex items-start gap-2 rounded-lg border border-tertiary/20 bg-tertiary-container/20 p-3">
             <span className="material-symbols-outlined mt-0.5 text-sm text-tertiary">info</span>
-            <p className="text-[11px] text-on-tertiary-container">Quedará registrada con origen trazable. Biométrico, QR, PIN y API son orígenes simulados para la entrega.</p>
+            <p className="text-[11px] text-on-tertiary-container">Quedará registrada con origen trazable. Para fichadas por terminal usá la pantalla pública con legajo; acá podés simular otros orígenes o cargar manualmente.</p>
           </div>
           <div className="flex gap-3 border-t border-slate-100 pt-2">
             <button type="button" onClick={() => setOpenManual(false)} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">Cancelar</button>
