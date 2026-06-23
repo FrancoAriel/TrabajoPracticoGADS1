@@ -2,13 +2,24 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import AppShell from '../../components/layout/AppShell'
 import Modal from '../../components/ui/Modal'
+import { isApiMode } from '../../config/env'
 import { routes } from '../../lib/routes'
 import { createEmployeeAssignment, createEmployeeManualPunch, createEmployeeNews, getEmployeeDetail, updateEmployee } from '../../services/employeeService'
+import { getLaborCatalogs } from '../../services/scheduleService'
 
 const INPUT = 'w-full rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30'
 const LABEL = 'mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant'
 
 const ESTADOS_LABORALES = ['Activo', 'Inactivo', 'Suspendido']
+const MOCK_HORARIOS = [
+  { id: 1, nombre: 'H-001 Planta Mañana', tipo: 'Fijo' },
+  { id: 2, nombre: 'H-002 Soporte Nocturno', tipo: 'Fijo' },
+  { id: 3, nombre: 'H-003 Oficina central', tipo: 'Flexible' },
+]
+const MOCK_CICLOS = [
+  { id: 1, nombre: 'C-001 4x2 Producción', duracionDias: 6 },
+  { id: 2, nombre: 'C-002 Rotación planta A', duracionDias: 14 },
+]
 
 function Field({ label, value }) {
   return (
@@ -72,8 +83,13 @@ function textoTipoJornada(jornada, parcialHoras) {
 
 export default function EmpleadoDetallePage() {
   const { id } = useParams()
+  const api = isApiMode()
 
   const [loading, setLoading]       = useState(true)
+  const [catalogLoading, setCatalogLoading] = useState(false)
+  const [catalogError, setCatalogError] = useState('')
+  const [catalogHorarios, setCatalogHorarios] = useState(api ? [] : MOCK_HORARIOS)
+  const [catalogCiclos, setCatalogCiclos] = useState(api ? [] : MOCK_CICLOS)
   const [detail, setDetail]         = useState(null)
   const [openEdit, setOpenEdit]     = useState(false)
   const [openHorario, setOpenHorario] = useState(false)
@@ -91,8 +107,8 @@ export default function EmpleadoDetallePage() {
 
   const [novForm, setNovForm] = useState({ tipo: '', fechaDesde: '', fechaHasta: '', cantidad: '', unidad: 'Horas', observacion: '' })
   const [punchForm, setPunchForm] = useState({ fecha: '', hora: '', tipo: 'Entrada', motivo: '' })
-  const [horarioForm, setHorarioForm] = useState({ targetId: '', fechaDesde: '' })
-  const [cicloForm, setCicloForm] = useState({ targetId: '', fechaDesde: '' })
+  const [horarioForm, setHorarioForm] = useState({ targetId: '', fechaDesde: today, fechaHasta: '' })
+  const [cicloForm, setCicloForm] = useState({ targetId: '', fechaDesde: today, fechaHasta: '' })
 
   const [editToast, setEditToast] = useState(null)
   const editToastTimerRef = useRef(null)
@@ -151,10 +167,41 @@ export default function EmpleadoDetallePage() {
     return () => { cancelled = true }
   }, [id])
 
+  useEffect(() => {
+    if (!api || (!openHorario && !openCiclo)) return
+    let cancelled = false
+    setCatalogLoading(true)
+    setCatalogError('')
+    getLaborCatalogs()
+      .then((catalogs) => {
+        if (cancelled) return
+        setCatalogHorarios(catalogs?.horarios ?? [])
+        setCatalogCiclos(catalogs?.ciclos ?? [])
+      })
+      .catch((err) => {
+        if (cancelled) return
+        setCatalogError(err?.message || 'No se pudo cargar el catálogo de horarios.')
+      })
+      .finally(() => {
+        if (!cancelled) setCatalogLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [api, openHorario, openCiclo])
+
+  const reloadDetail = async () => {
+    if (!id) return null
+    const updated = await getEmployeeDetail(id)
+    setDetail(updated)
+    applyEmployeeToEditForm(updated?.employee)
+    return updated
+  }
+
   const emp          = detail?.employee
   const sched        = detail?.scheduleConfig
   const recentPunches = detail?.recentPunches || []
   const recentNews   = detail?.recentNews || []
+  const selectedHorario = catalogHorarios.find((h) => String(h.id) === String(horarioForm.targetId))
+  const selectedCiclo = catalogCiclos.find((c) => String(c.id) === String(cicloForm.targetId))
 
   useEffect(() => {
     const s = detail?.employee?.status
@@ -186,9 +233,7 @@ export default function EmpleadoDetallePage() {
         cuil: editCuil,
         parcialHoras: editForm.jornada === 'Parcial' ? Number(parcialHoras) : null,
       })
-      const updated = await getEmployeeDetail(id)
-      setDetail(updated)
-      applyEmployeeToEditForm(updated?.employee)
+      await reloadDetail()
       setOpenEdit(false)
       showEditToast('Empleado actualizado correctamente.', true)
     } catch (err) {
@@ -201,9 +246,7 @@ export default function EmpleadoDetallePage() {
     setEstadoSaving(true)
     try {
       await updateEmployee(id, { estado: statusSelect })
-      const updated = await getEmployeeDetail(id)
-      setDetail(updated)
-      applyEmployeeToEditForm(updated?.employee)
+      await reloadDetail()
       showEditToast('Estado laboral actualizado.', true)
     } catch (err) {
       showEditToast(err?.message || 'No se pudo actualizar el estado.', false)
@@ -215,22 +258,30 @@ export default function EmpleadoDetallePage() {
   const handleHorario = async (e) => {
     e.preventDefault()
     try {
-      await createEmployeeAssignment(id, { type: 'horario', targetId: horarioForm.targetId, fechaDesde: horarioForm.fechaDesde })
-      const d = await getEmployeeDetail(id)
-      setDetail(d)
+      await createEmployeeAssignment(id, {
+        type: 'horario',
+        targetId: Number(horarioForm.targetId),
+        fechaDesde: horarioForm.fechaDesde,
+        fechaHasta: horarioForm.fechaHasta || null,
+      })
+      await reloadDetail()
       setOpenHorario(false)
-      setHorarioForm({ targetId: '', fechaDesde: '' })
+      setHorarioForm({ targetId: '', fechaDesde: today, fechaHasta: '' })
     } catch (err) { alert(`Error: ${err.message}`) }
   }
 
   const handleCiclo = async (e) => {
     e.preventDefault()
     try {
-      await createEmployeeAssignment(id, { type: 'ciclo', targetId: cicloForm.targetId, fechaDesde: cicloForm.fechaDesde })
-      const d = await getEmployeeDetail(id)
-      setDetail(d)
+      await createEmployeeAssignment(id, {
+        type: 'ciclo',
+        targetId: Number(cicloForm.targetId),
+        fechaDesde: cicloForm.fechaDesde,
+        fechaHasta: cicloForm.fechaHasta || null,
+      })
+      await reloadDetail()
       setOpenCiclo(false)
-      setCicloForm({ targetId: '', fechaDesde: '' })
+      setCicloForm({ targetId: '', fechaDesde: today, fechaHasta: '' })
     } catch (err) { alert(`Error: ${err.message}`) }
   }
 
@@ -238,6 +289,7 @@ export default function EmpleadoDetallePage() {
     e.preventDefault()
     try {
       await createEmployeeNews(id, { ...novForm, idUsuarioCreacion: null })
+      await reloadDetail()
       setOpenNews(false)
       setNovForm({ tipo: '', fechaDesde: '', fechaHasta: '', cantidad: '', unidad: 'Horas', observacion: '' })
     } catch (err) { alert(`Error: ${err.message}`) }
@@ -248,6 +300,7 @@ export default function EmpleadoDetallePage() {
     try {
       const fechaHora = `${punchForm.fecha}T${punchForm.hora}:00`
       await createEmployeeManualPunch(id, { fechaHora, tipo: punchForm.tipo })
+      await reloadDetail()
       setOpenPunch(false)
       setPunchForm({ fecha: '', hora: '', tipo: 'Entrada', motivo: '' })
     } catch (err) { alert(`Error: ${err.message}`) }
@@ -316,66 +369,52 @@ export default function EmpleadoDetallePage() {
                 </span>
               </p>
             </div>
-            <div className="flex w-full shrink-0 flex-wrap items-stretch justify-start gap-3 sm:w-auto sm:justify-end">
+            <div className="flex flex-wrap items-center justify-end gap-2">
               <div
-                className="flex min-w-[min(100%,18rem)] flex-1 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_2px_8px_-2px_rgba(15,23,42,0.08),0_1px_2px_rgba(15,23,42,0.04)] sm:max-w-md sm:flex-initial dark:border-outline-variant/30 dark:bg-surface-container-low"
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-200/70 bg-surface-container-low px-3 py-2 dark:border-outline-variant/30"
                 role="group"
                 aria-label="Estado laboral del empleado"
               >
-                <div className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(145deg,#5a739c_0%,#3d5780_100%)] text-white shadow-inner shadow-black/10">
-                    <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: '"FILL" 1' }}>work_history</span>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-on-surface-variant/80">
-                      Estado laboral
-                    </p>
-                    <div className="mt-1.5 flex items-center gap-2">
-                      <span
-                        className={`h-2.5 w-2.5 shrink-0 rounded-full ring-2 ring-white dark:ring-surface-container-low ${statusDot(statusSelect)}`}
-                        aria-hidden
-                      />
-                      <div className="relative min-w-0 flex-1">
-                        <select
-                          value={statusSelect}
-                          onChange={(e) => setStatusSelect(e.target.value)}
-                          disabled={estadoSaving}
-                          className={`w-full appearance-none truncate rounded-xl border border-outline-variant/30 bg-surface-container-high/70 py-2 pl-3 pr-9 text-[13px] font-bold tracking-tight shadow-[inset_0_1px_2px_rgba(15,23,42,0.04)] outline-none transition-[box-shadow,border-color] hover:border-outline-variant/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50 ${statusTextStrong(statusSelect)}`}
-                        >
-                          {ESTADOS_LABORALES.map((s) => (
-                            <option key={s} value={s}>{s}</option>
-                          ))}
-                        </select>
-                        <span className="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant/50">
-                          expand_more
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  disabled={estadoSaving || statusSelect === emp.status}
-                  onClick={handleEstadoSave}
-                  title={statusSelect === emp.status ? 'Sin cambios' : 'Guardar estado laboral'}
-                  className="flex shrink-0 items-center gap-2 border-l border-slate-200/90 bg-gradient-to-br from-primary/8 to-transparent px-4 py-3 text-xs font-bold uppercase tracking-wide text-primary transition-colors hover:from-primary/14 disabled:cursor-not-allowed disabled:opacity-[0.35] dark:border-outline-variant/30"
-                >
-                  <span
-                    className={`material-symbols-outlined text-[20px] ${estadoSaving ? 'animate-spin' : ''}`}
-                    style={{ fontVariationSettings: '"FILL" 1' }}
+                <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">
+                  Estado
+                </span>
+                <span className={`h-2 w-2 shrink-0 rounded-full ${statusDot(statusSelect)}`} aria-hidden />
+                <div className="relative">
+                  <select
+                    value={statusSelect}
+                    onChange={(e) => setStatusSelect(e.target.value)}
+                    disabled={estadoSaving}
+                    className={`appearance-none rounded-md border-0 bg-transparent py-0.5 pl-1 pr-7 text-sm font-semibold outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50 ${statusTextStrong(statusSelect)}`}
                   >
-                    {estadoSaving ? 'progress_activity' : 'check_circle'}
+                    {ESTADOS_LABORALES.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                  <span className="material-symbols-outlined pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-base text-on-surface-variant/60">
+                    expand_more
                   </span>
-                  <span className="hidden min-[420px]:inline">{estadoSaving ? 'Guardando' : 'Aplicar'}</span>
-                </button>
+                </div>
+                {statusSelect !== emp.status ? (
+                  <button
+                    type="button"
+                    disabled={estadoSaving}
+                    onClick={handleEstadoSave}
+                    title="Guardar estado laboral"
+                    className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-1 text-[11px] font-bold uppercase tracking-wide text-primary transition-colors hover:bg-primary/15 disabled:opacity-50"
+                  >
+                    <span className={`material-symbols-outlined text-sm ${estadoSaving ? 'animate-spin' : ''}`}>
+                      {estadoSaving ? 'progress_activity' : 'check'}
+                    </span>
+                    Guardar
+                  </button>
+                ) : null}
               </div>
               <button
                 type="button"
                 onClick={() => setOpenEdit(true)}
-                className="flex min-h-[3.5rem] min-w-[12rem] flex-1 items-center justify-center gap-2 self-stretch rounded-2xl px-5 text-sm font-semibold text-on-primary shadow-[0_4px_14px_-4px_rgba(57,83,124,0.55)] transition-[transform,box-shadow] hover:scale-[0.99] hover:shadow-[0_6px_20px_-4px_rgba(57,83,124,0.45)] sm:flex-initial sm:py-4"
-                style={{ background: 'linear-gradient(135deg, #455f88 0%, #39537c 100%)' }}
+                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-on-primary transition-opacity hover:opacity-90"
               >
-                <span className="material-symbols-outlined text-xl">edit</span>
+                <span className="material-symbols-outlined text-base">edit</span>
                 Editar empleado
               </button>
             </div>
@@ -559,7 +598,7 @@ export default function EmpleadoDetallePage() {
                     value={editForm.parcialHoras}
                     onChange={ef('parcialHoras')}
                     placeholder="Ej: 4"
-                    className="w-32 rounded-lg border border-outline-variant/40 bg-white px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    className="w-32 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                   <span className="text-sm font-medium text-on-surface-variant">hs / día <span className="text-on-surface-variant/60">(máx. 7)</span></span>
                 </div>
@@ -594,11 +633,46 @@ export default function EmpleadoDetallePage() {
       {/* ── Modal: Asignar Horario ── */}
       <Modal open={openHorario} title="Asignar Horario" subtitle={`${emp.name} — Legajo ${emp.legajo}`} onClose={() => setOpenHorario(false)} size="max-w-md">
         <form onSubmit={handleHorario} className="space-y-4 px-8 py-6">
-          <div><label className={LABEL}>ID del horario *</label>
-            <input required placeholder="Ej: 1" value={horarioForm.targetId} onChange={e => setHorarioForm(f => ({ ...f, targetId: e.target.value }))} className={INPUT} />
+          <div><label htmlFor="employee-detail-horario" className={LABEL}>Horario *</label>
+            <select
+              id="employee-detail-horario"
+              required
+              value={horarioForm.targetId}
+              onChange={e => setHorarioForm(f => ({ ...f, targetId: e.target.value }))}
+              disabled={catalogLoading}
+              className={`${INPUT} disabled:cursor-not-allowed disabled:opacity-60`}
+            >
+              <option value="">{catalogLoading ? 'Cargando horarios...' : 'Seleccionar horario...'}</option>
+              {catalogHorarios.map((horario) => (
+                <option key={horario.id} value={String(horario.id)}>
+                  H-{String(horario.id).padStart(3, '0')} · {horario.nombre}
+                </option>
+              ))}
+            </select>
+            {catalogError ? <p className="mt-1 text-[11px] font-semibold text-error">{catalogError}</p> : null}
+            {!catalogLoading && !catalogError && catalogHorarios.length === 0 ? (
+              <p className="mt-1 text-[11px] text-on-surface-variant">No hay horarios activos disponibles.</p>
+            ) : null}
           </div>
-          <div><label className={LABEL}>Vigencia desde *</label>
-            <input required type="date" value={horarioForm.fechaDesde} onChange={e => setHorarioForm(f => ({ ...f, fechaDesde: e.target.value }))} className={INPUT} />
+          {selectedHorario ? (
+            <div className="rounded-lg border border-primary/15 bg-primary-container/20 p-3">
+              <p className="text-sm font-bold text-on-surface">{selectedHorario.nombre}</p>
+              <p className="mt-1 text-xs text-on-surface-variant">
+                Tipo: {selectedHorario.tipo || 'Sin tipo'}{selectedHorario.estado ? ` · Estado: ${selectedHorario.estado}` : ''}
+              </p>
+            </div>
+          ) : null}
+          <div className="grid grid-cols-2 gap-4">
+            <div><label htmlFor="employee-detail-horario-desde" className={LABEL}>Vigencia desde *</label>
+              <input id="employee-detail-horario-desde" required type="date" value={horarioForm.fechaDesde} onChange={e => setHorarioForm(f => ({ ...f, fechaDesde: e.target.value }))} className={INPUT} />
+            </div>
+            <div><label htmlFor="employee-detail-horario-hasta" className={LABEL}>Vigencia hasta</label>
+              <input id="employee-detail-horario-hasta" type="date" value={horarioForm.fechaHasta} onChange={e => setHorarioForm(f => ({ ...f, fechaHasta: e.target.value }))} className={INPUT} />
+            </div>
+          </div>
+          <div className="flex items-start gap-2 rounded-lg bg-surface-container-low p-3">
+            <span className="material-symbols-outlined mt-0.5 text-sm text-on-surface-variant">info</span>
+            <p className="text-[11px] text-on-surface-variant">Dejá “hasta” vacío para mantener la asignación vigente. Si se solapa con otro horario, el backend puede rechazarla.</p>
           </div>
           <div className="flex gap-3 border-t border-slate-100 pt-2">
             <button type="button" onClick={() => setOpenHorario(false)} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant hover:bg-surface-container-low">Cancelar</button>
@@ -612,11 +686,47 @@ export default function EmpleadoDetallePage() {
       {/* ── Modal: Asignar Ciclo ── */}
       <Modal open={openCiclo} title="Asignar Ciclo Rotativo" subtitle={`${emp.name} — Legajo ${emp.legajo}`} onClose={() => setOpenCiclo(false)} size="max-w-md">
         <form onSubmit={handleCiclo} className="space-y-4 px-8 py-6">
-          <div><label className={LABEL}>ID del ciclo *</label>
-            <input required placeholder="Ej: 1" value={cicloForm.targetId} onChange={e => setCicloForm(f => ({ ...f, targetId: e.target.value }))} className={INPUT} />
+          <div><label htmlFor="employee-detail-ciclo" className={LABEL}>Ciclo *</label>
+            <select
+              id="employee-detail-ciclo"
+              required
+              value={cicloForm.targetId}
+              onChange={e => setCicloForm(f => ({ ...f, targetId: e.target.value }))}
+              disabled={catalogLoading}
+              className={`${INPUT} disabled:cursor-not-allowed disabled:opacity-60`}
+            >
+              <option value="">{catalogLoading ? 'Cargando ciclos...' : 'Seleccionar ciclo...'}</option>
+              {catalogCiclos.map((ciclo) => (
+                <option key={ciclo.id} value={String(ciclo.id)}>
+                  C-{String(ciclo.id).padStart(3, '0')} · {ciclo.nombre}
+                  {ciclo.duracionDias != null ? ` (${ciclo.duracionDias} días)` : ''}
+                </option>
+              ))}
+            </select>
+            {catalogError ? <p className="mt-1 text-[11px] font-semibold text-error">{catalogError}</p> : null}
+            {!catalogLoading && !catalogError && catalogCiclos.length === 0 ? (
+              <p className="mt-1 text-[11px] text-on-surface-variant">No hay ciclos activos disponibles.</p>
+            ) : null}
           </div>
-          <div><label className={LABEL}>Vigencia desde *</label>
-            <input required type="date" value={cicloForm.fechaDesde} onChange={e => setCicloForm(f => ({ ...f, fechaDesde: e.target.value }))} className={INPUT} />
+          {selectedCiclo ? (
+            <div className="rounded-lg border border-primary/15 bg-primary-container/20 p-3">
+              <p className="text-sm font-bold text-on-surface">{selectedCiclo.nombre}</p>
+              <p className="mt-1 text-xs text-on-surface-variant">
+                Duración: {selectedCiclo.duracionDias != null ? `${selectedCiclo.duracionDias} días` : 'Sin duración definida'}{selectedCiclo.estado ? ` · Estado: ${selectedCiclo.estado}` : ''}
+              </p>
+            </div>
+          ) : null}
+          <div className="grid grid-cols-2 gap-4">
+            <div><label htmlFor="employee-detail-ciclo-desde" className={LABEL}>Vigencia desde *</label>
+              <input id="employee-detail-ciclo-desde" required type="date" value={cicloForm.fechaDesde} onChange={e => setCicloForm(f => ({ ...f, fechaDesde: e.target.value }))} className={INPUT} />
+            </div>
+            <div><label htmlFor="employee-detail-ciclo-hasta" className={LABEL}>Vigencia hasta</label>
+              <input id="employee-detail-ciclo-hasta" type="date" value={cicloForm.fechaHasta} onChange={e => setCicloForm(f => ({ ...f, fechaHasta: e.target.value }))} className={INPUT} />
+            </div>
+          </div>
+          <div className="flex items-start gap-2 rounded-lg bg-surface-container-low p-3">
+            <span className="material-symbols-outlined mt-0.5 text-sm text-on-surface-variant">info</span>
+            <p className="text-[11px] text-on-surface-variant">Dejá “hasta” vacío para mantener el ciclo vigente. La duración del ciclo define la rotación de días.</p>
           </div>
           <div className="flex gap-3 border-t border-slate-100 pt-2">
             <button type="button" onClick={() => setOpenCiclo(false)} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant hover:bg-surface-container-low">Cancelar</button>
@@ -708,7 +818,7 @@ export default function EmpleadoDetallePage() {
 
       {editToast && (
         <div
-          className={`fixed bottom-6 right-6 z-[60] flex max-w-md items-start gap-3 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-2xl ${editToast.ok ? 'bg-slate-900' : 'bg-slate-900 ring-2 ring-red-500/60'}`}
+          className={`fixed bottom-6 right-6 z-[60] flex max-w-md items-start gap-3 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-2xl dark:bg-surface-container-highest ${editToast.ok ? 'bg-slate-900' : 'bg-slate-900 ring-2 ring-red-500/60'}`}
           role="status"
           aria-live="polite"
         >

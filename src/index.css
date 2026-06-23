@@ -2,6 +2,156 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  Sistema de tema claro/oscuro basado en CSS variables.
+  - Cada variable es un triplete "R G B" (sin rgb()) para que Tailwind
+    pueda aplicar opacidades con <alpha-value>.
+  - :root        -> esquema claro (valores originales del diseno M3).
+  - html.dark    -> esquema oscuro (paleta M3 dark + neutros invertidos).
+  El cambio de tema solo agrega/saca la clase .dark en <html>; ningun
+  componente necesita variantes dark: salvo casos puntuales documentados.
+*/
+
+:root {
+  color-scheme: light;
+
+  /* --- Tokens semanticos (M3) - claro --- */
+  --on-surface-variant: 86 97 102;
+  --inverse-on-surface: 154 157 159;
+  --on-tertiary-fixed-variant: 84 84 111;
+  --tertiary-container: 217 215 248;
+  --on-tertiary: 251 247 255;
+  --on-secondary-fixed-variant: 78 92 113;
+  --outline: 113 124 130;
+  --secondary: 82 96 116;
+  --on-secondary-fixed: 50 64 83;
+  --secondary-dim: 70 84 104;
+  --error-container: 254 137 131;
+  --primary: 69 95 136;
+  --primary-fixed: 214 227 255;
+  --on-secondary: 248 248 255;
+  --background: 247 249 251;
+  --on-primary-fixed: 37 64 103;
+  --surface-container-lowest: 255 255 255;
+  --secondary-fixed: 213 227 252;
+  --surface-container-high: 225 233 238;
+  --on-background: 42 52 57;
+  --on-error-container: 117 33 33;
+  --inverse-surface: 11 15 16;
+  --surface-container-highest: 217 228 234;
+  --secondary-container: 213 227 252;
+  --surface-container-low: 240 244 247;
+  --on-primary-fixed-variant: 66 92 133;
+  --tertiary-fixed: 217 215 248;
+  --on-secondary-container: 69 83 103;
+  --on-primary: 246 247 255;
+  --tertiary: 93 93 120;
+  --tertiary-dim: 81 81 108;
+  --surface-dim: 207 220 227;
+  --outline-variant: 169 180 185;
+  --on-error: 255 247 246;
+  --error-dim: 78 3 9;
+  --surface-variant: 217 228 234;
+  --secondary-fixed-dim: 199 213 237;
+  --surface-container: 232 239 243;
+  --surface-bright: 247 249 251;
+  --error: 159 64 61;
+  --primary-dim: 57 83 124;
+  --surface-tint: 69 95 136;
+  --surface: 247 249 251;
+  --on-primary-container: 56 82 123;
+  --primary-container: 214 227 255;
+  --primary-fixed-dim: 191 213 255;
+  --on-tertiary-fixed: 55 56 81;
+  --tertiary-fixed-dim: 203 201 233;
+  --inverse-primary: 179 205 253;
+  --on-surface: 42 52 57;
+  --on-tertiary-container: 74 74 101;
+
+  /* --- Escala slate (Tailwind) - claro --- */
+  --slate-50: 248 250 252;
+  --slate-100: 241 245 249;
+  --slate-200: 226 232 240;
+  --slate-300: 203 213 225;
+  --slate-400: 148 163 184;
+  --slate-500: 100 116 139;
+  --slate-600: 71 85 105;
+  --slate-700: 51 65 85;
+  --slate-800: 30 41 59;
+  --slate-900: 15 23 42;
+  --slate-950: 2 6 23;
+}
+
+html.dark {
+  color-scheme: dark;
+
+  /* --- Tokens semanticos (M3) - oscuro --- */
+  --on-surface-variant: 192 201 205;
+  --inverse-on-surface: 43 49 52;
+  --on-tertiary-fixed-variant: 84 84 111;
+  --tertiary-container: 69 69 94;
+  --on-tertiary: 47 47 71;
+  --on-secondary-fixed-variant: 78 92 113;
+  --outline: 138 147 152;
+  --secondary: 186 200 222;
+  --on-secondary-fixed: 50 64 83;
+  --secondary-dim: 164 178 200;
+  --error-container: 127 45 42;
+  --primary: 179 205 253;
+  --primary-fixed: 214 227 255;
+  --on-secondary: 36 50 64;
+  --background: 15 20 22;
+  --on-primary-fixed: 37 64 103;
+  --surface-container-lowest: 24 29 32;
+  --secondary-fixed: 213 227 252;
+  --surface-container-high: 42 49 52;
+  --on-background: 223 227 230;
+  --on-error-container: 255 218 214;
+  --inverse-surface: 223 227 230;
+  --surface-container-highest: 53 60 64;
+  --secondary-container: 58 72 88;
+  --surface-container-low: 28 34 37;
+  --on-primary-fixed-variant: 66 92 133;
+  --tertiary-fixed: 217 215 248;
+  --on-secondary-container: 213 227 252;
+  --on-primary: 23 50 81;
+  --tertiary: 198 195 234;
+  --tertiary-dim: 176 174 212;
+  --surface-dim: 15 20 22;
+  --outline-variant: 65 73 77;
+  --on-error: 94 21 18;
+  --error-dim: 232 144 137;
+  --surface-variant: 65 73 77;
+  --secondary-fixed-dim: 199 213 237;
+  --surface-container: 32 38 42;
+  --surface-bright: 53 60 64;
+  --error: 255 179 171;
+  --primary-dim: 151 179 229;
+  --surface-tint: 179 205 253;
+  --surface: 15 20 22;
+  --on-primary-container: 214 227 255;
+  --primary-container: 46 73 116;
+  --primary-fixed-dim: 191 213 255;
+  --on-tertiary-fixed: 55 56 81;
+  --tertiary-fixed-dim: 203 201 233;
+  --inverse-primary: 69 95 136;
+  --on-surface: 223 227 230;
+  --on-tertiary-container: 217 215 248;
+
+  /* --- Escala slate invertida en luminancia (tono neutro frio) - oscuro --- */
+  --slate-50: 24 29 32;
+  --slate-100: 32 38 42;
+  --slate-200: 47 54 58;
+  --slate-300: 59 67 71;
+  --slate-400: 138 147 152;
+  --slate-500: 154 163 168;
+  --slate-600: 182 191 196;
+  --slate-700: 201 209 213;
+  --slate-800: 221 227 230;
+  --slate-900: 238 242 244;
+  --slate-950: 247 250 251;
+}
+
 @layer base {
   html {
     font-family: 'Inter', sans-serif;
@@ -10,8 +160,8 @@
   body {
     margin: 0;
     min-height: 100vh;
-    background: #f7f9fb;
-    color: #2a3439;
+    background: rgb(var(--background));
+    color: rgb(var(--on-background));
     font-family: 'Inter', sans-serif;
   }
 

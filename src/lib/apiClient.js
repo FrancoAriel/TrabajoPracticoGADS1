@@ -1,9 +1,12 @@
 import { env } from '../config/env'
+import { clearSession, getAuthToken } from './session'
 
 async function request(path, options = {}) {
+  const token = getAuthToken()
   const response = await fetch(`${env.apiBaseUrl}${path}`, {
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },
     ...options,
@@ -17,6 +20,7 @@ async function request(path, options = {}) {
     } catch {
       message = response.statusText || message
     }
+    if (response.status === 401) clearSession()
     throw new Error(message)
   }
 

@@ -2,7 +2,9 @@ import { useMemo, useState, useEffect, useCallback } from 'react'
 import AppShell from '../../components/layout/AppShell'
 import Modal from '../../components/ui/Modal'
 import { isApiMode } from '../../config/env'
-import { listNews, approveNews, rejectNews } from '../../services/newsService'
+import { getSession } from '../../lib/session'
+import { createNews, listNews, approveNews, rejectNews } from '../../services/newsService'
+import { listEmployees } from '../../services/employeeService'
 
 const TYPE_BADGE = {
   horas_extra_50: 'bg-tertiary-container/40 text-on-tertiary-container',
@@ -17,6 +19,8 @@ const TYPE_BADGE = {
   permiso_especial: 'bg-secondary-container/40 text-on-secondary-container',
   salida_anticipada: 'bg-error-container/20 text-error',
   doble_fichada: 'bg-secondary-container/40 text-on-secondary-container',
+  descanso_no_tomado: 'bg-error-container/20 text-error',
+  descanso_excedido: 'bg-tertiary-container/40 text-on-tertiary-container',
   horas_faltantes: 'bg-error-container/20 text-error',
 }
 
@@ -30,10 +34,11 @@ const initialItems = [
 ]
 
 const employeeOptions = ['0042 · Juan Perez', '0018 · Ana Gomez', '0027 · Martin Sosa', '0031 · Luis Diaz', '0050 · Carla Ruiz', '0093 · Carlos Méndez', '0105 · Lucía Ferrero', '0158 · Maria Alvez']
+// employeeOptions is used as fallback in non-api mode only
 
 function StatusPill({ status }) {
   if (status === 'Pendiente') return <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-tertiary"><span className="h-1.5 w-1.5 rounded-full bg-tertiary" />Pendiente</span>
-  if (status === 'Aprobado') return <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-700"><span className="h-1.5 w-1.5 rounded-full bg-green-600" />Aprobado</span>
+  if (status === 'Aprobado') return <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-700 dark:text-green-400"><span className="h-1.5 w-1.5 rounded-full bg-green-600" />Aprobado</span>
   return <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-error"><span className="h-1.5 w-1.5 rounded-full bg-error" />Rechazado</span>
 }
 
@@ -51,6 +56,8 @@ const TYPE_LABEL = {
   salida_anticipada: 'Salida anticipada',
   horas_faltantes: 'Horas faltantes',
   doble_fichada: 'Doble fichada',
+  descanso_no_tomado: 'Descanso no tomado',
+  descanso_excedido: 'Descanso excedido',
   licencia: 'Licencia',
 }
 
@@ -88,8 +95,8 @@ function SelectInput({ children, ...props }) {
 }
 
 const HORAS_TYPES = ['horas_extra_50', 'horas_extra_100']
-const MINUTOS_TYPES = ['tardanza']
-const DIAS_TYPES = ['justificacion', 'ausencia', 'licencia_enfermedad', 'licencia_examen', 'vacaciones', 'permiso_especial', 'suspension']
+const MINUTOS_TYPES = ['tardanza', 'descanso_no_tomado', 'descanso_excedido']
+const DIAS_TYPES = ['justificacion', 'ausencia', 'licencia', 'vacaciones', 'permiso_especial', 'suspension']
 
 function formatApiDate(isoDate) {
   if (!isoDate) return '—'
@@ -128,6 +135,14 @@ function mapApiTipoToFilterKey(tipo) {
   return String(tipo).toLowerCase()
 }
 
+function mapFilterKeyToApiTipo(tipo) {
+  if (!tipo) return ''
+  return String(tipo)
+    .split('_')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('_')
+}
+
 function mapEstadoToPill(estado) {
   if (estado === 'Aprobada') return 'Aprobado'
   if (estado === 'Rechazada') return 'Rechazado'
@@ -161,49 +176,62 @@ function mapNewsItemFromApi(n) {
 
 export default function NovedadesPage() {
   const api = isApiMode()
+  const canMutate = !api || getSession()?.user?.role === 'Admin'
   const [search, setSearch] = useState('')
   const [filterType, setFilterType] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
-  const [items, setItems] = useState(initialItems)
-  const [kpiStats, setKpiStats] = useState({ pending: 9, approved: 4, rejected: 1, total: 28 })
-  const [loading, setLoading] = useState(false)
+  const [items, setItems] = useState(() => (api ? [] : initialItems))
+  const [kpiStats, setKpiStats] = useState(() => (api ? { pending: 0, approved: 0, rejected: 0, total: 0 } : { pending: 9, approved: 4, rejected: 1, total: 28 }))
+  const [loading, setLoading] = useState(() => api)
   const [dataReady, setDataReady] = useState(() => !api)
   const [selectedId, setSelectedId] = useState(null)
   const [openCreate, setOpenCreate] = useState(false)
   const [openReject, setOpenReject] = useState(false)
+  const [approveLoading, setApproveLoading] = useState(false)
   const [novType, setNovType] = useState('')
   const [toast, setToast] = useState('')
+  const [loadError, setLoadError] = useState('')
+  const [createLoading, setCreateLoading] = useState(false)
+  const [creationDate] = useState(() => new Date().toISOString().slice(0, 10))
+  const [apiEmployees, setApiEmployees] = useState([])
 
   useEffect(() => { document.title = 'Novedades - Executive Architect' }, [])
 
-  const loadNews = useCallback(() => {
+  const loadNews = useCallback(async () => {
     if (!api) return
     setLoading(true)
-    listNews({ pageSize: 500 })
-      .then((data) => {
-        const rows = (data.items ?? []).map(mapNewsItemFromApi)
-        setItems(rows)
-        const st = data.stats ?? {}
-        setKpiStats({
-          pending:  st.pending ?? 0,
-          approved: st.approved ?? 0,
-          rejected: st.rejected ?? 0,
-          total:    (st.pending ?? 0) + (st.approved ?? 0) + (st.rejected ?? 0),
-        })
+    setLoadError('')
+    try {
+      const data = await listNews({ pageSize: 500 })
+      const rows = (data.items ?? []).map(mapNewsItemFromApi)
+      setItems(rows)
+      const st = data.stats ?? {}
+      setKpiStats({
+        pending: st.pending ?? 0,
+        approved: st.approved ?? 0,
+        rejected: st.rejected ?? 0,
+        total: (st.pending ?? 0) + (st.approved ?? 0) + (st.rejected ?? 0),
       })
-      .catch(() => {
-        setItems([])
-        setKpiStats({ pending: 0, approved: 0, rejected: 0, total: 0 })
-      })
-      .finally(() => {
-        setLoading(false)
-        setDataReady(true)
-      })
+    } catch (error) {
+      setItems([])
+      setKpiStats({ pending: 0, approved: 0, rejected: 0, total: 0 })
+      setLoadError(error?.message ?? 'No se pudieron cargar las novedades.')
+    } finally {
+      setLoading(false)
+      setDataReady(true)
+    }
   }, [api])
 
   useEffect(() => {
     loadNews()
   }, [loadNews])
+
+  useEffect(() => {
+    if (!api) return
+    listEmployees({ pageSize: 200 }).then((data) => {
+      setApiEmployees(data.items ?? [])
+    }).catch(() => {})
+  }, [api])
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3000) }
 
@@ -222,15 +250,18 @@ export default function NovedadesPage() {
   const clearFilters = () => { setFilterType(''); setFilterStatus('') }
 
   const approve = async () => {
-    if (!selected) return
+    if (!selected || approveLoading) return
     if (api) {
+      setApproveLoading(true)
       try {
         await approveNews(selected.rawId ?? selected.id)
         showToast('Novedad aprobada correctamente.')
-        loadNews()
+        await loadNews()
         setSelectedId(null)
       } catch (e) {
         showToast(`Error: ${e.message}`)
+      } finally {
+        setApproveLoading(false)
       }
       return
     }
@@ -238,14 +269,14 @@ export default function NovedadesPage() {
     showToast('Novedad aprobada correctamente.')
   }
 
-  const reject = async () => {
+  const reject = async (motivo = '') => {
     if (!selected) return
     if (api) {
       try {
-        await rejectNews(selected.rawId ?? selected.id, '')
+        await rejectNews(selected.rawId ?? selected.id, motivo)
         showToast('Novedad rechazada.')
         setOpenReject(false)
-        loadNews()
+        await loadNews()
         setSelectedId(null)
       } catch (e) {
         showToast(`Error: ${e.message}`)
@@ -277,24 +308,80 @@ export default function NovedadesPage() {
           <p className="text-sm font-semibold">Cargando novedades...</p>
         </div>
       </AppShell>
-    )
+      )
+  }
+
+  const handleCreate = async (e) => {
+    e.preventDefault()
+    if (!api) {
+      setOpenCreate(false)
+      showToast('Novedad cargada. Estado: Pendiente.')
+      return
+    }
+
+    const formData = new FormData(e.currentTarget)
+    const employeeRef = String(formData.get('employeeRef') ?? '')
+    const legajo = Number(employeeRef.split('·')[0]?.trim())
+    const tipo = String(formData.get('tipo') ?? '')
+    const fechaDesde = String(formData.get('fechaDesde') ?? '')
+    const fechaHasta = String(formData.get('fechaHasta') ?? '')
+    const cantidadRaw = String(formData.get('cantidad') ?? '').trim()
+    const observacion = String(formData.get('observacion') ?? '').trim()
+    const unidad = HORAS_TYPES.includes(tipo) ? 'Horas' : MINUTOS_TYPES.includes(tipo) ? 'Minutos' : 'Dias'
+
+    if (!Number.isFinite(legajo) || !tipo || !fechaDesde) {
+      showToast('Completá empleado, tipo y fecha desde.')
+      return
+    }
+
+    setCreateLoading(true)
+    try {
+      await createNews({
+        legajo,
+        tipo: mapFilterKeyToApiTipo(tipo),
+        fechaDesde,
+        fechaHasta: fechaHasta || null,
+        cantidad: cantidadRaw === '' ? null : Number(cantidadRaw),
+        unidad,
+        observacion: observacion || null,
+        idUsuarioCreacion: getSession()?.user?.id ?? null,
+      })
+      await loadNews()
+      setOpenCreate(false)
+      setNovType('')
+      e.currentTarget.reset()
+      setSelectedId(null)
+      showToast('Novedad cargada. Estado: Pendiente.')
+    } catch (error) {
+      showToast(`Error: ${error.message}`)
+    } finally {
+      setCreateLoading(false)
+    }
   }
 
   return (
     <AppShell topbarTitle="NOVEDADES" topbarContent={topbarContent}>
+      {loadError ? (
+        <div className="mb-4 rounded-lg border border-error/20 bg-error-container/20 px-4 py-3 text-sm text-error">
+          {loadError}
+        </div>
+      ) : null}
+
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h2 className="font-headline text-2xl font-extrabold tracking-tight text-on-background">Gestión de Novedades</h2>
           <p className="mt-1 text-sm text-on-surface-variant">Revisión y aprobación de novedades del período.</p>
         </div>
-        <button type="button" onClick={() => setOpenCreate(true)} className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90">
-          <span className="material-symbols-outlined text-sm">add</span> Nueva novedad
-        </button>
+        {canMutate ? (
+          <button type="button" onClick={() => setOpenCreate(true)} className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90">
+            <span className="material-symbols-outlined text-sm">add</span> Nueva novedad
+          </button>
+        ) : null}
       </div>
 
       <div className="mb-8 grid grid-cols-4 gap-4">
         <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Pendientes</p><p className="font-headline text-2xl font-black text-tertiary">{kpiStats.pending}</p></div>
-        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Aprobadas</p><p className="font-headline text-2xl font-black text-on-secondary-container">{kpiStats.approved}</p></div>
+        <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Aprobadas</p><p className="font-headline text-2xl font-black text-green-700 dark:text-green-400">{kpiStats.approved}</p></div>
         <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Rechazadas</p><p className="font-headline text-2xl font-black text-error">{kpiStats.rejected}</p></div>
         <div className="rounded-lg bg-surface-container-highest p-5"><p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Total (en vista)</p><p className="font-headline text-2xl font-black text-primary">{kpiStats.total}</p></div>
       </div>
@@ -302,7 +389,7 @@ export default function NovedadesPage() {
       <div className="grid grid-cols-12 gap-6">
         <div className="relative col-span-12 overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest lg:col-span-7">
           {loading && api && dataReady ? (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface-container-lowest/80">
               <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
             </div>
           ) : null}
@@ -319,6 +406,8 @@ export default function NovedadesPage() {
                 <option value="horas_extra_50">Horas extra 50%</option>
                 <option value="horas_extra_100">Horas extra 100%</option>
                 <option value="doble_fichada">Doble fichada</option>
+                <option value="descanso_no_tomado">Descanso no tomado</option>
+                <option value="descanso_excedido">Descanso excedido</option>
                 <option value="justificacion">Justificación</option>
                 <option value="licencia">Licencia</option>
                 <option value="vacaciones">Vacaciones</option>
@@ -436,10 +525,20 @@ export default function NovedadesPage() {
                   <p className="mb-1.5 text-[10px] font-bold uppercase text-on-surface-variant">Observación</p>
                   <p className="text-xs text-on-background">{selected.obs}</p>
                 </div>
-                {selected.status === 'Pendiente' && (
+                {canMutate && selected.status === 'Pendiente' && (
                   <div className="flex gap-3 pt-1">
-                    <button type="button" onClick={approve} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-on-secondary-container/30 bg-on-secondary-container/15 py-2.5 text-xs font-bold text-on-secondary-container transition-colors hover:bg-on-secondary-container/25">
-                      <span className="material-symbols-outlined text-sm">check_circle</span> Aprobar
+                    <button
+                      type="button"
+                      onClick={approve}
+                      disabled={approveLoading}
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-green-600/25 bg-green-600/10 py-2.5 text-xs font-bold text-green-700 transition-colors hover:bg-green-600/15 disabled:cursor-wait disabled:opacity-60 dark:text-green-400"
+                    >
+                      {approveLoading ? (
+                        <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>
+                      ) : (
+                        <span className="material-symbols-outlined text-sm">check_circle</span>
+                      )}
+                      {approveLoading ? 'Aprobando...' : 'Aprobar'}
                     </button>
                     <button type="button" onClick={() => setOpenReject(true)} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-error/25 bg-error/10 py-2.5 text-xs font-bold text-error transition-colors hover:bg-error/15">
                       <span className="material-symbols-outlined text-sm">cancel</span> Rechazar
@@ -453,15 +552,21 @@ export default function NovedadesPage() {
       </div>
 
       <Modal open={openCreate} title="Nueva novedad" subtitle="Cargá una novedad manual para un empleado." onClose={() => setOpenCreate(false)} size="max-w-lg">
-        <form className="space-y-5 px-8 py-6" onSubmit={(e) => { e.preventDefault(); setOpenCreate(false); showToast('Novedad cargada. Estado: Pendiente.') }}>
+        <form className="space-y-5 px-8 py-6" onSubmit={handleCreate}>
           <Field label="Empleado *">
-            <SelectInput required>
+            <SelectInput required name="employeeRef">
               <option value="">Seleccionar empleado...</option>
-              {employeeOptions.map((o) => <option key={o}>{o}</option>)}
+              {api
+                ? apiEmployees.map((e) => {
+                    const label = `${String(e.legajo).padStart(4, '0')} · ${e.name ?? e.nombre ?? ''}`
+                    return <option key={e.legajo} value={label}>{label}</option>
+                  })
+                : employeeOptions.map((o) => <option key={o}>{o}</option>)
+              }
             </SelectInput>
           </Field>
           <Field label="Tipo de novedad *">
-            <SelectInput required value={novType} onChange={(e) => setNovType(e.target.value)}>
+            <SelectInput required name="tipo" value={novType} onChange={(e) => setNovType(e.target.value)}>
               <option value="">Seleccionar tipo...</option>
               <optgroup label="Horas extra">
                 <option value="horas_extra_50">Horas extra 50%</option>
@@ -470,8 +575,7 @@ export default function NovedadesPage() {
               <optgroup label="Ausencias y licencias">
                 <option value="justificacion">Justificación de ausencia</option>
                 <option value="ausencia">Ausencia injustificada</option>
-                <option value="licencia_enfermedad">Licencia por enfermedad</option>
-                <option value="licencia_examen">Licencia por examen</option>
+                <option value="licencia">Licencia</option>
                 <option value="vacaciones">Vacaciones parciales</option>
                 <option value="permiso_especial">Permiso especial</option>
               </optgroup>
@@ -482,13 +586,13 @@ export default function NovedadesPage() {
             </SelectInput>
           </Field>
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Fecha desde *"><TextInput required type="date" /></Field>
-            <Field label="Fecha hasta"><TextInput type="date" /></Field>
+            <Field label="Fecha desde *"><TextInput required type="date" name="fechaDesde" /></Field>
+            <Field label="Fecha hasta"><TextInput type="date" name="fechaHasta" /></Field>
           </div>
           {HORAS_TYPES.includes(novType) && (
             <Field label="Cantidad de horas *">
               <div className="relative">
-                <TextInput type="number" min="0.5" max="24" step="0.5" placeholder="Ej: 2" required />
+                <TextInput type="number" min="0.5" max="24" step="0.5" placeholder="Ej: 2" required name="cantidad" />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant">hs</span>
               </div>
             </Field>
@@ -496,7 +600,7 @@ export default function NovedadesPage() {
           {MINUTOS_TYPES.includes(novType) && (
             <Field label="Cantidad de minutos *">
               <div className="relative">
-                <TextInput type="number" min="1" max="480" placeholder="Ej: 15" required />
+                <TextInput type="number" min="1" max="480" placeholder="Ej: 15" required name="cantidad" />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant">min</span>
               </div>
             </Field>
@@ -504,15 +608,15 @@ export default function NovedadesPage() {
           {DIAS_TYPES.includes(novType) && (
             <Field label="Cantidad de días *">
               <div className="relative">
-                <TextInput type="number" min="1" max="365" placeholder="Ej: 1" required />
+                <TextInput type="number" min="1" max="365" placeholder="Ej: 1" required name="cantidad" />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant">días</span>
               </div>
             </Field>
           )}
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Fecha de creación *"><TextInput required type="date" defaultValue={new Date().toISOString().slice(0, 10)} /></Field>
+            <Field label="Fecha de creación *"><TextInput required type="date" defaultValue={creationDate} disabled /></Field>
             <Field label="Creado por *">
-              <SelectInput required>
+              <SelectInput required disabled>
                 <option>Administrator</option>
                 <option>Supervisor RRHH</option>
                 <option>Jefe de área</option>
@@ -520,21 +624,26 @@ export default function NovedadesPage() {
             </Field>
           </div>
           <Field label="Observación">
-            <textarea rows={2} placeholder="Detalle adicional (opcional)..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            <textarea name="observacion" aria-label="Observación" rows={2} placeholder="Detalle adicional (opcional)..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
           </Field>
           <div className="flex gap-3 border-t border-slate-100 pt-2">
-            <button type="button" onClick={() => setOpenCreate(false)} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">Cancelar</button>
-            <button type="submit" className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary/90">
-              <span className="material-symbols-outlined text-sm">add</span> Cargar novedad
+            <button type="button" onClick={() => setOpenCreate(false)} disabled={createLoading} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low disabled:opacity-50">Cancelar</button>
+            <button type="submit" disabled={createLoading} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary/90 disabled:opacity-50">
+              {createLoading ? <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span> : <span className="material-symbols-outlined text-sm">add</span>}
+              Cargar novedad
             </button>
           </div>
         </form>
       </Modal>
 
       <Modal open={openReject} title="Rechazar novedad" onClose={() => setOpenReject(false)} size="max-w-sm">
-        <form className="space-y-4 px-8 py-6" onSubmit={(e) => { e.preventDefault(); reject() }}>
+        <form className="space-y-4 px-8 py-6" onSubmit={(e) => {
+          e.preventDefault()
+          const motivo = new FormData(e.currentTarget).get('motivo')
+          reject(String(motivo ?? '').trim())
+        }}>
           <Field label="Motivo de rechazo *">
-            <textarea required rows={3} placeholder="Indicá el motivo del rechazo..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-error focus:outline-none focus:ring-2 focus:ring-error/30" />
+            <textarea required name="motivo" aria-label="Motivo de rechazo" rows={3} placeholder="Indicá el motivo del rechazo..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-error focus:outline-none focus:ring-2 focus:ring-error/30" />
           </Field>
           <div className="flex gap-3">
             <button type="button" onClick={() => setOpenReject(false)} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">Cancelar</button>
@@ -544,7 +653,7 @@ export default function NovedadesPage() {
       </Modal>
 
       {toast && (
-        <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-3 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-2xl">
+        <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-3 rounded-xl bg-slate-900 dark:bg-surface-container-highest px-5 py-3 text-sm font-semibold text-white shadow-2xl">
           <span className="material-symbols-outlined text-green-400" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
           {toast}
         </div>

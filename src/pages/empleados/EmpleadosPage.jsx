@@ -60,6 +60,39 @@ function calculateCuil(dni, sexo) {
   return `${prefix}-${dni}-${dni.slice(-1)}`
 }
 
+function parseCsvLine(line) {
+  const values = []
+  let current = ''
+  let quoted = false
+  for (let i = 0; i < line.length; i += 1) {
+    const char = line[i]
+    const next = line[i + 1]
+    if (char === '"' && quoted && next === '"') {
+      current += '"'
+      i += 1
+    } else if (char === '"') {
+      quoted = !quoted
+    } else if (char === ',' && !quoted) {
+      values.push(current.trim())
+      current = ''
+    } else {
+      current += char
+    }
+  }
+  values.push(current.trim())
+  return values
+}
+
+function parseEmployeesCsv(text) {
+  const lines = String(text).split(/\r?\n/).filter((line) => line.trim())
+  if (lines.length < 2) return []
+  const headers = parseCsvLine(lines[0]).map((h) => h.trim())
+  return lines.slice(1).map((line) => {
+    const values = parseCsvLine(line)
+    return Object.fromEntries(headers.map((header, index) => [header, values[index] ?? '']))
+  })
+}
+
 export default function EmpleadosPage() {
   const api = isApiMode()
   const [employees, setEmployees] = useState([])
@@ -68,6 +101,9 @@ export default function EmpleadosPage() {
   const [filters, setFilters] = useState({ category: '', jornada: '', status: '' })
   const [page, setPage] = useState(1)
   const [open, setOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
+  const [importLoading, setImportLoading] = useState(false)
+  const [importResult, setImportResult] = useState('')
   const [loading, setLoading] = useState(true)
   const [form, setForm] = useState({
     nombre: '', apellido: '', dni: '', sexo: '', fechaIngreso: '',
@@ -236,6 +272,63 @@ export default function EmpleadosPage() {
     }
   }
 
+  async function reloadEmployees() {
+    const data = await listEmployees({ page: 1, pageSize: 500 })
+    setEmployees(data?.items ?? [])
+    const st = data?.stats ?? {}
+    setStats({
+      totalActivos:    st.active          ?? st.totalActivos  ?? 0,
+      jornadaCompleta: st.jornadaCompleta ?? 0,
+      jornadaParcial:  st.jornadaParcial  ?? st.partial       ?? 0,
+      bajasEsteMes:    st.bajasEsteMes    ?? 0,
+    })
+  }
+
+  async function handleImportFile(event) {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setImportLoading(true)
+    setImportResult('')
+    try {
+      const text = await file.text()
+      const rows = parseEmployeesCsv(text)
+      if (!rows.length) throw new Error('El CSV no contiene empleados.')
+      const payloads = rows.map((row) => {
+        const dni = String(row.dni ?? row.DNI ?? '').replace(/\D/g, '')
+        const sexo = row.sexo ?? row.Sexo ?? 'X'
+        const payload = {
+          nombre: row.nombre ?? row.Nombre,
+          apellido: row.apellido ?? row.Apellido,
+          dni,
+          cuil: row.cuil ?? row.CUIL ?? calculateCuil(dni, sexo),
+          fechaIngreso: row.fechaIngreso ?? row.fecha_ingreso ?? row.Ingreso,
+          categoria: row.categoria ?? row.Categoria ?? '',
+          convenio: row.convenio ?? row.Convenio ?? '',
+          jornada: row.jornada ?? row.Jornada ?? 'Completa',
+          parcialHoras: row.parcialHoras || row.horasParcial ? Number(row.parcialHoras || row.horasParcial) : undefined,
+          fichada: row.fichada ?? row.Fichada ?? 'Biométrico',
+        }
+        if (!payload.nombre || !payload.apellido || !payload.dni || !payload.cuil || !payload.fechaIngreso || !payload.jornada) {
+          throw new Error('Cada fila debe incluir nombre, apellido, dni, cuil o sexo, fechaIngreso y jornada.')
+        }
+        return payload
+      })
+      await Promise.all(payloads.map((payload) => createEmployee(payload)))
+      const createdCount = payloads.length
+      if (api) await reloadEmployees()
+      else {
+        const data = await listEmployees()
+        setEmployees(data?.items ?? [])
+      }
+      setImportResult(`${createdCount} empleado${createdCount === 1 ? '' : 's'} importado${createdCount === 1 ? '' : 's'} correctamente.`)
+    } catch (e) {
+      setImportResult(`Error: ${e.message}`)
+    } finally {
+      setImportLoading(false)
+      event.target.value = ''
+    }
+  }
+
   const clearFilters = () => {
     setSearch('')
     setFilters({ category: '', jornada: '', status: '' })
@@ -336,13 +429,22 @@ export default function EmpleadosPage() {
         title="Gestión de Empleados"
         subtitle="Administre el personal activo de la organización."
         actions={
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dim"
-          >
-            <span className="material-symbols-outlined text-sm">person_add</span> Nuevo empleado
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setImportOpen(true)}
+              className="flex items-center gap-2 rounded-md border border-primary/20 bg-surface-container-lowest px-4 py-2 text-sm font-semibold text-primary shadow-sm transition-colors hover:bg-primary/5"
+            >
+              <span className="material-symbols-outlined text-sm">upload_file</span> Importar CSV
+            </button>
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dim"
+            >
+              <span className="material-symbols-outlined text-sm">person_add</span> Nuevo empleado
+            </button>
+          </div>
         }
       />
 
@@ -539,7 +641,7 @@ export default function EmpleadosPage() {
                     value={form.parcialHoras}
                     onChange={(e) => setForm((f) => ({ ...f, parcialHoras: e.target.value }))}
                     placeholder="Ej: 4"
-                    className="w-32 rounded-lg border border-outline-variant/40 bg-white px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    className="w-32 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                   <span className="text-sm font-medium text-on-surface-variant">hs / día <span className="text-on-surface-variant/60">(máx. 7)</span></span>
                 </div>
@@ -615,6 +717,31 @@ export default function EmpleadosPage() {
             </button>
           </div>
         </form>
+      </Modal>
+
+      <Modal open={importOpen} title="Importar empleados" subtitle="Carga masiva inicial desde CSV con encabezados." onClose={() => setImportOpen(false)} size="max-w-xl">
+        <div className="space-y-5 px-8 py-6">
+          <div className="rounded-lg bg-surface-container-low p-4 text-xs text-on-surface-variant">
+            <p className="mb-2 font-bold text-on-surface">Encabezados aceptados</p>
+            <p className="font-mono">nombre,apellido,dni,sexo,fechaIngreso,categoria,convenio,jornada,parcialHoras,fichada</p>
+          </div>
+          <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-primary/30 bg-primary-container/10 px-6 py-10 text-center transition-colors hover:bg-primary-container/20">
+            <span className="material-symbols-outlined mb-2 text-4xl text-primary">upload_file</span>
+            <span className="text-sm font-bold text-primary">{importLoading ? 'Importando...' : 'Seleccionar CSV'}</span>
+            <span className="mt-1 text-xs text-on-surface-variant">El archivo se procesa localmente y se crean empleados con el endpoint actual.</span>
+            <input type="file" accept=".csv,text/csv" disabled={importLoading} onChange={handleImportFile} className="hidden" />
+          </label>
+          {importResult && (
+            <div className={`rounded-lg px-4 py-3 text-sm font-semibold ${importResult.startsWith('Error') ? 'bg-error-container/30 text-error' : 'bg-green-50 text-green-700'}`}>
+              {importResult}
+            </div>
+          )}
+          <div className="flex justify-end border-t border-slate-100 pt-4">
+            <button type="button" onClick={() => setImportOpen(false)} className="rounded-lg border border-outline-variant/40 px-5 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">
+              Cerrar
+            </button>
+          </div>
+        </div>
       </Modal>
     </AppShell>
   )

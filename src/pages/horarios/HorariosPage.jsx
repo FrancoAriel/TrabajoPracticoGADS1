@@ -539,10 +539,10 @@ export default function HorariosPage() {
       topbarTitle="HORARIOS"
       topbarContent={horarioTopbar}
     >
-      {toast ? <div className="fixed bottom-6 right-6 z-[60] max-w-sm rounded-lg bg-slate-800 px-4 py-3 text-xs font-semibold text-white shadow-lg">{toast}</div> : null}
+      {toast ? <div className="fixed bottom-6 right-6 z-[60] max-w-sm rounded-lg bg-slate-800 dark:bg-surface-container-highest px-4 py-3 text-xs font-semibold text-white shadow-lg">{toast}</div> : null}
       <div className="relative">
         {listLoading && api ? (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/75">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface-container-lowest/75">
             <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
           </div>
         ) : null}
@@ -1039,14 +1039,14 @@ function ScheduleModal({ open, mode, initialSchedule, apiMode, onClose, onDone }
               Configuración de flexibilidad
             </p>
             <div className="flex gap-3">
-              <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-outline-variant/40 bg-white p-3">
+              <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-outline-variant/40 bg-surface-container-lowest p-3">
                 <input type="radio" name="modo-flex-sch" checked={flexMode === 'diaria'} onChange={() => setFlexMode('diaria')} />
                 <div>
                   <p className="text-sm font-semibold">Diaria</p>
                   <p className="text-[10px] text-on-surface-variant">Objetivo por día</p>
                 </div>
               </label>
-              <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-outline-variant/40 bg-white p-3">
+              <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-outline-variant/40 bg-surface-container-lowest p-3">
                 <input type="radio" name="modo-flex-sch" checked={flexMode === 'semanal'} onChange={() => setFlexMode('semanal')} />
                 <div>
                   <p className="text-sm font-semibold">Semanal</p>

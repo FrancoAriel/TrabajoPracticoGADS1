@@ -1,0 +1,2 @@
+nombre,apellido,dni,sexo,fechaIngreso,categoria,convenio,jornada,parcialHoras,fichada
+Test,Empleado,12345678,X,2026-06-01,Admin,Fuera de convenio,Completa,,Biométrico

@@ -337,7 +337,7 @@ export default function FichadasPage() {
   const initialLoadPendingRef = useRef(api)
   const [initialLoading, setInitialLoading] = useState(api)
   const [manualForm, setManualForm] = useState({
-    legajo: '', fecha: today, hora: '09:00', tipo: 'Entrada',
+    legajo: '', fecha: today, hora: '09:00', tipo: 'Entrada', origen: 'Manual',
   })
   const [corrForm, setCorrForm] = useState({
     fecha: today, hora: '09:00', tipo: 'Entrada',
@@ -464,7 +464,7 @@ export default function FichadasPage() {
       return
     }
     try {
-      const res = await createManualPunch({ legajo: legajoNum, fechaHora, tipo: manualForm.tipo })
+      const res = await createManualPunch({ legajo: legajoNum, fechaHora, tipo: manualForm.tipo, origen: manualForm.origen })
       const extra = extraMsgFromAttendanceEvaluation(res?.attendanceEvaluation)
       showToast(`Fichada manual registrada.${extra}`.trim())
       setOpenManual(false)
@@ -549,6 +549,14 @@ export default function FichadasPage() {
           <p className="mt-1 text-sm text-on-surface-variant">Registros de asistencia del personal.</p>
         </div>
         <div className="flex gap-3">
+          <Link
+            to={routes.fichar}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 rounded-md border border-outline-variant/40 bg-surface-container-low px-4 py-2 text-sm font-semibold text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-primary"
+          >
+            <span className="material-symbols-outlined text-sm">open_in_new</span> Abrir terminal
+          </Link>
           <button
             type="button"
             onClick={() => { if (api) showToast('Reprocesamiento no disponible en API básica.'); else showToast('Interpretación reprocesada correctamente.') }}
@@ -570,7 +578,7 @@ export default function FichadasPage() {
 
       <div className="relative overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest">
         {loading && !initialLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface-container-lowest/70">
             <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
           </div>
         )}
@@ -735,15 +743,15 @@ export default function FichadasPage() {
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-3">
-                <div className="rounded-lg border-b-2 border-error bg-white p-3">
+                <div className="rounded-lg border-b-2 border-error bg-surface-container-lowest p-3">
                   <p className="text-[10px] font-bold uppercase text-on-surface-variant">Tardanza</p>
                   <p className="text-base font-black text-error">{selected.tipo === 'Entrada' && !api ? '6 min' : '—'}</p>
                 </div>
-                <div className="rounded-lg border-b-2 border-primary bg-white p-3">
+                <div className="rounded-lg border-b-2 border-primary bg-surface-container-lowest p-3">
                   <p className="text-[10px] font-bold uppercase text-on-surface-variant">Horas extra</p>
                   <p className="text-base font-black text-primary">{selected.tipo === 'Salida' && !api ? '105 min' : '—'}</p>
                 </div>
-                <div className="rounded-lg border-b-2 border-on-secondary-container bg-white p-3">
+                <div className="rounded-lg border-b-2 border-on-secondary-container bg-surface-container-lowest p-3">
                   <p className="text-[10px] font-bold uppercase text-on-surface-variant">Efectivo</p>
                   <p className="text-base font-black text-on-secondary-container">{selected.tipo === 'Salida' && !api ? '9h 45m' : '—'}</p>
                 </div>
@@ -819,12 +827,21 @@ export default function FichadasPage() {
               ))}
             </div>
           </Field>
+          <Field label="Origen *">
+            <SelectInput required value={manualForm.origen} onChange={(e) => setManualForm((f) => ({ ...f, origen: e.target.value }))}>
+              <option value="Manual">Manual</option>
+              <option value="Biometrico">Biométrico</option>
+              <option value="Qr">QR</option>
+              <option value="Pin">PIN / Teclado</option>
+              <option value="Api">API externa</option>
+            </SelectInput>
+          </Field>
           <Field label="Motivo *">
             <textarea required rows={2} placeholder="Describí el motivo del registro manual..." className="w-full resize-none rounded-lg border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
           </Field>
           <div className="flex items-start gap-2 rounded-lg border border-tertiary/20 bg-tertiary-container/20 p-3">
             <span className="material-symbols-outlined mt-0.5 text-sm text-tertiary">info</span>
-            <p className="text-[11px] text-on-tertiary-container">Quedará marcada como <strong>Manual</strong> con tu usuario y el motivo ingresado.</p>
+            <p className="text-[11px] text-on-tertiary-container">Quedará registrada con origen trazable. Para fichadas por terminal usá la pantalla pública con legajo; acá podés simular otros orígenes o cargar manualmente.</p>
           </div>
           <div className="flex gap-3 border-t border-slate-100 pt-2">
             <button type="button" onClick={() => setOpenManual(false)} className="flex-1 rounded-lg border border-outline-variant/40 py-2.5 text-sm font-bold text-on-surface-variant transition-colors hover:bg-surface-container-low">Cancelar</button>
@@ -898,7 +915,7 @@ export default function FichadasPage() {
         </form>
       </Modal>
       {toast && (
-        <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-3 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-2xl">
+        <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-3 rounded-xl bg-slate-900 dark:bg-surface-container-highest px-5 py-3 text-sm font-semibold text-white shadow-2xl">
           <span className="material-symbols-outlined text-green-400" style={{ fontVariationSettings: '"FILL" 1' }}>check_circle</span>
           {toast}
         </div>

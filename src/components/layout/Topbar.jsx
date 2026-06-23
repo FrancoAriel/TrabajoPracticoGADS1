@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
+import { getSession } from '../../lib/session'
+import ThemeToggle from '../ui/ThemeToggle'
 
 export default function Topbar({ title, children }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
+  const session = getSession()
+  const user = session?.user
 
   useEffect(() => {
     function handleClick(e) {
@@ -19,12 +23,13 @@ export default function Topbar({ title, children }) {
         {children}
       </div>
       <div className="flex items-center gap-6">
+        <ThemeToggle />
         <div className="relative" ref={ref}>
-          <button type="button" onClick={() => setOpen((v) => !v)} className="text-slate-500 transition-all hover:text-blue-900">
+          <button type="button" onClick={() => setOpen((v) => !v)} className="text-slate-500 transition-all hover:text-on-surface">
             <span className="material-symbols-outlined">notifications</span>
           </button>
           {open && (
-            <div className="absolute right-0 top-10 z-50 w-72 overflow-hidden rounded-xl border border-slate-200/50 bg-white shadow-xl">
+            <div className="absolute right-0 top-10 z-50 w-72 overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest shadow-xl">
               <div className="border-b border-slate-100 px-4 py-3">
                 <p className="font-headline text-xs font-extrabold uppercase tracking-widest text-on-background">Notificaciones</p>
               </div>
@@ -37,11 +42,11 @@ export default function Topbar({ title, children }) {
         </div>
         <div className="flex items-center gap-3 border-l border-slate-200/50 pl-6">
           <div className="text-right">
-            <p className="font-headline text-[10px] font-bold leading-none text-slate-900">ADMINISTRATOR</p>
-            <p className="mt-1 font-headline text-[9px] uppercase tracking-widest text-slate-500">Super User</p>
+            <p className="font-headline text-[10px] font-bold leading-none text-slate-900">{(user?.name ?? 'Administrator').toUpperCase()}</p>
+            <p className="mt-1 font-headline text-[9px] uppercase tracking-widest text-slate-500">{user?.role ?? 'Super User'}</p>
           </div>
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary font-headline text-xs font-bold text-on-primary">
-            AD
+            {user?.initials ?? 'AD'}
           </div>
         </div>
       </div>
