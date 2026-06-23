@@ -369,66 +369,52 @@ export default function EmpleadoDetallePage() {
                 </span>
               </p>
             </div>
-            <div className="flex w-full shrink-0 flex-wrap items-stretch justify-start gap-3 sm:w-auto sm:justify-end">
+            <div className="flex flex-wrap items-center justify-end gap-2">
               <div
-                className="flex min-w-[min(100%,18rem)] flex-1 overflow-hidden rounded-2xl border border-slate-200/90 bg-surface-container-lowest shadow-[0_2px_8px_-2px_rgba(15,23,42,0.08),0_1px_2px_rgba(15,23,42,0.04)] sm:max-w-md sm:flex-initial dark:border-outline-variant/30 dark:bg-surface-container-low"
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-200/70 bg-surface-container-low px-3 py-2 dark:border-outline-variant/30"
                 role="group"
                 aria-label="Estado laboral del empleado"
               >
-                <div className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(145deg,#5a739c_0%,#3d5780_100%)] text-white shadow-inner shadow-black/10">
-                    <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: '"FILL" 1' }}>work_history</span>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-on-surface-variant/80">
-                      Estado laboral
-                    </p>
-                    <div className="mt-1.5 flex items-center gap-2">
-                      <span
-                        className={`h-2.5 w-2.5 shrink-0 rounded-full ring-2 ring-white dark:ring-surface-container-low ${statusDot(statusSelect)}`}
-                        aria-hidden
-                      />
-                      <div className="relative min-w-0 flex-1">
-                        <select
-                          value={statusSelect}
-                          onChange={(e) => setStatusSelect(e.target.value)}
-                          disabled={estadoSaving}
-                          className={`w-full appearance-none truncate rounded-xl border border-outline-variant/30 bg-surface-container-high/70 py-2 pl-3 pr-9 text-[13px] font-bold tracking-tight shadow-[inset_0_1px_2px_rgba(15,23,42,0.04)] outline-none transition-[box-shadow,border-color] hover:border-outline-variant/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50 ${statusTextStrong(statusSelect)}`}
-                        >
-                          {ESTADOS_LABORALES.map((s) => (
-                            <option key={s} value={s}>{s}</option>
-                          ))}
-                        </select>
-                        <span className="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant/50">
-                          expand_more
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  disabled={estadoSaving || statusSelect === emp.status}
-                  onClick={handleEstadoSave}
-                  title={statusSelect === emp.status ? 'Sin cambios' : 'Guardar estado laboral'}
-                  className="flex shrink-0 items-center gap-2 border-l border-slate-200/90 bg-gradient-to-br from-primary/8 to-transparent px-4 py-3 text-xs font-bold uppercase tracking-wide text-primary transition-colors hover:from-primary/14 disabled:cursor-not-allowed disabled:opacity-[0.35] dark:border-outline-variant/30"
-                >
-                  <span
-                    className={`material-symbols-outlined text-[20px] ${estadoSaving ? 'animate-spin' : ''}`}
-                    style={{ fontVariationSettings: '"FILL" 1' }}
+                <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">
+                  Estado
+                </span>
+                <span className={`h-2 w-2 shrink-0 rounded-full ${statusDot(statusSelect)}`} aria-hidden />
+                <div className="relative">
+                  <select
+                    value={statusSelect}
+                    onChange={(e) => setStatusSelect(e.target.value)}
+                    disabled={estadoSaving}
+                    className={`appearance-none rounded-md border-0 bg-transparent py-0.5 pl-1 pr-7 text-sm font-semibold outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50 ${statusTextStrong(statusSelect)}`}
                   >
-                    {estadoSaving ? 'progress_activity' : 'check_circle'}
+                    {ESTADOS_LABORALES.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                  <span className="material-symbols-outlined pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-base text-on-surface-variant/60">
+                    expand_more
                   </span>
-                  <span className="hidden min-[420px]:inline">{estadoSaving ? 'Guardando' : 'Aplicar'}</span>
-                </button>
+                </div>
+                {statusSelect !== emp.status ? (
+                  <button
+                    type="button"
+                    disabled={estadoSaving}
+                    onClick={handleEstadoSave}
+                    title="Guardar estado laboral"
+                    className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-1 text-[11px] font-bold uppercase tracking-wide text-primary transition-colors hover:bg-primary/15 disabled:opacity-50"
+                  >
+                    <span className={`material-symbols-outlined text-sm ${estadoSaving ? 'animate-spin' : ''}`}>
+                      {estadoSaving ? 'progress_activity' : 'check'}
+                    </span>
+                    Guardar
+                  </button>
+                ) : null}
               </div>
               <button
                 type="button"
                 onClick={() => setOpenEdit(true)}
-                className="flex min-h-[3.5rem] min-w-[12rem] flex-1 items-center justify-center gap-2 self-stretch rounded-2xl px-5 text-sm font-semibold text-on-primary shadow-[0_4px_14px_-4px_rgba(57,83,124,0.55)] transition-[transform,box-shadow] hover:scale-[0.99] hover:shadow-[0_6px_20px_-4px_rgba(57,83,124,0.45)] sm:flex-initial sm:py-4"
-                style={{ background: 'linear-gradient(135deg, #455f88 0%, #39537c 100%)' }}
+                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-on-primary transition-opacity hover:opacity-90"
               >
-                <span className="material-symbols-outlined text-xl">edit</span>
+                <span className="material-symbols-outlined text-base">edit</span>
                 Editar empleado
               </button>
             </div>
