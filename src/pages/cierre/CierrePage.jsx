@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AppShell from '../../components/layout/AppShell'
 import Modal from '../../components/ui/Modal'
@@ -6,6 +6,7 @@ import { isApiMode } from '../../config/env'
 import { getSession } from '../../lib/session'
 import { routes } from '../../lib/routes'
 import { createClosure, getCurrentClosure, runClosure } from '../../services/closureService'
+import { buildNavPeriodCards, resolveReprocessRange } from '../../lib/closurePeriods'
 import { reprocessRange } from '../../services/reasoningService'
 
 const employees = [
@@ -101,18 +102,6 @@ function ReprocessResultPanel({ result }) {
   )
 }
 
-function isoYmd(date = new Date()) {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const d = String(date.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}`
-}
-
-function firstDayOfMonth() {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
-}
-
 export default function CierrePage() {
   const api = isApiMode()
   const canMutate = !api || getSession()?.user?.role === 'Admin'
@@ -124,8 +113,8 @@ export default function CierrePage() {
   const [closureMessage, setClosureMessage] = useState('')
   const [closureError, setClosureError] = useState('')
   const [reprocessOpen, setReprocessOpen] = useState(false)
-  const [reprocessDesde, setReprocessDesde] = useState(() => firstDayOfMonth())
-  const [reprocessHasta, setReprocessHasta] = useState(() => isoYmd())
+  const [reprocessDesde, setReprocessDesde] = useState('')
+  const [reprocessHasta, setReprocessHasta] = useState('')
   const [reprocessDryRun, setReprocessDryRun] = useState(true)
   const [reprocessLegajos, setReprocessLegajos] = useState('')
   const [reprocessLoading, setReprocessLoading] = useState(false)
@@ -135,7 +124,7 @@ export default function CierrePage() {
 
   useEffect(() => { document.title = 'Cierre Mensual - Executive Architect' }, [])
 
-  async function loadClosure(periodo = selectedPeriod) {
+  async function loadClosure(periodo) {
     setClosureLoading(true)
     setClosureError('')
     try {
@@ -144,8 +133,9 @@ export default function CierrePage() {
       if (data?.currentPeriod) {
         setSelectedPeriod(data.currentPeriod)
       }
-      if (data?.periodRange?.desde) setReprocessDesde(data.periodRange.desde)
-      if (data?.periodRange?.hasta) setReprocessHasta(data.periodRange.hasta)
+      const range = resolveReprocessRange(data?.currentPeriod, data?.periodRange)
+      if (range.desde) setReprocessDesde(range.desde)
+      if (range.hasta) setReprocessHasta(range.hasta)
     } catch (e) {
       setClosureError(e?.message ?? 'No se pudo cargar el cierre.')
     } finally {
@@ -158,18 +148,28 @@ export default function CierrePage() {
   }, [])
 
   function selectPeriod(periodo) {
-    if (!periodo || periodo === selectedPeriod) return
+    if (!periodo) return
+    const viewed = selectedPeriod || closureData?.currentPeriod
+    if (periodo === viewed) return
     setSelected(null)
+    setSelectedPeriod(periodo)
     loadClosure(periodo)
   }
 
   const currentPeriod = closureData?.currentPeriod ?? (api ? '—' : 'Junio 2025')
+  const viewedPeriod = selectedPeriod || currentPeriod
   const stats = closureData?.stats ?? (api ? { liquidated: 0, pending: 0, he50: '0', he100: '0' } : { liquidated: 39, pending: 3, he50: '42h 15m', he100: '8h 00m' })
-  const periodCards = closureData?.periodCards?.length ? closureData.periodCards : (api ? [] : [
-    { id: 'may-2025', label: 'Mayo 2025', status: 'Cerrado', sub: 'Cerrado el 05/06/2025' },
-    { id: 'jun-2025', label: 'Junio 2025', status: 'En progreso', sub: '3 novedades pendientes' },
-    { id: 'jul-2025', label: 'Julio 2025', status: 'Futuro', sub: 'Aún no iniciado' },
-  ])
+  const availablePeriods = closureData?.availablePeriods ?? []
+  const periodCards = useMemo(() => {
+    if (!api) {
+      return closureData?.periodCards?.length ? closureData.periodCards : [
+        { id: 'may-2025', label: 'Mayo 2025', status: 'Cerrado', sub: 'Cerrado el 05/06/2025' },
+        { id: 'jun-2025', label: 'Junio 2025', status: 'En progreso', sub: '3 novedades pendientes' },
+        { id: 'jul-2025', label: 'Julio 2025', status: 'Futuro', sub: 'Aún no iniciado' },
+      ]
+    }
+    return buildNavPeriodCards(viewedPeriod, availablePeriods, closureData?.history ?? [])
+  }, [api, viewedPeriod, availablePeriods, closureData?.history, closureData?.periodCards])
   const rawEmployees = closureData?.employeeBreakdown?.length ? closureData.employeeBreakdown : (api ? [] : employees)
   const closureEmployees = rawEmployees.map((emp) => ({
     name: emp.name,
@@ -215,12 +215,14 @@ export default function CierrePage() {
     : (api ? [] : checklist)
 
   const hasClosureData = Boolean(closureData)
-  const closureStatus = closureData?.currentClosure?.estado ?? 'Abierto'
+  const viewedPeriodMeta = availablePeriods.find((p) => p.label === viewedPeriod)
+  const closureStatus = viewedPeriodMeta?.status === 'Cerrado' || closureData?.isClosed
+    ? 'Cerrado'
+    : (closureData?.currentClosure?.estado ?? 'Abierto')
   const isClosedClosure = closureStatus === 'Cerrado'
   const isFuturePeriod = Boolean(closureData?.isFuture)
   const isCurrentMonth = Boolean(closureData?.isCurrentMonth)
   const canClosePeriod = closureData?.canClose ?? (!isClosedClosure && !isFuturePeriod && Number(stats.pending ?? 0) === 0)
-  const availablePeriods = closureData?.availablePeriods ?? []
 
   function periodOptionSuffix(period) {
     if (period.status === 'Cerrado') return ' · Cerrado'
@@ -249,15 +251,15 @@ export default function CierrePage() {
     try {
       let closure = closureData?.currentClosure
       if (!closure?.id) {
-        const created = await createClosure({ periodo: currentPeriod })
+        const created = await createClosure({ periodo: viewedPeriod })
         closure = { id: created.id_cierre ?? created.id, periodo: created.periodo, estado: created.estado }
       }
       const result = await runClosure(closure.id, {
-        archivoExportado: `cierre_${currentPeriod.replace(/\s+/g, '_')}.csv`,
+        archivoExportado: `cierre_${viewedPeriod.replace(/\s+/g, '_')}.csv`,
       })
       setClosureMessage(`Cierre ejecutado. Novedades incluidas: ${result.novedadesIncluidas ?? 0}.`)
       setClosureConfirmOpen(false)
-      await loadClosure(currentPeriod)
+      await loadClosure(viewedPeriod)
     } catch (e) {
       setClosureError(e?.message ?? 'No se pudo ejecutar el cierre.')
     } finally {
@@ -279,6 +281,10 @@ export default function CierrePage() {
     setReprocessError(null)
     setReprocessResult(null)
     try {
+      if (reprocessHasta < reprocessDesde) {
+        setReprocessError('No hay días completos para reprocesar en este período (el mes recién empezó).')
+        return
+      }
       const legajosArr = String(reprocessLegajos)
         .split(',')
         .map((s) => Number(s.trim()))
@@ -290,7 +296,7 @@ export default function CierrePage() {
         legajos: legajosArr.length ? legajosArr : undefined,
       })
       setReprocessResult(res?.data ?? res)
-      await loadClosure(selectedPeriod || currentPeriod)
+      await loadClosure(viewedPeriod)
     } catch (e) {
       setReprocessError(e?.message ?? 'Error al reprocesar')
     } finally {
@@ -299,6 +305,9 @@ export default function CierrePage() {
   }
 
   function openReprocessModal() {
+    const range = resolveReprocessRange(viewedPeriod, closureData?.periodRange)
+    if (range.desde) setReprocessDesde(range.desde)
+    if (range.hasta) setReprocessHasta(range.hasta)
     setReprocessError(null)
     setReprocessResult(null)
     setReprocessDryRun(true)
@@ -314,13 +323,7 @@ export default function CierrePage() {
 
   return (
     <AppShell topbarTitle="CIERRE MENSUAL">
-      {api && closureLoading && hasClosureData ? (
-        <div className="mb-4 flex items-center gap-2 rounded-lg border border-primary/15 bg-primary/5 px-4 py-3 text-sm text-primary">
-          <span className="material-symbols-outlined animate-spin text-base">progress_activity</span>
-          Actualizando datos del cierre...
-        </div>
-      ) : null}
-
+      <div className={api && closureLoading && hasClosureData ? 'pointer-events-none opacity-60 transition-opacity' : 'transition-opacity'}>
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="font-headline text-2xl font-extrabold tracking-tight text-on-background">Cierre Mensual</h2>
@@ -330,12 +333,12 @@ export default function CierrePage() {
           <div className="relative flex items-center">
             <span className="material-symbols-outlined pointer-events-none absolute left-3 text-sm text-on-surface-variant">calendar_month</span>
             <select
-              value={selectedPeriod || currentPeriod}
+              value={viewedPeriod}
               onChange={(e) => selectPeriod(e.target.value)}
               disabled={closureLoading}
               className="appearance-none rounded-lg border border-slate-200/70 bg-surface-container-lowest py-2 pl-9 pr-8 text-sm font-semibold text-on-background focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-60"
             >
-              {(availablePeriods.length ? availablePeriods : [{ label: currentPeriod }]).map((p) => (
+              {(availablePeriods.length ? availablePeriods : [{ label: viewedPeriod }]).map((p) => (
                 <option key={p.label} value={p.label} disabled={p.isFuture}>
                   {p.label}{periodOptionSuffix(p)}
                 </option>
@@ -395,8 +398,8 @@ export default function CierrePage() {
         {periodCards.length ? periodCards.map((card) => {
           const normalizedStatus = String(card.status ?? '').toLowerCase()
           const isClosed = normalizedStatus === 'cerrado'
-          const isActive = card.label === (selectedPeriod || currentPeriod)
-          const isFuture = normalizedStatus === 'futuro'
+          const isActive = card.label === viewedPeriod
+          const isFuture = card.isFuture || normalizedStatus === 'futuro'
           const isInProgress = normalizedStatus === 'en curso' || normalizedStatus === 'en progreso'
           const wrapperClass = isActive
             ? 'relative cursor-pointer overflow-hidden rounded-xl bg-slate-900 dark:bg-surface-container-highest p-5 text-white ring-2 ring-primary/40'
@@ -448,7 +451,7 @@ export default function CierrePage() {
         <div className="col-span-12 overflow-hidden rounded-xl border border-slate-200/50 bg-surface-container-lowest lg:col-span-7">
           <div className="flex items-center justify-between gap-3 border-b border-slate-100 p-5">
             <h3 className="flex shrink-0 items-center gap-2 font-headline text-xs font-extrabold tracking-[0.2em]">
-              <span className="material-symbols-outlined text-sm">analytics</span> DESGLOSE POR EMPLEADO — {currentPeriod.toUpperCase()}
+              <span className="material-symbols-outlined text-sm">analytics</span> DESGLOSE POR EMPLEADO — {viewedPeriod.toUpperCase()}
             </h3>
             <span className={`shrink-0 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${isClosedClosure ? 'bg-green-50 text-green-700' : 'bg-tertiary-container/30 text-tertiary'}`}>
               {closureStatus}
@@ -517,7 +520,7 @@ export default function CierrePage() {
                   <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-black ${selected.avatarClass}`}>{selected.initials}</div>
                   <div>
                     <p className="text-sm font-bold">{selected.name}</p>
-                    <p className="text-xs text-on-surface-variant">Período: {currentPeriod}</p>
+                    <p className="text-xs text-on-surface-variant">Período: {viewedPeriod}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -580,6 +583,7 @@ export default function CierrePage() {
         <p className="mt-5 text-xs text-on-surface-variant">
           Elegí el período a cerrar con el selector o las tarjetas. Podés cerrar meses anteriores cuando no queden novedades pendientes.
         </p>
+      </div>
       </div>
 
       <Modal
@@ -713,7 +717,7 @@ export default function CierrePage() {
         open={closureConfirmOpen}
         onClose={closeClosureConfirm}
         title="Confirmar cierre mensual"
-        subtitle={currentPeriod}
+        subtitle={viewedPeriod}
         size="max-w-md"
       >
         <div className="space-y-5 px-8 py-6">
